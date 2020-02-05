@@ -13,14 +13,14 @@ type Resource struct {
 	Kind        string `json:"kind"`
 	Name        string `json:"name"`
 	URL         string `json:"url"`
-	Credentials struct {
+	Credentials *struct {
 		Username      string `json:"username"`
 		Password      string `json:"password"`
 		CACert        string `json:"ca_cert"`
 		ClientCert    string `json:"client_cert"`
 		ClientCertKey string `json:"client_cert_key"`
 		UseSSL        bool   `json:"ssl"`
-	} `json:"credentials"`
+	} `json:"credentials,omitempty"`
 	Configuration map[string]string `json:"configuration"`
 	Metadata      map[string]string `json:"metadata"`
 }
