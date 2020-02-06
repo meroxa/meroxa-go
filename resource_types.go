@@ -9,7 +9,7 @@ import (
 
 // ListResourceTypes returns the list of supported resources
 func (c *Client) ListResourceTypes(ctx context.Context) ([]string, error) {
-	path := fmt.Sprintf("/v1/plugins")
+	path := fmt.Sprintf("/v1/resource-types")
 
 	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
