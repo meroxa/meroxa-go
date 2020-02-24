@@ -9,7 +9,7 @@ import (
 
 type Connector struct {
 	ID            int                    `json:"id"`
-	Kind          string                 `json:"kind"`
+	Kind          string                 `json:"type"`
 	Name          string                 `json:"name"`
 	Configuration map[string]string      `json:"config"`
 	Metadata      map[string]string      `json:"metadata"`
