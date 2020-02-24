@@ -8,12 +8,12 @@ import (
 )
 
 type Connector struct {
-	ID            int               `json:"id"`
-	Kind          string            `json:"kind"`
-	Name          string            `json:"name"`
-	Configuration map[string]string `json:"configuration"`
-	Metadata      map[string]string `json:"metadata"`
-	Streams       map[string]string `json:"streams"`
+	ID            int                    `json:"id"`
+	Kind          string                 `json:"kind"`
+	Name          string                 `json:"name"`
+	Configuration map[string]string      `json:"configuration"`
+	Metadata      map[string]string      `json:"metadata"`
+	Streams       map[string]interface{} `json:"streams"`
 }
 
 // CreateConnection provisions a connection between the Resource and the Meroxa
