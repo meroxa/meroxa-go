@@ -39,6 +39,24 @@ func (c *Client) CreateConnection(ctx context.Context, resourceID int, config ma
 	return &con, nil
 }
 
+// ListConnections returns an array of Connections (scoped to the calling user)
+func (c *Client) ListConnections(ctx context.Context) ([]*Connector, error) {
+	path := fmt.Sprintf("/v1/connectors")
+
+	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var rr []*Connector
+	err = json.NewDecoder(resp.Body).Decode(&rr)
+	if err != nil {
+		return nil, err
+	}
+
+	return rr, nil
+}
+
 // GetConnection returns a Connector for the given connection ID
 func (c *Client) GetConnection(ctx context.Context, id int) (*Connector, error) {
 	path := fmt.Sprintf("/v1/connections/%d", id)
