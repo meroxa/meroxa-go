@@ -11,7 +11,7 @@ type Connector struct {
 	ID            int                    `json:"id"`
 	Kind          string                 `json:"kind"`
 	Name          string                 `json:"name"`
-	Configuration map[string]string      `json:"configuration"`
+	Configuration map[string]string      `json:"config"`
 	Metadata      map[string]string      `json:"metadata"`
 	Streams       map[string]interface{} `json:"streams"`
 }
