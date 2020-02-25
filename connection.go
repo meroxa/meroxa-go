@@ -99,7 +99,7 @@ func (c *Client) GetConnectionByName(ctx context.Context, name string) (*Connect
 
 // DeleteConnection deletes the Connector with the given id
 func (c *Client) DeleteConnection(ctx context.Context, id int) error {
-	path := fmt.Sprintf("/v1/connections/%d", id)
+	path := fmt.Sprintf("/v1/connectors/%d", id)
 
 	_, err := c.makeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {
