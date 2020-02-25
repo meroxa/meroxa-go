@@ -59,9 +59,31 @@ func (c *Client) ListConnections(ctx context.Context) ([]*Connector, error) {
 
 // GetConnection returns a Connector for the given connection ID
 func (c *Client) GetConnection(ctx context.Context, id int) (*Connector, error) {
-	path := fmt.Sprintf("/v1/connections/%d", id)
+	path := fmt.Sprintf("/v1/connectors/%d", id)
 
 	resp, err := c.makeRequest(ctx, http.MethodPost, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var con Connector
+	err = json.NewDecoder(resp.Body).Decode(&con)
+	if err != nil {
+		return nil, err
+	}
+
+	return &con, nil
+}
+
+// GetConnectionByName returns a Connection with the given name
+func (c *Client) GetConnectionByName(ctx context.Context, name string) (*Connector, error) {
+	path := fmt.Sprintf("/v1/connectors")
+
+	params := map[string][]string{
+		"name": []string{name},
+	}
+
+	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, params)
 	if err != nil {
 		return nil, err
 	}
