@@ -101,9 +101,13 @@ func (c *Client) GetConnectionByName(ctx context.Context, name string) (*Connect
 func (c *Client) DeleteConnection(ctx context.Context, id int) error {
 	path := fmt.Sprintf("/v1/connectors/%d", id)
 
-	_, err := c.makeRequest(ctx, http.MethodDelete, path, nil, nil)
+	resp, err := c.makeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {
 		return err
+	}
+
+	if resp.StatusCode > 204 {
+		return fmt.Errorf("Status %d, %s", resp.StatusCode, err)
 	}
 
 	return nil
