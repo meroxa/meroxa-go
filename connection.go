@@ -107,7 +107,7 @@ func (c *Client) DeleteConnection(ctx context.Context, id int) error {
 	}
 
 	if resp.StatusCode > 204 {
-		return fmt.Errorf("Status %d, %s", resp.StatusCode, err)
+		return fmt.Errorf("Status %d, %v", resp.StatusCode, err)
 	}
 
 	return nil
