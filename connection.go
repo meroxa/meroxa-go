@@ -30,6 +30,10 @@ func (c *Client) CreateConnection(ctx context.Context, resourceID int, config ma
 		return nil, err
 	}
 
+	if resp.StatusCode > 204 {
+		return nil, fmt.Errorf("Status %d, %v", resp.StatusCode, err)
+	}
+
 	var con Connector
 	err = json.NewDecoder(resp.Body).Decode(&con)
 	if err != nil {
