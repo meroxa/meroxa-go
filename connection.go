@@ -36,7 +36,7 @@ func (c *Client) CreateConnection(ctx context.Context, resourceID int, config ma
 		if err != nil {
 			return nil, err
 		}
-		return nil, fmt.Errorf("Status %d, %v", resp.StatusCode, body)
+		return nil, fmt.Errorf("Status %d, %v", resp.StatusCode, string(body))
 	}
 
 	var con Connector
