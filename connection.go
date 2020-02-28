@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -31,7 +32,11 @@ func (c *Client) CreateConnection(ctx context.Context, resourceID int, config ma
 	}
 
 	if resp.StatusCode > 204 {
-		return nil, fmt.Errorf("Status %d, %v", resp.StatusCode, err)
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("Status %d, %v", resp.StatusCode, body)
 	}
 
 	var con Connector
