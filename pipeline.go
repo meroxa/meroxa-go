@@ -11,12 +11,13 @@ import (
 
 // Pipeline represents the Meroxa Pipeline type within the Meroxa API
 type Pipeline struct {
+	ID       int               `json:"id"`
 	Name     string            `json:"name"`
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // ComponentKind enum for Component "kinds" within Pipeline stages
-type ComponentKind int32
+type ComponentKind int
 
 const (
 	// ConnectorComponent is a Pipeline stage component of type Connector
@@ -28,9 +29,10 @@ const (
 
 // PipelineStage represents the Meroxa PipelineStage type within the Meroxa API
 type PipelineStage struct {
-	PipelineID    int32 `json:"pipeline_id"`
-	ComponentID   int32 `json:"component_id"`
-	ComponentKind int32 `json:"component_kind"`
+	ID            int `json:"id"`
+	PipelineID    int `json:"pipeline_id"`
+	ComponentID   int `json:"component_id"`
+	ComponentKind int `json:"component_kind"`
 }
 
 // CreatePipeline provisions a new Pipeline
