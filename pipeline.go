@@ -42,6 +42,14 @@ func (c *Client) CreatePipeline(ctx context.Context, pipeline *Pipeline) (*Pipel
 		return nil, err
 	}
 
+	if resp.StatusCode > 204 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("Status %d, %v", resp.StatusCode, string(body))
+	}
+
 	var p Pipeline
 	err = json.NewDecoder(resp.Body).Decode(&p)
 	if err != nil {
