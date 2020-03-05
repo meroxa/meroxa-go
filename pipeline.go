@@ -12,7 +12,7 @@ import (
 // Pipeline represents the Meroxa Pipeline type within the Meroxa API
 type Pipeline struct {
 	Name     string            `json:"name"`
-	Metadata map[string]string `json:"metadata"`
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // ComponentKind enum for Component "kinds" within Pipeline stages
