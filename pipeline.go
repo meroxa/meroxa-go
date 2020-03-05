@@ -77,8 +77,8 @@ func (c *Client) ListPipelines(ctx context.Context) ([]*Pipeline, error) {
 	return pp, nil
 }
 
-// GetPipeline returns a Pipeline with the given id
-func (c *Client) GetPipeline(ctx context.Context, name string) (*Pipeline, error) {
+// GetPipelineByName returns a Pipeline with the given id
+func (c *Client) GetPipelineByName(ctx context.Context, name string) (*Pipeline, error) {
 	path := fmt.Sprintf("/v1/pipelines")
 
 	params := map[string][]string{
