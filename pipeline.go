@@ -78,12 +78,20 @@ func (c *Client) ListPipelines(ctx context.Context) ([]*Pipeline, error) {
 }
 
 // GetPipeline returns a Pipeline with the given id
-func (c *Client) GetPipeline(ctx context.Context, id int) (*Pipeline, error) {
-	path := fmt.Sprintf("/v1/pipelines/%d", id)
+func (c *Client) GetPipeline(ctx context.Context, name string) (*Pipeline, error) {
+	path := fmt.Sprintf("/v1/pipelines")
 
-	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
+	params := map[string][]string{
+		"name": []string{name},
+	}
+
+	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, params)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode > 204 {
+		return nil, fmt.Errorf("Status %d, %v", resp.StatusCode, err)
 	}
 
 	var p Pipeline
@@ -94,6 +102,8 @@ func (c *Client) GetPipeline(ctx context.Context, id int) (*Pipeline, error) {
 
 	return &p, nil
 }
+
+// GetPipelineByName returns a Pipeline with the given name (scoped to the calling user)
 
 // DeletePipeline deletes the Pipeline with the given id
 func (c *Client) DeletePipeline(ctx context.Context, id int) error {
