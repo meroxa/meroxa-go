@@ -120,7 +120,7 @@ func (c *Client) DeletePipeline(ctx context.Context, id int) error {
 
 	err = handleAPIErrors(resp)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	return nil
