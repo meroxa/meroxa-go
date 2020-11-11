@@ -18,16 +18,29 @@ type Connector struct {
 	Trace         string                 `json:"trace,omitempty"`
 }
 
-// CreateConnection provisions a connection between the Resource and the Meroxa
+// CreateConnector provisions a connector between the Resource and the Meroxa
 // platform
-func (c *Client) CreateConnection(ctx context.Context, resourceID int, config map[string]string) (*Connector, error) {
-	path := fmt.Sprintf("/v1/resources/%d/connection", resourceID)
+func (c *Client) CreateConnector(ctx context.Context, name string, resourceID int, config map[string]string, metadata map[string]string) (*Connector, error) {
+	path := fmt.Sprintf("/v1/connectors")
 
-	options := map[string]map[string]string{
-		"configuration": config,
+	type connectorRequest struct {
+		Name          string            `json:"name,omitempty"`
+		Configuration map[string]string `json:"config,omitempty"`
+		ResourceID    int               `json:"resource_id"`
+		Metadata      map[string]string `json:"metadata,omitempty"`
 	}
 
-	resp, err := c.makeRequest(ctx, http.MethodPost, path, options, nil)
+	cr := connectorRequest{
+		Configuration: config,
+		ResourceID:    resourceID,
+		Metadata:      metadata,
+	}
+
+	if name != "" {
+		cr.Name = name
+	}
+
+	resp, err := c.makeRequest(ctx, http.MethodPost, path, cr, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +59,8 @@ func (c *Client) CreateConnection(ctx context.Context, resourceID int, config ma
 	return &con, nil
 }
 
-// ListConnections returns an array of Connections (scoped to the calling user)
-func (c *Client) ListConnections(ctx context.Context) ([]*Connector, error) {
+// ListConnectors returns an array of Connectors (scoped to the calling user)
+func (c *Client) ListConnectors(ctx context.Context) ([]*Connector, error) {
 	path := fmt.Sprintf("/v1/connectors")
 
 	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
@@ -69,8 +82,8 @@ func (c *Client) ListConnections(ctx context.Context) ([]*Connector, error) {
 	return rr, nil
 }
 
-// GetConnection returns a Connector for the given connection ID
-func (c *Client) GetConnection(ctx context.Context, id int) (*Connector, error) {
+// GetConnector returns a Connector for the given connector ID
+func (c *Client) GetConnector(ctx context.Context, id int) (*Connector, error) {
 	path := fmt.Sprintf("/v1/connectors/%d", id)
 
 	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
@@ -92,8 +105,8 @@ func (c *Client) GetConnection(ctx context.Context, id int) (*Connector, error) 
 	return &con, nil
 }
 
-// GetConnectionByName returns a Connection with the given name
-func (c *Client) GetConnectionByName(ctx context.Context, name string) (*Connector, error) {
+// GetConnectorByName returns a Connector with the given name
+func (c *Client) GetConnectorByName(ctx context.Context, name string) (*Connector, error) {
 	path := fmt.Sprintf("/v1/connectors")
 
 	params := map[string][]string{
@@ -119,8 +132,8 @@ func (c *Client) GetConnectionByName(ctx context.Context, name string) (*Connect
 	return &con, nil
 }
 
-// DeleteConnection deletes the Connector with the given id
-func (c *Client) DeleteConnection(ctx context.Context, id int) error {
+// DeleteConnector deletes the Connector with the given id
+func (c *Client) DeleteConnector(ctx context.Context, id int) error {
 	path := fmt.Sprintf("/v1/connectors/%d", id)
 
 	resp, err := c.makeRequest(ctx, http.MethodDelete, path, nil, nil)

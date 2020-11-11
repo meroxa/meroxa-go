@@ -30,7 +30,7 @@ type Resource struct {
 	Name          string            `json:"name"`
 	URL           string            `json:"url"`
 	Credentials   *Credentials      `json:"credentials,omitempty"`
-	Configuration map[string]string `json:"configuration,omitempty"`
+	Configuration map[string]string `json:"config,omitempty"`
 	Metadata      map[string]string `json:"metadata,omitempty"`
 }
 
