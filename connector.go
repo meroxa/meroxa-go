@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+const connectorsBasePath = "/v1/connectors"
+
 type Connector struct {
 	ID            int                    `json:"id"`
 	Kind          string                 `json:"type"`
@@ -21,8 +23,6 @@ type Connector struct {
 // CreateConnector provisions a connector between the Resource and the Meroxa
 // platform
 func (c *Client) CreateConnector(ctx context.Context, name string, resourceID int, config map[string]string, metadata map[string]string) (*Connector, error) {
-	path := fmt.Sprintf("/v1/connectors")
-
 	type connectorRequest struct {
 		Name          string            `json:"name,omitempty"`
 		Configuration map[string]string `json:"config,omitempty"`
@@ -40,7 +40,7 @@ func (c *Client) CreateConnector(ctx context.Context, name string, resourceID in
 		cr.Name = name
 	}
 
-	resp, err := c.makeRequest(ctx, http.MethodPost, path, cr, nil)
+	resp, err := c.makeRequest(ctx, http.MethodPost, connectorsBasePath, cr, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -61,9 +61,7 @@ func (c *Client) CreateConnector(ctx context.Context, name string, resourceID in
 
 // ListConnectors returns an array of Connectors (scoped to the calling user)
 func (c *Client) ListConnectors(ctx context.Context) ([]*Connector, error) {
-	path := fmt.Sprintf("/v1/connectors")
-
-	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
+	resp, err := c.makeRequest(ctx, http.MethodGet, connectorsBasePath, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +82,7 @@ func (c *Client) ListConnectors(ctx context.Context) ([]*Connector, error) {
 
 // GetConnector returns a Connector for the given connector ID
 func (c *Client) GetConnector(ctx context.Context, id int) (*Connector, error) {
-	path := fmt.Sprintf("/v1/connectors/%d", id)
+	path := fmt.Sprintf("%s/%d", connectorsBasePath, id)
 
 	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
@@ -107,13 +105,11 @@ func (c *Client) GetConnector(ctx context.Context, id int) (*Connector, error) {
 
 // GetConnectorByName returns a Connector with the given name
 func (c *Client) GetConnectorByName(ctx context.Context, name string) (*Connector, error) {
-	path := fmt.Sprintf("/v1/connectors")
-
 	params := map[string][]string{
 		"name": {name},
 	}
 
-	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, params)
+	resp, err := c.makeRequest(ctx, http.MethodGet, connectorsBasePath, nil, params)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +130,7 @@ func (c *Client) GetConnectorByName(ctx context.Context, name string) (*Connecto
 
 // DeleteConnector deletes the Connector with the given id
 func (c *Client) DeleteConnector(ctx context.Context, id int) error {
-	path := fmt.Sprintf("/v1/connectors/%d", id)
+	path := fmt.Sprintf("%s/%d", connectorsBasePath, id)
 
 	resp, err := c.makeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {

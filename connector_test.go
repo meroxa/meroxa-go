@@ -25,7 +25,7 @@ func TestCreateConnector(t *testing.T) {
 		// Test request
 		type connectionRequest struct {
 			Name          string            `json:"name"`
-			Configuration map[string]string `json:"configuration"`
+			Configuration map[string]string `json:"config"`
 			ResourceID    int               `json:"resource_id"`
 			Metadata      map[string]string `json:"metadata"`
 		}
