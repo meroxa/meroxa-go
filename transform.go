@@ -7,14 +7,20 @@ import (
 	"net/http"
 )
 
+type Property struct {
+	Name        string
+	Type        string
+	Description string
+}
+
 // Transform represent the Meroxa Transform type within the Meroxa API
 type Transform struct {
-	ID          int             `json:"id"`
-	Name        string          `json:"name"`
-	Required    bool            `json:"bool"`
-	Description string          `json:"description"`
-	Kind        string          `json:"kind"`
-	Properties  json.RawMessage `json:"properties"`
+	ID          int        `json:"id"`
+	Name        string     `json:"name"`
+	Required    bool       `json:"bool"`
+	Description string     `json:"description"`
+	Kind        string     `json:"kind"`
+	Properties  []Property `json:"properties"`
 }
 
 // ListTransforms returns an array of Transforms (scoped to the calling user)
