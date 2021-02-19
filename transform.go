@@ -8,9 +8,9 @@ import (
 )
 
 type Property struct {
-	Name        string
-	Type        string
-	Description string
+	Name     string
+	Kind     string
+	Required bool
 }
 
 // Transform represent the Meroxa Transform type within the Meroxa API
