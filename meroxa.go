@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -85,12 +86,12 @@ func (c *Client) newRequest(ctx context.Context, method, path string, body inter
 	}
 
 	// Set Auth
-	var bearer = "Bearer " + c.token
+	bearer := fmt.Sprintf("Bearer %s", c.token)
 
 	// add authorization header to the req
 	req.Header.Add("Authorization", bearer)
-	req.Header.Add("Content-Type", contentType)
-	req.Header.Add("Accept", contentType)
+	req.Header.Add("Content-Type", jsonContentType)
+	req.Header.Add("Accept", jsonContentType)
 	req.Header.Add("User-Agent", c.userAgent)
 	return req, nil
 }
