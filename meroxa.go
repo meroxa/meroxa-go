@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	apiURL      = "https://api.meroxa.io/v1"
-	contentType = "application/json"
+	apiURL          = "https://api.meroxa.io/v1"
+	jsonContentType = "application/json"
+	textContentType = "text/plain"
 )
 
 // Client represents the Meroxa API Client
