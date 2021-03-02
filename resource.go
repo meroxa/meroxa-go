@@ -63,6 +63,26 @@ func (c *Client) CreateResource(ctx context.Context, resource *Resource) (*Resou
 	return &r, nil
 }
 
+func (c *Client) UpdateResource(ctx context.Context, resource *Resource) (*Resource, error) {
+	resp, err := c.makeRequest(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", resourcesBasePath, resource.Name), resource, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var r Resource
+	err = json.NewDecoder(resp.Body).Decode(&r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
 // ListResources returns an array of Resources (scoped to the calling user)
 func (c *Client) ListResources(ctx context.Context) ([]*Resource, error) {
 	resp, err := c.makeRequest(ctx, http.MethodGet, resourcesBasePath, nil, nil)
