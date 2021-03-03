@@ -38,7 +38,7 @@ type PipelineStage struct {
 func (c *Client) CreatePipeline(ctx context.Context, pipeline *Pipeline) (*Pipeline, error) {
 	path := fmt.Sprintf("/v1/pipelines")
 
-	resp, err := c.makeRequest(ctx, http.MethodPost, path, pipeline, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodPost, path, pipeline, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *Client) CreatePipeline(ctx context.Context, pipeline *Pipeline) (*Pipel
 func (c *Client) ListPipelines(ctx context.Context) ([]*Pipeline, error) {
 	path := fmt.Sprintf("/v1/pipelines")
 
-	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Client) GetPipelineByName(ctx context.Context, name string) (*Pipeline,
 		"name": []string{name},
 	}
 
-	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, params)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, params)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *Client) GetPipelineByName(ctx context.Context, name string) (*Pipeline,
 func (c *Client) DeletePipeline(ctx context.Context, id int) error {
 	path := fmt.Sprintf("/v1/pipelines/%d", id)
 
-	resp, err := c.makeRequest(ctx, http.MethodDelete, path, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func (c *Client) DeletePipeline(ctx context.Context, id int) error {
 func (c *Client) GetPipelineStages(ctx context.Context, pipelineID int) ([]*PipelineStage, error) {
 	path := fmt.Sprintf("/v1/pipelines/%d/stages", pipelineID)
 
-	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (c *Client) AddPipelineStage(ctx context.Context, pipelineID int, connector
 		"connector": []string{strconv.Itoa(connectorID)},
 	}
 
-	resp, err := c.makeRequest(ctx, http.MethodPost, path, nil, params)
+	resp, err := c.MakeRequest(ctx, http.MethodPost, path, nil, params)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func (c *Client) AddPipelineStage(ctx context.Context, pipelineID int, connector
 func (c *Client) RemovePipelineStage(ctx context.Context, pipelineID int, stageID int) error {
 	path := fmt.Sprintf("/v1/pipelines/%d/stages/%d", pipelineID, stageID)
 
-	resp, err := c.makeRequest(ctx, http.MethodDelete, path, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {
 		return err
 	}

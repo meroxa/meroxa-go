@@ -42,7 +42,7 @@ func New(token, ua string) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) makeRequest(ctx context.Context, method, path string, body interface{}, params url.Values) (*http.Response, error) {
+func (c *Client) MakeRequest(ctx context.Context, method, path string, body interface{}, params url.Values) (*http.Response, error) {
 	req, err := c.newRequest(ctx, method, path, body)
 	if err != nil {
 		return nil, err

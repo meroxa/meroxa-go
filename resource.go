@@ -44,7 +44,7 @@ func (c *Client) CreateResource(ctx context.Context, resource *Resource) (*Resou
 		return nil, err
 	}
 
-	resp, err := c.makeRequest(ctx, http.MethodPost, resourcesBasePath, resource, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodPost, resourcesBasePath, resource, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *Client) CreateResource(ctx context.Context, resource *Resource) (*Resou
 
 // ListResources returns an array of Resources (scoped to the calling user)
 func (c *Client) ListResources(ctx context.Context) ([]*Resource, error) {
-	resp, err := c.makeRequest(ctx, http.MethodGet, resourcesBasePath, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, resourcesBasePath, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Client) ListResources(ctx context.Context) ([]*Resource, error) {
 func (c *Client) GetResource(ctx context.Context, id int) (*Resource, error) {
 	path := fmt.Sprintf("%s/%d", resourcesBasePath, id)
 
-	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *Client) GetResourceByName(ctx context.Context, name string) (*Resource,
 		"name": []string{name},
 	}
 
-	resp, err := c.makeRequest(ctx, http.MethodGet, resourcesBasePath, nil, params)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, resourcesBasePath, nil, params)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (c *Client) GetResourceByName(ctx context.Context, name string) (*Resource,
 func (c *Client) DeleteResource(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s/%d", resourcesBasePath, id)
 
-	resp, err := c.makeRequest(ctx, http.MethodDelete, path, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -153,7 +153,7 @@ func (c *Client) DeleteResource(ctx context.Context, id int) error {
 func (c *Client) ListResourceConnections(ctx context.Context, id int) ([]*Connector, error) {
 	path := fmt.Sprintf("%s/%d/connections", resourcesBasePath, id)
 
-	resp, err := c.makeRequest(ctx, http.MethodGet, path, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
