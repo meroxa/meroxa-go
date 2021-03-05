@@ -70,9 +70,8 @@ func (c *Client) CreateResource(ctx context.Context, resource *Resource) (*Resou
 	return &r, nil
 }
 
-func (c *Client) UpdateResource(ctx context.Context, resource *Resource) (*Resource, error) {
-//func (c *Client) UpdateResource(ctx context.Context, resourceKey string, resourceInput *Resource) (*Resource, error) {
-	resp, err := c.makeRequest(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", ResourcesBasePath, resource.Name), resource, nil)
+func (c *Client) UpdateResource(ctx context.Context, key string, resourceToUpdate *UpdateResourceInput) (*Resource, error) {
+	resp, err := c.makeRequest(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", ResourcesBasePath, key), resourceToUpdate, nil)
 	if err != nil {
 		return nil, err
 	}

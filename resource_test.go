@@ -36,7 +36,7 @@ func TestEncodeURLCreds(t *testing.T) {
 }
 
 func TestUpdateResource(t *testing.T) {
-	var resource *Resource
+	var resource *UpdateResourceInput
 
 	resource.Name = "resource-name"
 	resource.URL = "http://foo.com"
@@ -79,7 +79,7 @@ func TestUpdateResource(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdateResource(context.Background(), resource)
+	resp, err := c.UpdateResource(context.Background(), resource.Name, resource)
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
