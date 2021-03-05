@@ -1,6 +1,13 @@
 package meroxa
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"math/rand"
+	"net/http"
+	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -25,5 +32,77 @@ func TestEncodeURLCreds(t *testing.T) {
 		if got != tt.want {
 			t.Errorf("expected %+v, got %+v", tt.want, got)
 		}
+	}
+}
+
+func TestUpdateResource(t *testing.T) {
+	var resource *Resource
+
+	resource.Name = "resource-name"
+	resource.URL = "http://foo.com"
+	resource.Metadata = map[string]string{"key": "value"}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s", ResourcesBasePath, resource.Name), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		type resourceUpdateInputRequest struct {
+			Name     string            `json:"name"`
+			URL      string            `json:"url"`
+			Metadata map[string]string `json:"metadata,omitempty"`
+		}
+
+		var rr resourceUpdateInputRequest
+		if err := json.NewDecoder(req.Body).Decode(&rr); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+		defer req.Body.Close()
+
+		if rr.URL != resource.URL {
+			t.Errorf("expected URL %s, got %s", resource.URL, rr.URL)
+		}
+
+		if !reflect.DeepEqual(rr.Metadata, resource.Metadata) {
+			t.Errorf("expected same metadata")
+		}
+
+		// Return response to satisfy client and test response
+		c := generateResource(resource.Name, 0, "", nil)
+		c.URL = resource.URL
+		c.Metadata = resource.Metadata
+		json.NewEncoder(w).Encode(c)
+	}))
+
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.UpdateResource(context.Background(), resource)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if resp.URL != resource.URL {
+		t.Errorf("expected url %s, got %s", resource.URL, resp.URL)
+	}
+}
+
+func generateResource(name string, id int, url string, metadata map[string]string) Resource {
+	if name == "" {
+		name = "test"
+	}
+
+	if id == 0 {
+		id = rand.Intn(10000)
+	}
+
+	return Resource{
+		ID:       id,
+		Kind:     "postgres",
+		Name:     name,
+		URL:      url,
+		Metadata: metadata,
 	}
 }
