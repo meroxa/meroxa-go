@@ -138,7 +138,7 @@ func generateConnector(name string, id int, config, metadata map[string]string) 
 
 	return Connector{
 		ID:            id,
-		Kind:          "postgres",
+		Type:          "postgres",
 		Name:          name,
 		Configuration: config,
 		Metadata:      metadata,
