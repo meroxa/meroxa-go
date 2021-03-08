@@ -36,7 +36,7 @@ func TestEncodeURLCreds(t *testing.T) {
 }
 
 func TestUpdateResource(t *testing.T) {
-	var resource *UpdateResourceInput
+	var resource UpdateResourceInput
 
 	resource.Name = "resource-name"
 	resource.URL = "http://foo.com"
@@ -47,13 +47,7 @@ func TestUpdateResource(t *testing.T) {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
-		type resourceUpdateInputRequest struct {
-			Name     string            `json:"name"`
-			URL      string            `json:"url"`
-			Metadata map[string]string `json:"metadata,omitempty"`
-		}
-
-		var rr resourceUpdateInputRequest
+		var rr *UpdateResourceInput
 		if err := json.NewDecoder(req.Body).Decode(&rr); err != nil {
 			t.Errorf("expected no error, got %+v", err)
 		}
