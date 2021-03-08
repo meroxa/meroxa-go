@@ -100,7 +100,7 @@ func generateResource(name string, id int, url string, metadata map[string]strin
 
 	return Resource{
 		ID:       id,
-		Kind:     "postgres",
+		Type:     "postgres",
 		Name:     name,
 		URL:      url,
 		Metadata: metadata,
