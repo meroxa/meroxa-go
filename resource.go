@@ -37,8 +37,8 @@ type Resource struct {
 
 // UpdateResourceInput represents the Meroxa Resource we're updating in the Meroxa API
 type UpdateResourceInput struct {
-	Name     string            `json:"name"`
-	URL      string            `json:"url"`
+	Name     string            `json:"name,omitempty"`
+	URL      string            `json:"url,omitempty"`
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
