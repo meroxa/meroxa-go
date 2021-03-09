@@ -71,6 +71,7 @@ func (c *Client) CreateResource(ctx context.Context, resource *Resource) (*Resou
 }
 
 func (c *Client) UpdateResource(ctx context.Context, key string, resourceToUpdate UpdateResourceInput) (*Resource, error) {
+	fmt.Printf("key: %s", key)
 	resp, err := c.makeRequest(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", ResourcesBasePath, key), resourceToUpdate, nil)
 	if err != nil {
 		return nil, err

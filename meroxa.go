@@ -88,6 +88,7 @@ func (c *Client) makeRequestRaw(ctx context.Context, method, path string, body i
 		}
 	}
 	resp, err := c.do(ctx, req)
+	fmt.Printf("%s: RESPONSE OBJ: \n%v\n", time.Now(), resp)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +124,6 @@ func (c *Client) newRequest(ctx context.Context, method, path string, body inter
 	req.Header.Add("User-Agent", c.userAgent)
 	return req, nil
 }
-
 func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	req = req.WithContext(ctx)
 	return c.httpClient.Do(req)
@@ -131,7 +131,8 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 
 func httpClient() *http.Client {
 	return &http.Client{
-		Timeout: 5 * time.Second,
+		Transport: &DumpTransport{http.DefaultTransport},
+		Timeout:   5 * time.Second,
 	}
 }
 
