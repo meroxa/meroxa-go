@@ -12,11 +12,11 @@ type DumpTransport struct {
 
 func (d *DumpTransport) RoundTrip(h *http.Request) (*http.Response, error) {
 	dump, _ := httputil.DumpRequestOut(h, true)
-	log.Println(string(dump))
+	log.Printf(string(dump))
 
 	resp, err := d.r.RoundTrip(h)
 	dump, _ = httputil.DumpResponse(resp, true)
-	log.Println(string(dump))
+	log.Printf(string(dump))
 
 	return resp, err
 }
