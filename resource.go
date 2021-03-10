@@ -25,7 +25,7 @@ type Credentials struct {
 	UseSSL        bool   `json:"ssl"`
 }
 
-// CreateResourceInput represents the Meroxa Resource type within the Meroxa API
+// CreateResourceInput represents the input for a Meroxa Resource type we're creating within the Meroxa API
 type CreateResourceInput struct {
 	ID          int               `json:"id"`
 	Type        string            `json:"type"`
@@ -50,10 +50,10 @@ type UpdateResourceInput struct {
 	Name        string            `json:"name,omitempty"` // TODO: Update this via CLI
 	URL         string            `json:"url,omitempty"`
 	Metadata    map[string]string `json:"metadata,omitempty"`
-	Credentials *Credentials      `json:"credentials,omitempty"` // TODO: Update this via CLI
+	Credentials *Credentials      `json:"credentials,omitempty"`
 }
 
-// CreateResource provisions a new Resource from the given Resource struct
+// CreateResource provisions a new Resource from the given CreateResourceInput struct
 func (c *Client) CreateResource(ctx context.Context, resource *CreateResourceInput) (*Resource, error) {
 	// url encode url username/password if needed
 	var err error
