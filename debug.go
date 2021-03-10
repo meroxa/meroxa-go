@@ -17,14 +17,6 @@ func (d *DumpTransport) RoundTrip(h *http.Request) (*http.Response, error) {
 	resp, err := d.r.RoundTrip(h)
 	dump, _ = httputil.DumpResponse(resp, true)
 	log.Println(string(dump))
-	log.Println(resp)
 
 	return resp, err
-}
-
-func httpDebugClient() *http.Client {
-	return &http.Client{
-		Transport: &DumpTransport{http.DefaultTransport},
-		Timeout:   ClientTimeOut,
-	}
 }
