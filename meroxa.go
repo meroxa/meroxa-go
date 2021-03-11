@@ -49,7 +49,7 @@ type Client struct {
 }
 
 // New returns a configured Meroxa API Client
-func New(token, ua string) (*Client, error) {
+func New(token, ua string, debugMode bool) (*Client, error) {
 	u, err := url.Parse(getAPIURL())
 	if err != nil {
 		return nil, err
@@ -62,8 +62,7 @@ func New(token, ua string) (*Client, error) {
 		httpClient: httpClient(),
 	}
 
-	if isDebugEnabled() {
-		// Overrides the default
+	if debugMode {
 		c.httpClient.Transport = &DumpTransport{http.DefaultTransport}
 	}
 
@@ -148,16 +147,6 @@ func getAPIURL() string {
 	}
 
 	return apiURL
-}
-
-func isDebugEnabled() bool {
-	if val, ok := os.LookupEnv("MEROXA_DEBUG"); ok {
-		if val == "1" {
-			return true
-		}
-	}
-
-	return false
 }
 
 func userAgent(ua string) string {
