@@ -16,7 +16,7 @@ const (
 	apiURL          = "https://api.meroxa.io/v1"
 	jsonContentType = "application/json"
 	textContentType = "text/plain"
-	ClientTimeOut   = 5 * time.Second
+	clientTimeOut   = 5 * time.Second
 )
 
 // encodeFunc encodes v into w
@@ -137,7 +137,7 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 
 func httpClient() *http.Client {
 	return &http.Client{
-		Timeout: ClientTimeOut,
+		Timeout: clientTimeOut,
 	}
 }
 
