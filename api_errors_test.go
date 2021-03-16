@@ -3,6 +3,7 @@ package meroxa
 import (
 	"bytes"
 	"errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -15,6 +16,10 @@ var httpNoErrorResponse = &http.Response{
 
 // create a new reader with a JSON response
 var errorJSONResponse = ioutil.NopCloser(bytes.NewReader([]byte(`{ "error": "api error" }`)))
+var errorJSONResponseCodeMessage = ioutil.NopCloser(bytes.NewReader([]byte(`{ "code": "already_exists", "message": "resource with name test already exists"}`)))
+var errorJSONResponseDetails = ioutil.NopCloser(bytes.NewReader([]byte(
+	`{ "code": "already_exists", "message": "resource with name test already exists", "details": { "name": ["too long", "invalid"], "type": ["invalid"] } }`,
+)))
 
 // create a new reader with an HTML response
 var errorHTMLResponse = ioutil.NopCloser(bytes.NewReader([]byte(`<h1>Error!</h1>`)))
@@ -25,6 +30,16 @@ var http503JSONResponse = &http.Response{
 	Body:       errorJSONResponse,
 	Proto:      "HTTP/1.0",
 	Header:     make(http.Header),
+}
+
+var http422JSONResponse = func(body io.ReadCloser) *http.Response {
+	return &http.Response{
+		StatusCode: 422,
+		Status:     "422 Unprocessable Entity",
+		Body:       body,
+		Proto:      "HTTP/1.0",
+		Header:     make(http.Header),
+	}
 }
 
 var http503HTMLResponse = &http.Response{
@@ -41,8 +56,22 @@ func TestHandleAPIErrors(t *testing.T) {
 		err error
 	}{
 		{httpNoErrorResponse, nil},
-		{http503JSONResponse, errors.New("api error")},
+		{http503JSONResponse, &errResponse{ErrorDeprecated: "api error"}},
 		{http503HTMLResponse, errors.New("HTTP/1.0 503 Service Unavailable")},
+		{http422JSONResponse(errorJSONResponseCodeMessage),
+			&errResponse{
+				Code:    "already_exists",
+				Message: "resource with name test already exists",
+			}},
+		{http422JSONResponse(errorJSONResponseDetails),
+			&errResponse{
+				Code:    "already_exists",
+				Message: "resource with name test already exists",
+				Details: map[string][]string{
+					"name": {"too long", "invalid"},
+					"type": {"invalid"},
+				},
+			}},
 	}
 
 	for _, tt := range tests {
