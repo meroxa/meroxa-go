@@ -54,15 +54,17 @@ func TestHandleAPIErrors(t *testing.T) {
 	tests := []struct {
 		in  *http.Response
 		err error
+		output string
 	}{
-		{httpNoErrorResponse, nil},
-		{http503JSONResponse, &errResponse{ErrorDeprecated: "api error"}},
-		{http503HTMLResponse, errors.New("HTTP/1.0 503 Service Unavailable")},
+		{httpNoErrorResponse, nil, ""},
+		{http503HTMLResponse, errors.New("HTTP/1.0 503 Service Unavailable"), "HTTP/1.0 503 Service Unavailable"},
 		{http422JSONResponse(errorJSONResponseCodeMessage),
 			&errResponse{
 				Code:    "already_exists",
 				Message: "resource with name test already exists",
-			}},
+			},
+			"resource with name test already exists",
+		},
 		{http422JSONResponse(errorJSONResponseDetails),
 			&errResponse{
 				Code:    "already_exists",
@@ -71,7 +73,9 @@ func TestHandleAPIErrors(t *testing.T) {
 					"name": {"too long", "invalid"},
 					"type": {"invalid"},
 				},
-			}},
+			},
+			"resource with name test already exists\ndetails: \n\t\"name\": [\"too long\", \"invalid\"]\n\t\"type\": [\"invalid\"]",
+		},
 	}
 
 	for _, tt := range tests {
@@ -79,6 +83,10 @@ func TestHandleAPIErrors(t *testing.T) {
 
 		if !reflect.DeepEqual(err, tt.err) {
 			t.Errorf("expected %+v, got %+v", tt.err, err)
+		}
+
+		if tt.err != nil && err.Error() != tt.output {
+			t.Errorf("expected %+v, got %+v", tt.output, err.Error())
 		}
 	}
 }
