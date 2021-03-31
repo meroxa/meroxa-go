@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -55,13 +56,66 @@ func TestUpdatePipelineStatus(t *testing.T) {
 	}
 }
 
+func TestUpdatePipeline(t *testing.T) {
+	var pipelineUpdate UpdatePipelineInput
+	var pipeline = generatePipeline("", 0, "", nil)
+
+	pipelineUpdate.Name = pipeline.Name
+	pipelineUpdate.Metadata = pipeline.Metadata
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%d", pipelinesBasePath, pipeline.ID), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		var pi UpdatePipelineInput
+
+		if err := json.NewDecoder(req.Body).Decode(&pi); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+		defer req.Body.Close()
+
+		if pi.Name != pipeline.Name {
+			t.Errorf("expected name %s, got %s", pipeline.Name, pi.Name)
+		}
+
+		if !reflect.DeepEqual(pi.Metadata, pipeline.Metadata) {
+			t.Errorf("expected same metadata")
+		}
+
+		// Return response to satisfy client and test response
+		json.NewEncoder(w).Encode(pipeline)
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.UpdatePipeline(context.Background(), pipeline.ID, pipelineUpdate)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &pipeline) {
+		t.Errorf("expected response same as pipeline")
+	}
+}
+
 func generatePipeline(name string, id int, state string, metadata map[string]string) Pipeline {
 	if name == "" {
 		name = "test"
 	}
 
+	if state == "" {
+		state = "healthy"
+	}
+
 	if id == 0 {
 		id = rand.Intn(10000)
+	}
+
+	if metadata == nil {
+		metadata = map[string]string{"key": "value"}
 	}
 
 	return Pipeline{
