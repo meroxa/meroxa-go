@@ -13,14 +13,16 @@ import (
 )
 
 func TestCreateConnector(t *testing.T) {
-	name := "test"
-	resourceID := 1
-	pipelineID := 2
-	configuration := map[string]string{
-		"custom_config": "true",
-	}
-	metadata := map[string]string{
-		"region": "us-east-1",
+	input := CreateConnectorInput{
+		Name:       "test",
+		ResourceID: 1,
+		PipelineID: 2,
+		Configuration: map[string]string{
+			"custom_config": "true",
+		},
+		Metadata: map[string]string{
+			"region": "us-east-1",
+		},
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -39,29 +41,29 @@ func TestCreateConnector(t *testing.T) {
 			t.Errorf("expected no error, got %+v", err)
 		}
 
-		if cr.Name != name {
-			t.Errorf("expected name %s, got %s", name, cr.Name)
+		if cr.Name != input.Name {
+			t.Errorf("expected name %s, got %s", input.Name, cr.Name)
 		}
 
-		if cr.ResourceID != resourceID {
-			t.Errorf("expected resource ID %d, got %d", resourceID, cr.ResourceID)
+		if cr.ResourceID != input.ResourceID {
+			t.Errorf("expected resource ID %d, got %d", input.ResourceID, cr.ResourceID)
 		}
 
-		if cr.PipelineID != pipelineID {
-			t.Errorf("expected pipeline ID %d, got %d", pipelineID, cr.PipelineID)
+		if cr.PipelineID != input.PipelineID {
+			t.Errorf("expected pipeline ID %d, got %d", input.PipelineID, cr.PipelineID)
 		}
 
-		if !reflect.DeepEqual(cr.Configuration, configuration) {
-			t.Errorf("expected configuration %+v, got %+v", configuration, cr.Configuration)
+		if !reflect.DeepEqual(cr.Configuration, input.Configuration) {
+			t.Errorf("expected configuration %+v, got %+v", input.Configuration, cr.Configuration)
 		}
 
-		if !reflect.DeepEqual(cr.Metadata, metadata) {
-			t.Errorf("expected metadata %+v, got %+v", metadata, cr.Metadata)
+		if !reflect.DeepEqual(cr.Metadata, input.Metadata) {
+			t.Errorf("expected metadata %+v, got %+v", input.Metadata, cr.Metadata)
 		}
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		c := generateConnector(name, resourceID, configuration, metadata)
+		c := generateConnector(input.Name, input.ResourceID, input.Configuration, input.Metadata)
 		json.NewEncoder(w).Encode(c)
 	}))
 	// Close the server when test finishes
@@ -69,16 +71,15 @@ func TestCreateConnector(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.CreateConnector(context.Background(), name, resourceID, pipelineID, configuration, metadata)
+	resp, err := c.CreateConnector(context.Background(), input)
 
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
 
-	if resp.Name != name {
-		t.Errorf("expected name %s, got %s", name, resp.Name)
+	if resp.Name != input.Name {
+		t.Errorf("expected name %s, got %s", input.Name, resp.Name)
 	}
-
 }
 
 func TestUpdateConnectorStatus(t *testing.T) {
