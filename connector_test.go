@@ -14,9 +14,10 @@ import (
 
 func TestCreateConnector(t *testing.T) {
 	input := CreateConnectorInput{
-		Name:       "test",
-		ResourceID: 1,
-		PipelineID: 2,
+		Name:         "test",
+		ResourceID:   1,
+		PipelineID:   2,
+		PipelineName: "my-pipeline",
 		Configuration: map[string]string{
 			"custom_config": "true",
 		},
@@ -32,6 +33,7 @@ func TestCreateConnector(t *testing.T) {
 			Configuration map[string]string `json:"config"`
 			ResourceID    int               `json:"resource_id"`
 			PipelineID    int               `json:"pipeline_id"`
+			PipelineName  string            `json:"pipeline_name"`
 			Metadata      map[string]string `json:"metadata"`
 		}
 
@@ -51,6 +53,10 @@ func TestCreateConnector(t *testing.T) {
 
 		if cr.PipelineID != input.PipelineID {
 			t.Errorf("expected pipeline ID %d, got %d", input.PipelineID, cr.PipelineID)
+		}
+
+		if cr.PipelineName != input.PipelineName {
+			t.Errorf("expected pipeline name %s, got %s", input.PipelineName, cr.PipelineName)
 		}
 
 		if !reflect.DeepEqual(cr.Configuration, input.Configuration) {
