@@ -23,7 +23,7 @@ func TestCreateConnector(t *testing.T) {
 			"custom_config": true,
 		},
 		Metadata: map[string]interface{}{
-			"custom_metadata": "value",
+			"region": "us-east-1",
 		},
 	}
 
