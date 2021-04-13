@@ -40,7 +40,9 @@ func TestUpdateResource(t *testing.T) {
 
 	resource.Name = "resource-name"
 	resource.URL = "http://foo.com"
-	resource.Metadata = map[string]string{"key": "value"}
+	resource.Metadata = map[string]interface{}{
+		"key": "value",
+	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", ResourcesBasePath, resource.Name), req.URL.Path; want != got {
@@ -83,7 +85,7 @@ func TestUpdateResource(t *testing.T) {
 	}
 }
 
-func generateResource(name string, id int, url string, metadata map[string]string) Resource {
+func generateResource(name string, id int, url string, metadata map[string]interface{}) Resource {
 	if name == "" {
 		name = "test"
 	}

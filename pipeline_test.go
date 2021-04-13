@@ -101,7 +101,7 @@ func TestUpdatePipeline(t *testing.T) {
 	}
 }
 
-func generatePipeline(name string, id int, state string, metadata map[string]string) Pipeline {
+func generatePipeline(name string, id int, state string, metadata map[string]interface{}) Pipeline {
 	if name == "" {
 		name = "test"
 	}
@@ -115,7 +115,9 @@ func generatePipeline(name string, id int, state string, metadata map[string]str
 	}
 
 	if metadata == nil {
-		metadata = map[string]string{"key": "value"}
+		metadata = map[string]interface{}{
+			"custom_metadata": true,
+		}
 	}
 
 	return Pipeline{

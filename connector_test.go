@@ -18,10 +18,11 @@ func TestCreateConnector(t *testing.T) {
 		ResourceID:   1,
 		PipelineID:   2,
 		PipelineName: "my-pipeline",
-		Configuration: map[string]string{
-			"custom_config": "true",
+
+		Configuration: map[string]interface{}{
+			"custom_config": true,
 		},
-		Metadata: map[string]string{
+		Metadata: map[string]interface{}{
 			"region": "us-east-1",
 		},
 	}
@@ -29,12 +30,12 @@ func TestCreateConnector(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		// Test request
 		type connectionRequest struct {
-			Name          string            `json:"name"`
-			Configuration map[string]string `json:"config"`
-			ResourceID    int               `json:"resource_id"`
-			PipelineID    int               `json:"pipeline_id"`
-			PipelineName  string            `json:"pipeline_name"`
-			Metadata      map[string]string `json:"metadata"`
+			Name          string                 `json:"name"`
+			Configuration map[string]interface{} `json:"config"`
+			ResourceID    int                    `json:"resource_id"`
+			PipelineID    int                    `json:"pipeline_id"`
+			PipelineName  string                 `json:"pipeline_name"`
+			Metadata      map[string]interface{} `json:"metadata"`
 		}
 
 		var cr connectionRequest
@@ -140,7 +141,7 @@ func testClient(c *http.Client, u string) *Client {
 	}
 }
 
-func generateConnector(name string, id int, config, metadata map[string]string) Connector {
+func generateConnector(name string, id int, config, metadata map[string]interface{}) Connector {
 	if name == "" {
 		name = "test"
 	}
