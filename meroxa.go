@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 )
 
@@ -32,7 +31,7 @@ func stringEncodeFunc(w io.Writer, v interface{}) error {
 		return err
 	}
 
-	return fmt.Errorf("Body is not a string")
+	return fmt.Errorf("body is not a string")
 }
 
 func noopEncodeFunc(w io.Writer, v interface{}) error {
@@ -41,7 +40,7 @@ func noopEncodeFunc(w io.Writer, v interface{}) error {
 
 // Client represents the Meroxa API Client
 type Client struct {
-	BaseURL   *url.URL
+	baseURL   *url.URL
 	userAgent string
 	token     string
 
@@ -49,28 +48,29 @@ type Client struct {
 }
 
 // New returns a configured Meroxa API Client
-func New(token, ua string, debugMode bool) (*Client, error) {
-	u, err := url.Parse(getAPIURL())
+func New(token string, options ...Option) (*Client, error) {
+	u, err := url.Parse(apiURL)
 	if err != nil {
 		return nil, err
 	}
 
 	c := &Client{
-		BaseURL:    u,
-		userAgent:  userAgent(ua),
-		token:      token,
-		httpClient: httpClient(),
+		baseURL:   u,
+		userAgent: "meroxa-go",
+		token:     token,
+		httpClient: &http.Client{
+			Timeout: clientTimeOut,
+		},
 	}
 
-	if debugMode {
-		c.httpClient.Transport = &DumpTransport{http.DefaultTransport}
+	for _, opt := range options {
+		err := opt(c)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return c, nil
-}
-
-func (c *Client) MakeRequestString(ctx context.Context, method, path string, body string) (*http.Response, error) {
-	return c.makeRequestRaw(ctx, method, path, body, nil, stringEncodeFunc)
 }
 
 func (c *Client) makeRequest(ctx context.Context, method, path string, body interface{}, params url.Values) (*http.Response, error) {
@@ -93,7 +93,7 @@ func (c *Client) makeRequestRaw(ctx context.Context, method, path string, body i
 			req.URL.RawQuery = q.Encode()
 		}
 	}
-	resp, err := c.do(ctx, req)
+	resp, err := c.httpClient.Do(req)
 
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (c *Client) makeRequestRaw(ctx context.Context, method, path string, body i
 }
 
 func (c *Client) newRequest(ctx context.Context, method, path string, body interface{}, encode encodeFunc) (*http.Request, error) {
-	u, err := c.BaseURL.Parse(path)
+	u, err := c.baseURL.Parse(path)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (c *Client) newRequest(ctx context.Context, method, path string, body inter
 		}
 	}
 
-	req, err := http.NewRequest(method, u.String(), buf)
+	req, err := http.NewRequestWithContext(ctx, method, u.String(), buf)
 	if err != nil {
 		return nil, err
 	}
@@ -129,29 +129,4 @@ func (c *Client) newRequest(ctx context.Context, method, path string, body inter
 	req.Header.Add("Accept", jsonContentType)
 	req.Header.Add("User-Agent", c.userAgent)
 	return req, nil
-}
-func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
-	req = req.WithContext(ctx)
-	return c.httpClient.Do(req)
-}
-
-func httpClient() *http.Client {
-	return &http.Client{
-		Timeout: clientTimeOut,
-	}
-}
-
-func getAPIURL() string {
-	if u := os.Getenv("API_URL"); u != "" {
-		return u
-	}
-
-	return apiURL
-}
-
-func userAgent(ua string) string {
-	if ua != "" {
-		return ua
-	}
-	return "meroxa-go"
 }

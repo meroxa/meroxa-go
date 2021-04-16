@@ -20,5 +20,5 @@ func (c *Client) GetConnectorLogs(ctx context.Context, connectorName string) (*h
 	req.Header.Add("Content-Type", textContentType)
 	req.Header.Add("Accept", textContentType)
 
-	return c.do(ctx, req)
+	return c.httpClient.Do(req)
 }
