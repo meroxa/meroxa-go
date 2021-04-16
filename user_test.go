@@ -1,0 +1,68 @@
+package meroxa
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"reflect"
+	"testing"
+)
+
+func TestGetUser(t *testing.T) {
+	u := generateUser("", "", "", "", "", true)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := usersPath+"/me", req.URL.Path; want != got {
+			t.Fatalf("Path mismatched: want=%v got=%v", want, got)
+		}
+
+		if err := json.NewEncoder(w).Encode(&u); err != nil {
+			t.Fatal(err)
+		}
+
+	}))
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	gotUser, err := c.GetUser(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if want, got := &u, gotUser; !reflect.DeepEqual(want, got) {
+		t.Fatalf("User mismatched: want=%v got=%v", want, got)
+	}
+}
+
+func generateUser(uuid, username, email, givenName, familyName string, verified bool) User {
+	if uuid != "" {
+		uuid = "1234-5678-9012"
+	}
+
+	if username != "" {
+		username = "gbutler"
+	}
+
+	if email != "" {
+		email = "gbutler@email.io"
+	}
+
+	if givenName != "" {
+		givenName = "Joseph"
+	}
+
+	if familyName != "" {
+		familyName = "Marcell"
+	}
+
+	return User{
+		UUID:       uuid,
+		Username:   username,
+		Email:      email,
+		GivenName:  givenName,
+		FamilyName: familyName,
+		Verified:   false,
+	}
+}
