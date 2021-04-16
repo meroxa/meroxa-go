@@ -7,10 +7,11 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestGetUser(t *testing.T) {
-	u := generateUser("", "", "", "", "", true)
+	u := generateUser("", "", "", "", "", true, time.Time{})
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := usersPath+"/me", req.URL.Path; want != got {
@@ -36,7 +37,7 @@ func TestGetUser(t *testing.T) {
 	}
 }
 
-func generateUser(uuid, username, email, givenName, familyName string, verified bool) User {
+func generateUser(uuid, username, email, givenName, familyName string, verified bool, lastLogin time.Time) User {
 	if uuid != "" {
 		uuid = "1234-5678-9012"
 	}
@@ -57,6 +58,10 @@ func generateUser(uuid, username, email, givenName, familyName string, verified 
 		familyName = "Marcell"
 	}
 
+	if lastLogin.IsZero() {
+		lastLogin = time.Date(2021, 04, 17, 06, 34, 58, 651387237, time.UTC)
+	}
+
 	return User{
 		UUID:       uuid,
 		Username:   username,
@@ -64,5 +69,6 @@ func generateUser(uuid, username, email, givenName, familyName string, verified 
 		GivenName:  givenName,
 		FamilyName: familyName,
 		Verified:   false,
+		LastLogin:  lastLogin,
 	}
 }
