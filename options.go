@@ -2,12 +2,18 @@ package meroxa
 
 import (
 	"io"
+	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/meroxa/meroxa-go/auth"
+	"golang.org/x/oauth2"
 )
 
 type Option func(*Client) error
 
+// WithBaseURL sets the base url in the client.
+// The default is "https://api.meroxa.io/v1".
 func WithBaseURL(rawurl string) Option {
 	return func(client *Client) error {
 		u, err := url.Parse(rawurl)
@@ -19,6 +25,8 @@ func WithBaseURL(rawurl string) Option {
 	}
 }
 
+// WithClientTimeout sets the http client timeout.
+// The default is 5 seconds.
 func WithClientTimeout(timeout time.Duration) Option {
 	return func(client *Client) error {
 		client.httpClient.Timeout = timeout
@@ -26,6 +34,8 @@ func WithClientTimeout(timeout time.Duration) Option {
 	}
 }
 
+// WithUserAgent sets the User-Agent header.
+// The default is "meroxa-go".
 func WithUserAgent(ua string) Option {
 	return func(client *Client) error {
 		client.userAgent = ua
@@ -33,12 +43,39 @@ func WithUserAgent(ua string) Option {
 	}
 }
 
-func WithDebugOutput(writer io.Writer) Option {
+// WithDumpTransport will dump the outgoing requests and incoming responses and
+// write them to writer.
+func WithDumpTransport(writer io.Writer) Option {
 	return func(client *Client) error {
 		client.httpClient.Transport = &dumpTransport{
-			out:       writer,
-			transport: client.httpClient.Transport,
+			out:                    writer,
+			transport:              client.httpClient.Transport,
+			obfuscateAuthorization: true,
 		}
+		return nil
+	}
+}
+
+// WithClient sets the http client to use for requests.
+func WithClient(httpClient *http.Client) Option {
+	return func(client *Client) error {
+		client.httpClient = httpClient
+		return nil
+	}
+}
+
+// WithAuthentication sets an authenticated http client that takes care of
+// adding the access token to requests as well as refreshing it with the
+// refresh token when it expires.
+// Note: provide WithClientTimeout option before WithAuthentication to set the
+// timeout of the client used for fetching access tokens.
+func WithAuthentication(conf *oauth2.Config, accessToken, refreshToken string) Option {
+	return func(client *Client) error {
+		httpClient, err := auth.NewClient(client.httpClient, conf, accessToken, refreshToken)
+		if err != nil {
+			return err
+		}
+		client.httpClient = httpClient
 		return nil
 	}
 }

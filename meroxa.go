@@ -12,10 +12,9 @@ import (
 )
 
 const (
-	apiURL          = "https://api.meroxa.io/v1"
+	baseURL         = "https://api.meroxa.io/v1"
 	jsonContentType = "application/json"
 	textContentType = "text/plain"
-	clientTimeOut   = 5 * time.Second
 )
 
 // encodeFunc encodes v into w
@@ -47,9 +46,17 @@ type Client struct {
 	httpClient *http.Client
 }
 
-// New returns a configured Meroxa API Client
-func New(token string, options ...Option) (*Client, error) {
-	u, err := url.Parse(apiURL)
+// New returns a Meroxa API client. To configure it provide a list of Options.
+// Note that by default the client is not using any authentication, to provide
+// it please use option WithAuthentication or provide your own *http.Client,
+// which takes care of authentication.
+//
+// Example creating an authenticated client:
+//  c, err := New(
+//      WithAuthentication(auth.DefaultConfig(), accessToken, refreshToken),
+//  )
+func New(options ...Option) (*Client, error) {
+	u, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -57,9 +64,9 @@ func New(token string, options ...Option) (*Client, error) {
 	c := &Client{
 		baseURL:   u,
 		userAgent: "meroxa-go",
-		token:     token,
 		httpClient: &http.Client{
-			Timeout: clientTimeOut,
+			Timeout:   5 * time.Second,
+			Transport: http.DefaultTransport,
 		},
 	}
 
@@ -120,11 +127,7 @@ func (c *Client) newRequest(ctx context.Context, method, path string, body inter
 		return nil, err
 	}
 
-	// Set Auth
-	bearer := fmt.Sprintf("Bearer %s", c.token)
-
-	// add authorization header to the req
-	req.Header.Add("Authorization", bearer)
+	// add global headers to request
 	req.Header.Add("Content-Type", jsonContentType)
 	req.Header.Add("Accept", jsonContentType)
 	req.Header.Add("User-Agent", c.userAgent)

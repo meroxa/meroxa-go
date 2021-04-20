@@ -1,7 +1,6 @@
 package meroxa
 
 import (
-	"context"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -10,8 +9,9 @@ import (
 )
 
 type dumpTransport struct {
-	out       io.Writer
-	transport http.RoundTripper
+	out                    io.Writer
+	transport              http.RoundTripper
+	obfuscateAuthorization bool
 }
 
 func (d *dumpTransport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -34,22 +34,28 @@ func (d *dumpTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 func (d *dumpTransport) dumpRequest(req *http.Request) error {
-	cloned := req.Clone(context.Background())
+	if d.obfuscateAuthorization {
+		if auth := req.Header.Get("Authorization"); auth != "" {
+			save := auth
+			defer func() {
+				// restore old header
+				req.Header.Set("Authorization", save)
+			}()
 
-	// Makes sure we don't log out the bearer token by accident when it's not nil
-	if auth := cloned.Header.Get("Authorization"); auth != "" {
-		tokens := strings.SplitN(auth, " ", 2)
-		if len(tokens) == 2 {
-			tokens[1] = d.obfuscate(tokens[1])
-			auth = strings.Join(tokens, " ")
+			tokens := strings.SplitN(auth, " ", 2)
+			if len(tokens) == 2 {
+				tokens[1] = d.obfuscate(tokens[1])
+				auth = strings.Join(tokens, " ")
+			}
+			req.Header.Set("Authorization", auth)
 		}
-		cloned.Header.Set("Authorization", auth)
 	}
 
-	dump, err := httputil.DumpRequestOut(cloned, true)
+	dump, err := httputil.DumpRequestOut(req, true)
 	if err != nil {
 		return err
 	}
+
 	_, err = d.out.Write(dump)
 	if err != nil {
 		return err
