@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,26 +15,6 @@ const (
 	jsonContentType = "application/json"
 	textContentType = "text/plain"
 )
-
-// encodeFunc encodes v into w
-type encodeFunc func(w io.Writer, v interface{}) error
-
-func jsonEncodeFunc(w io.Writer, v interface{}) error {
-	return json.NewEncoder(w).Encode(v)
-}
-
-func stringEncodeFunc(w io.Writer, v interface{}) error {
-	if s, ok := v.(string); ok {
-		_, err := w.Write([]byte(s))
-		return err
-	}
-
-	return fmt.Errorf("body is not a string")
-}
-
-func noopEncodeFunc(w io.Writer, v interface{}) error {
-	return nil
-}
 
 // Client represents the Meroxa API Client
 type Client struct {
@@ -80,26 +59,13 @@ func New(options ...Option) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) makeRequest(ctx context.Context, method, path string, body interface{}, params url.Values) (*http.Response, error) {
-	return c.makeRequestRaw(ctx, method, path, body, params, jsonEncodeFunc)
-}
-
-func (c *Client) makeRequestRaw(ctx context.Context, method, path string, body interface{}, params url.Values, encode encodeFunc) (*http.Response, error) {
-	req, err := c.newRequest(ctx, method, path, body, encode)
+func (c *Client) MakeRequest(ctx context.Context, method, path string, body interface{}, params url.Values) (*http.Response, error) {
+	req, err := c.newRequest(ctx, method, path, body, params)
 	if err != nil {
 		return nil, err
 	}
 
 	// Merge params
-	if params != nil {
-		q := req.URL.Query()
-		for k, v := range params { // v is a []string
-			for _, vv := range v {
-				q.Add(k, vv)
-			}
-			req.URL.RawQuery = q.Encode()
-		}
-	}
 	resp, err := c.httpClient.Do(req)
 
 	if err != nil {
@@ -109,7 +75,7 @@ func (c *Client) makeRequestRaw(ctx context.Context, method, path string, body i
 	return resp, nil
 }
 
-func (c *Client) newRequest(ctx context.Context, method, path string, body interface{}, encode encodeFunc) (*http.Request, error) {
+func (c *Client) newRequest(ctx context.Context, method, path string, body interface{}, params url.Values) (*http.Request, error) {
 	u, err := c.baseURL.Parse(path)
 	if err != nil {
 		return nil, err
@@ -117,7 +83,7 @@ func (c *Client) newRequest(ctx context.Context, method, path string, body inter
 
 	buf := new(bytes.Buffer)
 	if body != nil {
-		if err := encode(buf, body); err != nil {
+		if err := c.encodeBody(buf, body); err != nil {
 			return nil, err
 		}
 	}
@@ -131,5 +97,34 @@ func (c *Client) newRequest(ctx context.Context, method, path string, body inter
 	req.Header.Add("Content-Type", jsonContentType)
 	req.Header.Add("Accept", jsonContentType)
 	req.Header.Add("User-Agent", c.userAgent)
+
+	// add params
+	if params != nil {
+		q := req.URL.Query()
+		for k, v := range params { // v is a []string
+			for _, vv := range v {
+				q.Add(k, vv)
+			}
+			req.URL.RawQuery = q.Encode()
+		}
+	}
+
 	return req, nil
+}
+
+func (c *Client) encodeBody(w io.Writer, v interface{}) error {
+	if v == nil {
+		return nil
+	}
+
+	switch body := v.(type) {
+	case string:
+		_, err := w.Write([]byte(body))
+		return err
+	case []byte:
+		_, err := w.Write(body)
+		return err
+	default:
+		return json.NewEncoder(w).Encode(v)
+	}
 }
