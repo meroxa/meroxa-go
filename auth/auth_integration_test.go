@@ -3,12 +3,14 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"strings"
 	"testing"
 	"time"
+
+	"golang.org/x/oauth2"
 )
 
 func TestTokenSource_Integration_Token(t *testing.T) {
@@ -17,6 +19,7 @@ func TestTokenSource_Integration_Token(t *testing.T) {
 		t.Skipf("MEROXA_REFRESH_TOKEN is not set, skipping integration test")
 	}
 
+	tokenChan := make(chan *oauth2.Token)
 	c, err := NewClient(
 		&http.Client{
 			Timeout: 5 * time.Second,
@@ -24,18 +27,23 @@ func TestTokenSource_Integration_Token(t *testing.T) {
 		DefaultConfig(),
 		"",
 		refreshToken,
+		func(token *oauth2.Token) {
+			tokenChan <- token
+		},
 	)
 	if err != nil {
 		t.Fatalf("could not create client: %v", err)
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
-		auth := req.Header.Get("Authorization")
-		if auth == "" ||
-			!strings.HasPrefix(auth, "Bearer ") ||
-			len(auth[7:]) == 0 {
-			t.Fatalf("Unexpected Authorization header: %q", auth)
+		token := <-tokenChan
+		wantAuth := fmt.Sprintf("%s %s", token.TokenType, token.AccessToken)
+
+		gotAuth := req.Header.Get("Authorization")
+		if gotAuth != wantAuth {
+			t.Fatalf("expected %q, got %q", wantAuth, gotAuth)
 		}
+
 		resp.WriteHeader(200)
 	}))
 

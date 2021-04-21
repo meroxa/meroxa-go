@@ -66,12 +66,13 @@ func WithClient(httpClient *http.Client) Option {
 
 // WithAuthentication sets an authenticated http client that takes care of
 // adding the access token to requests as well as refreshing it with the
-// refresh token when it expires.
+// refresh token when it expires. Observers will be called each time the token
+// is refreshed.
 // Note: provide WithClientTimeout option before WithAuthentication to set the
 // timeout of the client used for fetching access tokens.
-func WithAuthentication(conf *oauth2.Config, accessToken, refreshToken string) Option {
+func WithAuthentication(conf *oauth2.Config, accessToken, refreshToken string, observers ...auth.TokenObserver) Option {
 	return func(client *Client) error {
-		httpClient, err := auth.NewClient(client.httpClient, conf, accessToken, refreshToken)
+		httpClient, err := auth.NewClient(client.httpClient, conf, accessToken, refreshToken, observers...)
 		if err != nil {
 			return err
 		}

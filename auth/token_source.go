@@ -18,6 +18,7 @@ type tokenSource struct {
 	client       *http.Client
 	conf         *oauth2.Config
 	refreshToken string
+	observers    []TokenObserver
 }
 
 func (ts *tokenSource) Token() (*oauth2.Token, error) {
@@ -37,7 +38,17 @@ func (ts *tokenSource) Token() (*oauth2.Token, error) {
 		ts.refreshToken = tk.RefreshToken
 	}
 
+	// asynchronously notify observers
+	go notifyTokenObservers(tk, ts.observers)
+
 	return tk, err
+}
+
+func notifyTokenObservers(token *oauth2.Token, observers []TokenObserver) {
+	clone := *token
+	for _, o := range observers {
+		o(&clone)
+	}
 }
 
 func retrieveToken(client *http.Client, conf *oauth2.Config, refreshToken string) (*oauth2.Token, error) {
@@ -93,6 +104,9 @@ func retrieveToken(client *http.Client, conf *oauth2.Config, refreshToken string
 		expiry = time.Unix(tokenRes.ExpiresIn, 0).UTC()
 	}
 	token.Expiry = expiry
+
+	// TODO validate JWT token signature
+	// keys are available at https://auth.meroxa.io/.well-known/jwks.json
 
 	return token, nil
 }

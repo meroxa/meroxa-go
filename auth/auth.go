@@ -19,6 +19,9 @@ var (
 	}
 )
 
+// TokenObserver is a function that will be notified when a new token is fetched.
+type TokenObserver func(*oauth2.Token)
+
 func DefaultConfig() *oauth2.Config {
 	return &oauth2.Config{
 		ClientID: ClientID,
@@ -26,7 +29,13 @@ func DefaultConfig() *oauth2.Config {
 	}
 }
 
-func NewClient(client *http.Client, conf *oauth2.Config, accessToken, refreshToken string) (*http.Client, error) {
+func NewClient(
+	client *http.Client,
+	conf *oauth2.Config,
+	accessToken,
+	refreshToken string,
+	tokenObservers ...TokenObserver,
+) (*http.Client, error) {
 	if client == nil {
 		client = http.DefaultClient
 	}
@@ -54,6 +63,7 @@ func NewClient(client *http.Client, conf *oauth2.Config, accessToken, refreshTok
 			conf:         conf,
 			client:       client,
 			refreshToken: refreshToken,
+			observers:    tokenObservers,
 		},
 	)
 
