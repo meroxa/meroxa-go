@@ -1,6 +1,6 @@
 // +build integration
 
-package auth
+package meroxa
 
 import (
 	"fmt"
@@ -13,18 +13,18 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func TestTokenSource_Integration_Token(t *testing.T) {
+func TestNewAuthClient_Integration_Token(t *testing.T) {
 	refreshToken := os.Getenv("MEROXA_REFRESH_TOKEN")
 	if refreshToken == "" {
 		t.Skipf("MEROXA_REFRESH_TOKEN is not set, skipping integration test")
 	}
 
 	tokenChan := make(chan *oauth2.Token)
-	c, err := NewClient(
+	c, err := newAuthClient(
 		&http.Client{
 			Timeout: 5 * time.Second,
 		},
-		DefaultConfig(),
+		DefaultOAuth2Config(),
 		"",
 		refreshToken,
 		func(token *oauth2.Token) {

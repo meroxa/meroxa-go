@@ -1,4 +1,4 @@
-package auth
+package meroxa
 
 import (
 	"encoding/json"
