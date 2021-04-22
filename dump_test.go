@@ -12,11 +12,11 @@ func TestDumpTransport_Obfuscate(t *testing.T) {
 		"testau":        "****au",
 		"testaut":       "****aut",
 		"testauth":      "****auth",
-		"testautht":     "*****utht",
-		"testauthto":    "******thto",
-		"testauthtok":   "*******htok",
-		"testauthtoke":  "********toke",
-		"testauthtoken": "*********oken",
+		"testautht":     "****utht",
+		"testauthto":    "****thto",
+		"testauthtok":   "****htok",
+		"testauthtoke":  "****toke",
+		"testauthtoken": "****oken",
 	}
 	dt := &dumpTransport{}
 	for have, want := range testCases {
