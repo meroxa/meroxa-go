@@ -136,7 +136,7 @@ func TestUpdateConnectorStatus(t *testing.T) {
 func testClient(c *http.Client, u string) *Client {
 	parsedURL, _ := url.Parse(u)
 	return &Client{
-		BaseURL:    parsedURL,
+		baseURL:    parsedURL,
 		httpClient: c,
 	}
 }
