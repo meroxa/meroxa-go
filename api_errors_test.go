@@ -15,11 +15,9 @@ var httpNoErrorResponse = &http.Response{
 }
 
 // create a new reader with a JSON response
-var errorJSONResponse = ioutil.NopCloser(bytes.NewReader([]byte(`{ "error": "api error" }`)))
-var errorJSONResponseCodeMessage = ioutil.NopCloser(bytes.NewReader([]byte(`{ "code": "already_exists", "message": "resource with name test already exists"}`)))
-var errorJSONResponseDetails = ioutil.NopCloser(bytes.NewReader([]byte(
-	`{ "code": "already_exists", "message": "resource with name test already exists", "details": { "name": ["too long", "invalid"], "type": ["invalid"] } }`,
-)))
+func errorJSONResponse(msg string) io.ReadCloser {
+	return ioutil.NopCloser(bytes.NewReader([]byte(msg)))
+}
 
 // create a new reader with an HTML response
 var errorHTMLResponse = ioutil.NopCloser(bytes.NewReader([]byte(`<h1>Error!</h1>`)))
@@ -27,7 +25,7 @@ var errorHTMLResponse = ioutil.NopCloser(bytes.NewReader([]byte(`<h1>Error!</h1>
 var http503JSONResponse = &http.Response{
 	StatusCode: 503,
 	Status:     "503 Service Unavailable",
-	Body:       errorJSONResponse,
+	Body:       errorJSONResponse(`{ "error": "api error" }`),
 	Proto:      "HTTP/1.0",
 	Header:     make(http.Header),
 }
@@ -52,20 +50,21 @@ var http503HTMLResponse = &http.Response{
 
 func TestHandleAPIErrors(t *testing.T) {
 	tests := []struct {
-		in  *http.Response
-		err error
+		in     *http.Response
+		err    error
 		output string
 	}{
 		{httpNoErrorResponse, nil, ""},
 		{http503HTMLResponse, errors.New("HTTP/1.0 503 Service Unavailable"), "HTTP/1.0 503 Service Unavailable"},
-		{http422JSONResponse(errorJSONResponseCodeMessage),
+		{http422JSONResponse(errorJSONResponse(`{ "code": "already_exists", "message": "resource with name test already exists"}`)),
 			&errResponse{
 				Code:    "already_exists",
 				Message: "resource with name test already exists",
 			},
 			"resource with name test already exists",
 		},
-		{http422JSONResponse(errorJSONResponseDetails),
+		{http422JSONResponse(errorJSONResponse(
+			`{ "code": "already_exists", "message": "resource with name test already exists", "details": { "name": ["too long", "invalid"], "type": ["invalid"] } }`)),
 			&errResponse{
 				Code:    "already_exists",
 				Message: "resource with name test already exists",
@@ -74,7 +73,17 @@ func TestHandleAPIErrors(t *testing.T) {
 					"type": {"invalid"},
 				},
 			},
-			"resource with name test already exists\ndetails: \n\t\"name\": [\"too long\", \"invalid\"]\n\t\"type\": [\"invalid\"]",
+			"resource with name test already exists. 2 problems occured:\n1. name: \"too long\", \"invalid\"\n2. type: \"invalid\"",
+		},
+		{http422JSONResponse(errorJSONResponse(`{ "code": "already_exists", "message": "resource with name test already exists", "details": { "type": ["invalid"] }}`)),
+			&errResponse{
+				Code:    "already_exists",
+				Message: "resource with name test already exists",
+				Details: map[string][]string{
+					"type": {"invalid"},
+				},
+			},
+			"resource with name test already exists. 1 problem occured:\n1. type: \"invalid\"",
 		},
 	}
 
