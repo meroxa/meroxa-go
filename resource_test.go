@@ -35,6 +35,75 @@ func TestEncodeURLCreds(t *testing.T) {
 	}
 }
 
+func TestCreateResource(t *testing.T) {
+	var resource CreateResourceInput
+
+	resource.Name = "resource-name"
+	resource.URL = "http://foo.com"
+	resource.Metadata = map[string]interface{}{
+		"key": "value",
+	}
+	resource.SSHTunnel = &ResourceSSHTunnelInput{
+		Address: "test@host.com",
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s", ResourcesBasePath), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		var rr *CreateResourceInput
+		if err := json.NewDecoder(req.Body).Decode(&rr); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+		defer req.Body.Close()
+
+		if rr.URL != resource.URL {
+			t.Errorf("expected URL %s, got %s", resource.URL, rr.URL)
+		}
+
+		if !reflect.DeepEqual(rr.Metadata, resource.Metadata) {
+			t.Errorf("expected same metadata")
+		}
+
+		if !reflect.DeepEqual(rr.SSHTunnel, resource.SSHTunnel) {
+			t.Errorf("expected same ssh tunnel")
+		}
+
+		// Return response to satisfy client and test response
+		c := generateResource(resource.Name, 0, "", nil)
+		c.URL = resource.URL
+		c.Metadata = resource.Metadata
+		c.SSHTunnel = &ResourceSSHTunnel{
+			Address:   resource.SSHTunnel.Address,
+			PublicKey: "1234",
+		}
+		json.NewEncoder(w).Encode(c)
+	}))
+
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.CreateResource(context.Background(), &resource)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if resp.URL != resource.URL {
+		t.Errorf("expected url %s, got %s", resource.URL, resp.URL)
+	}
+
+	if want, got := resource.SSHTunnel.Address, resp.SSHTunnel.Address; want != got {
+		t.Errorf("unexpected ssh tunnel address: want=%s got=%s", want, got)
+	}
+
+	if want, got := "1234", resp.SSHTunnel.PublicKey; want != got {
+		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
+	}
+}
+
 func TestUpdateResource(t *testing.T) {
 	var resource UpdateResourceInput
 
