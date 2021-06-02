@@ -43,6 +43,9 @@ func TestUpdateResource(t *testing.T) {
 	resource.Metadata = map[string]interface{}{
 		"key": "value",
 	}
+	resource.SSHTunnel = &ResourceSSHTunnelInput{
+		Address: "test@host.com",
+	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", ResourcesBasePath, resource.Name), req.URL.Path; want != got {
@@ -63,10 +66,18 @@ func TestUpdateResource(t *testing.T) {
 			t.Errorf("expected same metadata")
 		}
 
+		if !reflect.DeepEqual(rr.SSHTunnel, resource.SSHTunnel) {
+			t.Errorf("expected same ssh tunnel")
+		}
+
 		// Return response to satisfy client and test response
 		c := generateResource(resource.Name, 0, "", nil)
 		c.URL = resource.URL
 		c.Metadata = resource.Metadata
+		c.SSHTunnel = &ResourceSSHTunnel{
+			Address:   resource.SSHTunnel.Address,
+			PublicKey: "1234",
+		}
 		json.NewEncoder(w).Encode(c)
 	}))
 
@@ -82,6 +93,14 @@ func TestUpdateResource(t *testing.T) {
 
 	if resp.URL != resource.URL {
 		t.Errorf("expected url %s, got %s", resource.URL, resp.URL)
+	}
+
+	if want, got := resource.SSHTunnel.Address, resp.SSHTunnel.Address; want != got {
+		t.Errorf("unexpected ssh tunnel address: want=%s got=%s", want, got)
+	}
+
+	if want, got := "1234", resp.SSHTunnel.PublicKey; want != got {
+		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 	}
 }
 
