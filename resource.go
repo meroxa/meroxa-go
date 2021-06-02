@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const ResourcesBasePath = "/v1/resources"
@@ -54,6 +55,11 @@ type Resource struct {
 	Credentials *Credentials           `json:"credentials,omitempty"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	SSHTunnel   *ResourceSSHTunnel     `json:"ssh_tunnel,omitempty"`
+	Status      struct {
+		State string `json:"state"`
+	} `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // UpdateResourceInput represents the Meroxa Resource we're updating in the Meroxa API
