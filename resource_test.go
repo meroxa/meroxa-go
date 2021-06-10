@@ -11,6 +11,63 @@ import (
 	"testing"
 )
 
+func Test_Resource_PerformActions(t *testing.T) {
+	for k, v := range map[string]func(c *Client, id int) (*Resource, error){
+		"validate": func(c *Client, id int) (*Resource, error) {
+			return c.ValidateResource(context.Background(), id)
+		},
+		"rotate_keys": func(c *Client, id int) (*Resource, error) {
+			return c.RotateTunnelKeyForResource(context.Background(), id)
+		},
+	} {
+		action := k
+		f := v
+
+		t.Run(action, func(t *testing.T) {
+			resID := 1
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				if want, got := fmt.Sprintf("%s/%d/actions", ResourcesBasePath, resID), req.URL.Path; want != got {
+					t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+				}
+
+				var body = struct {
+					Action string `json:"action"`
+				}{}
+
+				if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+					t.Errorf("expected no error, got %+v", err)
+				}
+				defer req.Body.Close()
+
+				if want, got := action, body.Action; want != got {
+					t.Errorf("unexpected action: want=%s got=%s", want, got)
+				}
+
+				// Return response to satisfy client and test response
+				c := generateResource("test", resID, "", nil)
+				json.NewEncoder(w).Encode(c)
+			}))
+
+			// Close the server when test finishes
+			defer server.Close()
+
+			c := testClient(server.Client(), server.URL)
+
+			resp, err := f(c, resID)
+			if err != nil {
+				t.Errorf("expected no error, got %+v", err)
+			}
+
+			if want, got := resID, resp.ID; want != got {
+				t.Errorf("unexpected resource ID: want=%d got %d", want, got)
+			}
+
+		})
+
+	}
+
+}
+
 func TestEncodeURLCreds(t *testing.T) {
 	tests := []struct {
 		in   string
