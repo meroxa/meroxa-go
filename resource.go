@@ -130,16 +130,16 @@ func (c *Client) UpdateResource(ctx context.Context, key string, resourceToUpdat
 	return &r, nil
 }
 
-func (c *Client) RotateTunnelKeyForResource(ctx context.Context, id int) (*Resource, error) {
+func (c *Client) RotateTunnelKeyForResource(ctx context.Context, id string) (*Resource, error) {
 	return c.performResourceAction(ctx, id, "rotate_keys")
 }
 
-func (c *Client) ValidateResource(ctx context.Context, id int) (*Resource, error) {
+func (c *Client) ValidateResource(ctx context.Context, id string) (*Resource, error) {
 	return c.performResourceAction(ctx, id, "validate")
 }
 
-func (c *Client) performResourceAction(ctx context.Context, id int, action string) (*Resource, error) {
-	path := fmt.Sprintf("%s/%d/actions", ResourcesBasePath, id)
+func (c *Client) performResourceAction(ctx context.Context, id string, action string) (*Resource, error) {
+	path := fmt.Sprintf("%s/%s/actions", ResourcesBasePath, id)
 	body := struct {
 		Action string `json:"action"`
 	}{
