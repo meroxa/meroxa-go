@@ -130,6 +130,41 @@ func (c *Client) UpdateResource(ctx context.Context, key string, resourceToUpdat
 	return &r, nil
 }
 
+func (c *Client) RotateTunnelKeyForResource(ctx context.Context, id int) (*Resource, error) {
+	return c.performResourceAction(ctx, id, "rotate_keys")
+}
+
+func (c *Client) ValidateResource(ctx context.Context, id int) (*Resource, error) {
+	return c.performResourceAction(ctx, id, "validate")
+}
+
+func (c *Client) performResourceAction(ctx context.Context, id int, action string) (*Resource, error) {
+	path := fmt.Sprintf("%s/%d/actions", ResourcesBasePath, id)
+	body := struct {
+		Action string `json:"action"`
+	}{
+		Action: action,
+	}
+
+	resp, err := c.MakeRequest(ctx, http.MethodPost, path, body, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var rr Resource
+	err = json.NewDecoder(resp.Body).Decode(&rr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rr, nil
+}
+
 // ListResources returns an array of Resources (scoped to the calling user)
 func (c *Client) ListResources(ctx context.Context) ([]*Resource, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodGet, ResourcesBasePath, nil, nil)
