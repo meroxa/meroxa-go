@@ -8,16 +8,17 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strconv"
 	"testing"
 )
 
 func Test_Resource_PerformActions(t *testing.T) {
 	for k, v := range map[string]func(c *Client, id int) (*Resource, error){
 		"validate": func(c *Client, id int) (*Resource, error) {
-			return c.ValidateResource(context.Background(), id)
+			return c.ValidateResource(context.Background(), strconv.Itoa(id))
 		},
 		"rotate_keys": func(c *Client, id int) (*Resource, error) {
-			return c.RotateTunnelKeyForResource(context.Background(), id)
+			return c.RotateTunnelKeyForResource(context.Background(), strconv.Itoa(id))
 		},
 	} {
 		action := k
