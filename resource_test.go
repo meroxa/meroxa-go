@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func Test_Resource_PerformActions(t *testing.T) {
@@ -160,6 +161,18 @@ func TestCreateResource(t *testing.T) {
 	if want, got := "1234", resp.SSHTunnel.PublicKey; want != got {
 		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 	}
+
+	if want, got := "ready", resp.Status.State; want != got {
+		t.Errorf("unexpected status state: want=%s got=%s", want, got)
+	}
+
+	if want, got := "your resource is ready to use", resp.Status.Details; want != got {
+		t.Errorf("unexpected status details: want=%s got=%s", want, got)
+	}
+
+	if resp.Status.LastUpdatedAt.IsZero() {
+		t.Errorf("expected time to not be null: got=%s", resp.Status.LastUpdatedAt)
+	}
 }
 
 func TestUpdateResource(t *testing.T) {
@@ -229,6 +242,18 @@ func TestUpdateResource(t *testing.T) {
 	if want, got := "1234", resp.SSHTunnel.PublicKey; want != got {
 		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 	}
+
+	if want, got := "ready", resp.Status.State; want != got {
+		t.Errorf("unexpected status state: want=%s got=%s", want, got)
+	}
+
+	if want, got := "your resource is ready to use", resp.Status.Details; want != got {
+		t.Errorf("unexpected status details: want=%s got=%s", want, got)
+	}
+
+	if resp.Status.LastUpdatedAt.IsZero() {
+		t.Errorf("expected time to not be null: got=%s", resp.Status.LastUpdatedAt)
+	}
 }
 
 func generateResource(name string, id int, url string, metadata map[string]interface{}) Resource {
@@ -246,5 +271,10 @@ func generateResource(name string, id int, url string, metadata map[string]inter
 		Name:     name,
 		URL:      url,
 		Metadata: metadata,
+		Status: ResourceStatus{
+			State:         "ready",
+			Details:       "your resource is ready to use",
+			LastUpdatedAt: time.Now(),
+		},
 	}
 }
