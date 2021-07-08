@@ -38,7 +38,8 @@ type CreateResourceInput struct {
 }
 
 type ResourceSSHTunnelInput struct {
-	Address string `json:"address"`
+	Address    string `json:"address"`
+	PrivateKey string `json:"private_key"`
 }
 
 type ResourceSSHTunnel struct {
