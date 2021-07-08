@@ -104,7 +104,8 @@ func TestCreateResource(t *testing.T) {
 		"key": "value",
 	}
 	resource.SSHTunnel = &ResourceSSHTunnelInput{
-		Address: "test@host.com",
+		Address:    "test@host.com",
+		PrivateKey: "1234",
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
