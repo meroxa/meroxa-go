@@ -81,6 +81,9 @@ func TestEncodeURLCreds(t *testing.T) {
 		{"s3://us-east-1/bucket", "s3://us-east-1/bucket", nil},
 		{"s3://:apassword@us-east-1/bucket", "s3://:apassword@us-east-1/bucket", nil},
 		{"s3://foo@bar:/barfoo/+@us-east-1/bucket", "s3://foo%40bar:%2Fbarfoo%2F+@us-east-1/bucket", nil},
+		{"s3://foo@us-east-1/bucket", "s3://foo:@us-east-1/bucket", nil},
+		{"s3://foo:@us-east-1/bucket", "s3://foo:@us-east-1/bucket", nil},
+		{"s3://:bar@us-east-1/bucket", "s3://:bar@us-east-1/bucket", nil},
 		{"not a URL", "", ErrMissingScheme},
 	}
 
