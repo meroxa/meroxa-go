@@ -133,6 +133,50 @@ func TestUpdateConnectorStatus(t *testing.T) {
 	}
 }
 
+func TestUpdateConnector(t *testing.T) {
+	var connector = generateConnector("", 0, nil, nil)
+	var connectorUpdate UpdateConnectorInput
+	connectorUpdate.Name = connector.Name
+	connectorUpdate.Configuration = connector.Configuration
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s", connectorsBasePath, connector.Name), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		var cu UpdateConnectorInput
+
+		if err := json.NewDecoder(req.Body).Decode(&cu); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+		defer req.Body.Close()
+
+		if cu.Name != connector.Name {
+			t.Errorf("expected name %s, got %s", cu.Name, cu.Name)
+		}
+
+		if !reflect.DeepEqual(cu.Configuration, connector.Configuration) {
+			t.Errorf("expected same configuration")
+		}
+
+		// Return response to satisfy client and test response
+		json.NewEncoder(w).Encode(connector)
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.UpdateConnector(context.Background(), connector.Name, connectorUpdate)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &connector) {
+		t.Errorf("expected response same as connector")
+	}
+}
+
 func testClient(c *http.Client, u string) *Client {
 	parsedURL, _ := url.Parse(u)
 	return &Client{
@@ -148,6 +192,18 @@ func generateConnector(name string, id int, config, metadata map[string]interfac
 
 	if id == 0 {
 		id = rand.Intn(10000)
+	}
+
+	if config == nil {
+		config = map[string]interface{}{
+			"key": "value",
+		}
+	}
+
+	if metadata == nil {
+		metadata = map[string]interface{}{
+			"mx:key": "value",
+		}
 	}
 
 	return Connector{
