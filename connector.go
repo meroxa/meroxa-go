@@ -26,7 +26,7 @@ type CreateConnectorInput struct {
 	Name          string                 `json:"name,omitempty"`
 	ResourceID    int                    `json:"resource_id"`
 	PipelineID    int                    `json:"pipeline_id,omitempty"`
-	PipelineName  string                 `json:"pipeline_name,omitempty"`
+	PipelineName  string                 `json:"pipeline_name"`
 	Configuration map[string]interface{} `json:"config,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 }
