@@ -11,7 +11,7 @@ import (
 )
 
 func TestGetUser(t *testing.T) {
-	u := generateUser("", "", "", "", "", true, time.Time{})
+	u := generateUser("", "", "", "", "", true, time.Time{}, []string{"great-feature"})
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := usersPath+"/me", req.URL.Path; want != got {
@@ -37,7 +37,7 @@ func TestGetUser(t *testing.T) {
 	}
 }
 
-func generateUser(uuid, username, email, givenName, familyName string, verified bool, lastLogin time.Time) User {
+func generateUser(uuid, username, email, givenName, familyName string, verified bool, lastLogin time.Time, features []string) User {
 	if uuid != "" {
 		uuid = "1234-5678-9012"
 	}
@@ -68,7 +68,8 @@ func generateUser(uuid, username, email, givenName, familyName string, verified 
 		Email:      email,
 		GivenName:  givenName,
 		FamilyName: familyName,
-		Verified:   false,
+		Verified:   verified,
 		LastLogin:  lastLogin,
+		Features:   features,
 	}
 }
