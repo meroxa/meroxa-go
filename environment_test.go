@@ -10,7 +10,6 @@ import (
 )
 
 func TestGetEnvironments(t *testing.T) {
-
 	env := &Environment{
 		Type:     "dedicated",
 		Name:     "environment-1234",

@@ -23,7 +23,7 @@ type Environment struct {
 	ID       string            `json:"id"`
 }
 
-// ListEnvironments returns an array of Pipelines (scoped to the calling user)
+// ListEnvironments returns an array of Environments (scoped to the calling user)
 func (c *Client) ListEnvironments(ctx context.Context) ([]*Environment, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodGet, environmentsBasePath, nil, nil)
 	if err != nil {
