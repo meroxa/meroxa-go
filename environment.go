@@ -3,6 +3,7 @@ package meroxa
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -71,4 +72,14 @@ func (c *Client) CreateEnvironment(ctx context.Context, body *CreateEnvironmentI
 	}
 
 	return &e, nil
+}
+
+func (c *Client) DeleteEnvironment(ctx context.Context, nameOrUUID string) error {
+	path := fmt.Sprintf("%s/%s", environmentsBasePath, nameOrUUID)
+	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	return handleAPIErrors(resp)
 }

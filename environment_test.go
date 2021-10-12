@@ -103,6 +103,25 @@ func TestCreateEnvironment(t *testing.T) {
 	}
 }
 
+func TestDeleteEnvironment(t *testing.T) {
+	env := generateEnvironment("dedicated", "environment-1234", "aws")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		path := fmt.Sprintf("%s/%s", environmentsBasePath, env.ID)
+		if req.URL.Path != path {
+			t.Fatalf("Path mismatched: got=%v want=%v", req.URL.Path, path)
+		}
+	}))
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	err := c.DeleteEnvironment(context.Background(), env.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func generateEnvironment(t, p, n string) Environment {
 	// TODO: Return region based on config.
 	// i.e.: config: { "aws_region": "region" } => environment.region
