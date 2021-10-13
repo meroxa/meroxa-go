@@ -71,6 +71,10 @@ func TestCreateEnvironment(t *testing.T) {
 			t.Errorf("expected name %q, got %q", ee.Name, environment.Name)
 		}
 
+		if environment.Region != ee.Region {
+			t.Errorf("expected region %q, got %q", ee.Region, environment.Region)
+		}
+
 		if !reflect.DeepEqual(ee.Config, environment.Config) {
 			t.Errorf("expected same configuration")
 		}
@@ -112,6 +116,6 @@ func generateEnvironment(t, p, n string) Environment {
 		Provider: p,
 		Region:   "us-east-1",
 		Status:   EnvironmentStatus{State: "provisioned"},
-		ID:       "1a92d590-d59c-460b-94de-870f04ab35bf",
+		UUID:     "1a92d590-d59c-460b-94de-870f04ab35bf",
 	}
 }
