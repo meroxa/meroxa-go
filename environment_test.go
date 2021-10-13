@@ -11,12 +11,12 @@ import (
 
 func TestGetEnvironments(t *testing.T) {
 	env := &Environment{
-		Type:     "dedicated",
+		UUID:     "1234",
 		Name:     "environment-1234",
 		Provider: "aws",
-		Region:   "aws:us-east",
+		Region:   "us-east",
+		Type:     "dedicated",
 		Status:   EnvironmentStatus{State: "provisioned"},
-		ID:       "1234",
 	}
 
 	environments := []*Environment{env}
