@@ -29,11 +29,11 @@ type Environment struct {
 
 // CreateEnvironmentInput represents the input for a Meroxa Environment we're creating within the Meroxa API
 type CreateEnvironmentInput struct {
-	Type     string            `json:"type,omitempty"`
-	Provider string            `json:"provider,omitempty"`
-	Name     string            `json:"name,omitempty"`
-	Config   map[string]string `json:"config"`
-	Region   string            `json:"region"`
+	Type          string                 `json:"type,omitempty"`
+	Provider      string                 `json:"provider,omitempty"`
+	Name          string                 `json:"name,omitempty"`
+	Configuration map[string]interface{} `json:"config"`
+	Region        string                 `json:"region"`
 }
 
 // ListEnvironments returns an array of Environments (scoped to the calling user)
