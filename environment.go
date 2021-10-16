@@ -33,7 +33,7 @@ type CreateEnvironmentInput struct {
 	Provider      string                 `json:"provider,omitempty"`
 	Name          string                 `json:"name,omitempty"`
 	Configuration map[string]interface{} `json:"config"`
-	Region        string                 `json:"region"`
+	Region        string                 `json:"region,omitempty"`
 }
 
 // ListEnvironments returns an array of Environments (scoped to the calling user)
