@@ -256,29 +256,6 @@ func (c *Client) DeleteResource(ctx context.Context, id int) error {
 	return nil
 }
 
-// ListResourceConnections returns an array of Connectors for a given Resource
-func (c *Client) ListResourceConnections(ctx context.Context, id int) ([]*Connector, error) {
-	path := fmt.Sprintf("%s/%d/connections", ResourcesBasePath, id)
-
-	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	err = handleAPIErrors(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	var cc []*Connector
-	err = json.NewDecoder(resp.Body).Decode(&cc)
-	if err != nil {
-		return nil, err
-	}
-
-	return cc, nil
-}
-
 // Reassemble URL in order to properly encode username and password
 func encodeURLCreds(u string) (string, error) {
 	s1 := strings.SplitAfter(u, "://")
