@@ -136,7 +136,7 @@ func (c *Client) ListPipelines(ctx context.Context) ([]*Pipeline, error) {
 	return pp, nil
 }
 
-// GetPipelineByName returns a Pipeline with the given id
+// GetPipelineByName returns a Pipeline with the given name
 func (c *Client) GetPipelineByName(ctx context.Context, name string) (*Pipeline, error) {
 	params := map[string][]string{
 		"name": {name},
@@ -162,6 +162,28 @@ func (c *Client) GetPipelineByName(ctx context.Context, name string) (*Pipeline,
 }
 
 // GetPipelineByName returns a Pipeline with the given name (scoped to the calling user)
+
+// GetPipeline returns a Pipeline with the given id
+func (c *Client) GetPipeline(ctx context.Context, pipelineID int) (*Pipeline, error) {
+	path := fmt.Sprintf("%s/%d", pipelinesBasePath, pipelineID)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var p Pipeline
+	err = json.NewDecoder(resp.Body).Decode(&p)
+	if err != nil {
+		return nil, err
+	}
+
+	return &p, nil
+}
 
 // DeletePipeline deletes the Pipeline with the given id
 func (c *Client) DeletePipeline(ctx context.Context, id int) error {
