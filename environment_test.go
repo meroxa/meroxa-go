@@ -143,6 +143,25 @@ func TestGetEnvironment(t *testing.T) {
 	}
 }
 
+func TestDeleteEnvironment(t *testing.T) {
+	env := generateEnvironment("dedicated", "environment-1234", "aws")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		path := fmt.Sprintf("%s/%s", environmentsBasePath, env.UUID)
+		if req.URL.Path != path {
+			t.Fatalf("Path mismatched: got=%v want=%v", req.URL.Path, path)
+		}
+	}))
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	err := c.DeleteEnvironment(context.Background(), env.UUID)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func generateEnvironment(t, p, n string) Environment {
 	return Environment{
 		Type:     t,
