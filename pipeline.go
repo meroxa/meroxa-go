@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 )
 
 const pipelinesBasePath = "/v1/pipelines"
@@ -167,73 +166,6 @@ func (c *Client) GetPipelineByName(ctx context.Context, name string) (*Pipeline,
 // DeletePipeline deletes the Pipeline with the given id
 func (c *Client) DeletePipeline(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s/%d", pipelinesBasePath, id)
-
-	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
-	if err != nil {
-		return err
-	}
-
-	err = handleAPIErrors(resp)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// GetPipelineStages returns an array of Pipeline Stages for the given Pipeline id
-func (c *Client) GetPipelineStages(ctx context.Context, pipelineID int) ([]*PipelineStage, error) {
-	path := fmt.Sprintf("%s/%d/stages", pipelinesBasePath, pipelineID)
-
-	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	err = handleAPIErrors(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	var pp []*PipelineStage
-	err = json.NewDecoder(resp.Body).Decode(&pp)
-	if err != nil {
-		return nil, err
-	}
-
-	return pp, nil
-}
-
-// AddPipelineStage adds the PipelineStage to the given Pipeline
-func (c *Client) AddPipelineStage(ctx context.Context, pipelineID int, connectorID int) (*PipelineStage, error) {
-	path := fmt.Sprintf("%s/%d/stages", pipelinesBasePath, pipelineID)
-
-	params := map[string][]string{
-		"connector": {strconv.Itoa(connectorID)},
-	}
-
-	resp, err := c.MakeRequest(ctx, http.MethodPost, path, nil, params)
-	if err != nil {
-		return nil, err
-	}
-
-	err = handleAPIErrors(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	var s PipelineStage
-	err = json.NewDecoder(resp.Body).Decode(&s)
-	if err != nil {
-		return nil, err
-	}
-
-	return &s, nil
-}
-
-// RemovePipelineStage removes the PipelineStage from the given Pipeline
-func (c *Client) RemovePipelineStage(ctx context.Context, pipelineID int, stageID int) error {
-	path := fmt.Sprintf("%s/%d/stages/%d", pipelinesBasePath, pipelineID, stageID)
 
 	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {
