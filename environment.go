@@ -3,6 +3,7 @@ package meroxa
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -76,4 +77,25 @@ func (c *Client) CreateEnvironment(ctx context.Context, body *CreateEnvironmentI
 	}
 
 	return &e, nil
+}
+
+func (c *Client) GetEnvironment(ctx context.Context, nameOrUUID string) (*Environment, error) {
+	path := fmt.Sprintf("%s/%s", environmentsBasePath, nameOrUUID)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var e *Environment
+	err = json.NewDecoder(resp.Body).Decode(&e)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
 }

@@ -75,7 +75,7 @@ func TestCreateEnvironment(t *testing.T) {
 			t.Errorf("expected region %q, got %q", ee.Region, environment.Region)
 		}
 
-		if !reflect.DeepEqual(ee.Config, environment.Config) {
+		if !reflect.DeepEqual(ee.Configuration, environment.Configuration) {
 			t.Errorf("expected same configuration")
 		}
 
@@ -107,9 +107,43 @@ func TestCreateEnvironment(t *testing.T) {
 	}
 }
 
+func TestGetEnvironment(t *testing.T) {
+	env := generateEnvironment("dedicated", "environment-1234", "aws")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		path := fmt.Sprintf("%s/%s", environmentsBasePath, env.UUID)
+		if req.URL.Path != path {
+			t.Fatalf("Path mismatched: want=%v got=%v", path, req.URL.Path)
+		}
+
+		if err := json.NewEncoder(w).Encode(env); err != nil {
+			t.Fatal(err)
+		}
+	}))
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.GetEnvironment(context.Background(), env.UUID)
+
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if env.Type != resp.Type {
+		t.Errorf("expected type %q, got %q", resp.Type, env.Type)
+	}
+
+	if env.Provider != resp.Provider {
+		t.Errorf("expected provider %q, got %q", resp.Provider, env.Provider)
+	}
+
+	if env.Name != resp.Name {
+		t.Errorf("expected name %q, got %q", resp.Name, env.Name)
+	}
+}
+
 func generateEnvironment(t, p, n string) Environment {
-	// TODO: Return region based on config.
-	// i.e.: config: { "aws_region": "region" } => environment.region
 	return Environment{
 		Type:     t,
 		Name:     n,
