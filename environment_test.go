@@ -145,20 +145,33 @@ func TestGetEnvironment(t *testing.T) {
 
 func TestDeleteEnvironment(t *testing.T) {
 	env := generateEnvironment("dedicated", "environment-1234", "aws")
+	deprovisioningState := "deprovisioning"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		path := fmt.Sprintf("%s/%s", environmentsBasePath, env.UUID)
-		if req.URL.Path != path {
-			t.Fatalf("Path mismatched: got=%v want=%v", req.URL.Path, path)
+		if want, got := fmt.Sprintf("%s/%s", environmentsBasePath, env.UUID), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
+
+		defer req.Body.Close()
+
+		env.Status.State = deprovisioningState
+		json.NewEncoder(w).Encode(env)
 	}))
 	defer server.Close()
 
 	c := testClient(server.Client(), server.URL)
 
-	err := c.DeleteEnvironment(context.Background(), env.UUID)
+	resp, err := c.DeleteEnvironment(context.Background(), env.UUID)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(resp, &env) {
+		t.Errorf("expected response same as environment")
+	}
+
+	if resp.Status.State != deprovisioningState {
+		t.Errorf("expected state %q, got %s", deprovisioningState, resp.Status.State)
 	}
 }
 
