@@ -10,17 +10,17 @@ import (
 type ResourceType string
 
 const (
-	ResourceTypePostgres      ResourceType = "Postgres"
-	ResourceTypeMysql                      = "Mysql"
-	ResourceTypeRedshift                   = "Redshift"
-	ResourceTypeUrl                        = "Url"
-	ResourceTypeS3                         = "S3"
-	ResourceTypeMongodb                    = "Mongodb"
-	ResourceTypeElasticsearch              = "Elasticsearch"
-	ResourceTypeSnowflake                  = "Snowflake"
-	ResourceTypeBigquery                   = "Bigquery"
-	ResourceTypeSqlserver                  = "Sqlserver"
-	ResourceTypeCosmosdb                   = "Cosmosdb"
+	ResourceTypePostgres      ResourceType = "postgres"
+	ResourceTypeMysql                      = "mysql"
+	ResourceTypeRedshift                   = "redshift"
+	ResourceTypeUrl                        = "url"
+	ResourceTypeS3                         = "s3"
+	ResourceTypeMongodb                    = "mongodb"
+	ResourceTypeElasticsearch              = "elasticsearch"
+	ResourceTypeSnowflake                  = "snowflake"
+	ResourceTypeBigquery                   = "bigquery"
+	ResourceTypeSqlserver                  = "sqlserver"
+	ResourceTypeCosmosdb                   = "cosmosdb"
 )
 
 
