@@ -65,7 +65,7 @@ type ResourceStatus struct {
 // Resource represents the Meroxa Resource type within the Meroxa API
 type Resource struct {
 	ID          int                    `json:"id"`
-	Type        string                 `json:"type"`
+	Type        ResourceType                 `json:"type"`
 	Name        string                 `json:"name"`
 	URL         string                 `json:"url"`
 	Credentials *Credentials           `json:"credentials,omitempty"`
