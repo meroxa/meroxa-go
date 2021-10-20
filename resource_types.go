@@ -7,6 +7,8 @@ import (
 	"net/http"
 )
 
+type ResourceType string
+
 const (
 	ResourceTypePostgres      ResourceType = "Postgres"
 	ResourceTypeMysql                      = "Mysql"
@@ -21,7 +23,6 @@ const (
 	ResourceTypeCosmosdb                   = "Cosmosdb"
 )
 
-type ResourceType string
 
 // ListResourceTypes returns the list of supported resources
 func (c *Client) ListResourceTypes(ctx context.Context) ([]string, error) {
