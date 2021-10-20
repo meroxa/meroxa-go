@@ -9,18 +9,25 @@ import (
 
 const pipelinesBasePath = "/v1/pipelines"
 
+type PipelineState string
+
+const (
+	PipelineStateHealthy  PipelineState = "healthy"
+	PipelineStateDegraded               = "degraded"
+)
+
 // Pipeline represents the Meroxa Pipeline type within the Meroxa API
 type Pipeline struct {
 	ID       int                    `json:"id"`
 	Name     string                 `json:"name"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
-	State    string                 `json:"state"`
+	State    PipelineState          `json:"state"`
 }
 
 type UpdatePipelineInput struct {
 	Name     string                 `json:"name"`
 	Metadata map[string]interface{} `json:"metadata"`
-	State    string                 `json:"state"`
+	State    PipelineState          `json:"state"`
 }
 
 // ComponentKind enum for Component "kinds" within Pipeline stages
@@ -36,10 +43,10 @@ const (
 
 // PipelineStage represents the Meroxa PipelineStage type within the Meroxa API
 type PipelineStage struct {
-	ID            int `json:"id"`
-	PipelineID    int `json:"pipeline_id"`
-	ComponentID   int `json:"component_id"`
-	ComponentKind int `json:"component_kind"`
+	ID            int           `json:"id"`
+	PipelineID    int           `json:"pipeline_id"`
+	ComponentID   int           `json:"component_id"`
+	ComponentKind ComponentKind `json:"component_kind"`
 }
 
 // CreatePipeline provisions a new Pipeline

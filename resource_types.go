@@ -7,6 +7,22 @@ import (
 	"net/http"
 )
 
+const (
+	ResourceTypePostgres      ResourceType = "Postgres"
+	ResourceTypeMysql                      = "Mysql"
+	ResourceTypeRedshift                   = "Redshift"
+	ResourceTypeUrl                        = "Url"
+	ResourceTypeS3                         = "S3"
+	ResourceTypeMongodb                    = "Mongodb"
+	ResourceTypeElasticsearch              = "Elasticsearch"
+	ResourceTypeSnowflake                  = "Snowflake"
+	ResourceTypeBigquery                   = "Bigquery"
+	ResourceTypeSqlserver                  = "Sqlserver"
+	ResourceTypeCosmosdb                   = "Cosmosdb"
+)
+
+type ResourceType string
+
 // ListResourceTypes returns the list of supported resources
 func (c *Client) ListResourceTypes(ctx context.Context) ([]string, error) {
 	path := fmt.Sprintf("/v1/resource-types")

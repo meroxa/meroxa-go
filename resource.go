@@ -13,6 +13,15 @@ import (
 
 const ResourcesBasePath = "/v1/resources"
 
+type ResourceState string
+
+const (
+	ResourceStatePending  ResourceState = "pending"
+	ResourceStateStarting               = "starting"
+	ResourceStateError                  = "error"
+	ResourceStateReady                  = "ready"
+)
+
 var ErrMissingScheme = errors.New("URL scheme required")
 
 // Credentials represents the Meroxa Resource credentials type within the
@@ -29,7 +38,7 @@ type Credentials struct {
 // CreateResourceInput represents the input for a Meroxa Resource type we're creating within the Meroxa API
 type CreateResourceInput struct {
 	ID          int                     `json:"id"`
-	Type        string                  `json:"type"`
+	Type        ResourceType            `json:"type"`
 	Name        string                  `json:"name,omitempty"`
 	URL         string                  `json:"url"`
 	Credentials *Credentials            `json:"credentials,omitempty"`
@@ -48,9 +57,9 @@ type ResourceSSHTunnel struct {
 }
 
 type ResourceStatus struct {
-	State         string    `json:"state"`
-	Details       string    `json:"details"`
-	LastUpdatedAt time.Time `json:"last_updated_at"`
+	State         ResourceState `json:"state"`
+	Details       string        `json:"details"`
+	LastUpdatedAt time.Time     `json:"last_updated_at"`
 }
 
 // Resource represents the Meroxa Resource type within the Meroxa API

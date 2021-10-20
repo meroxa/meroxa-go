@@ -9,6 +9,17 @@ import (
 
 const connectorsBasePath = "/v1/connectors"
 
+type ConnectorState string
+
+const (
+	ConnectorStatePending ConnectorState = "pending"
+	ConnectorStateRunning                = "running"
+	ConnectorStatePaused                 = "paused"
+	ConnectorStateCrashed                = "crashed"
+	ConnectorStateFailed                 = "failed"
+	ConnectorStateDOA                    = "doa"
+)
+
 type Connector struct {
 	ID            int                    `json:"id"`
 	Type          string                 `json:"type"`
@@ -16,7 +27,7 @@ type Connector struct {
 	Configuration map[string]interface{} `json:"config"`
 	Metadata      map[string]interface{} `json:"metadata"`
 	Streams       map[string]interface{} `json:"streams"`
-	State         string                 `json:"state"`
+	State         ConnectorState         `json:"state"`
 	Trace         string                 `json:"trace,omitempty"`
 	PipelineID    int                    `json:"pipeline_id"`
 	PipelineName  string                 `json:"pipeline_name"`
