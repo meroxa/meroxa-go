@@ -20,12 +20,19 @@ const (
 	ConnectorStateDOA                    = "doa"
 )
 
+type Action string
+
+var (
+	ActionPause   Action = "pause"
+	ActionResume  Action = "resume"
+	ActionRestart Action = "restart"
+)
+
 type Connector struct {
 	ID            int                    `json:"id"`
 	Type          string                 `json:"type"`
 	Name          string                 `json:"name"`
 	Configuration map[string]interface{} `json:"config"`
-	Metadata      map[string]interface{} `json:"metadata"`
 	Streams       map[string]interface{} `json:"streams"`
 	State         ConnectorState         `json:"state"`
 	Trace         string                 `json:"trace,omitempty"`
@@ -39,7 +46,6 @@ type CreateConnectorInput struct {
 	PipelineID    int                    `json:"pipeline_id,omitempty"`
 	PipelineName  string                 `json:"pipeline_name,omitempty"`
 	Configuration map[string]interface{} `json:"config,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateConnectorInput struct {
@@ -69,12 +75,13 @@ func (c *Client) CreateConnector(ctx context.Context, input CreateConnectorInput
 	return &con, nil
 }
 
+// @TODO implement connector status
 // UpdateConnectorStatus updates the status of a connector
-func (c *Client) UpdateConnectorStatus(ctx context.Context, nameOrId, state string) (*Connector, error) {
+func (c *Client) UpdateConnectorStatus(ctx context.Context, nameOrId, state Action) (*Connector, error) {
 	path := fmt.Sprintf("%s/%s/status", connectorsBasePath, nameOrId)
 
 	cr := struct {
-		State string `json:"state,omitempty"`
+		State Action `json:"state,omitempty"`
 	}{
 		State: state,
 	}

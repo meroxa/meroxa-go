@@ -20,19 +20,15 @@ const (
 type Pipeline struct {
 	ID       int                    `json:"id"`
 	Name     string                 `json:"name"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	State    PipelineState          `json:"state"`
 }
 
 type CreatePipelineInput struct {
 	Name     string                 `json:"name"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdatePipelineInput struct {
 	Name     string                 `json:"name"`
-	Metadata map[string]interface{} `json:"metadata"`
-	State    PipelineState          `json:"state"`
 }
 
 // ComponentKind enum for Component "kinds" within Pipeline stages
@@ -98,14 +94,15 @@ func (c *Client) UpdatePipeline(ctx context.Context, pipelineID int, input *Upda
 	return &p, nil
 }
 
+// @TODO implement pipeline actions
 // UpdatePipelineStatus updates the status of a pipeline
-func (c *Client) UpdatePipelineStatus(ctx context.Context, pipelineID int, state PipelineState) (*Pipeline, error) {
+func (c *Client) UpdatePipelineStatus(ctx context.Context, pipelineID int, action Action) (*Pipeline, error) {
 	path := fmt.Sprintf("%s/%d/status", pipelinesBasePath, pipelineID)
 
 	cr := struct {
-		State PipelineState `json:"state,omitempty"`
+		State Action `json:"state,omitempty"`
 	}{
-		State: state,
+		State: action,
 	}
 
 	resp, err := c.MakeRequest(ctx, http.MethodPost, path, cr, nil)
