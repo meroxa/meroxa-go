@@ -59,8 +59,8 @@ func (c *Client) ListEnvironments(ctx context.Context) ([]*Environment, error) {
 }
 
 // CreateEnvironment creates a new Environment based on a CreateEnvironmentInput
-func (c *Client) CreateEnvironment(ctx context.Context, body *CreateEnvironmentInput) (*Environment, error) {
-	resp, err := c.MakeRequest(ctx, http.MethodPost, environmentsBasePath, body, nil)
+func (c *Client) CreateEnvironment(ctx context.Context, input *CreateEnvironmentInput) (*Environment, error) {
+	resp, err := c.MakeRequest(ctx, http.MethodPost, environmentsBasePath, input, nil)
 	if err != nil {
 		return nil, err
 	}

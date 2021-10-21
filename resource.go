@@ -65,7 +65,7 @@ type ResourceStatus struct {
 // Resource represents the Meroxa Resource type within the Meroxa API
 type Resource struct {
 	ID          int                    `json:"id"`
-	Type        ResourceType                 `json:"type"`
+	Type        ResourceType           `json:"type"`
 	Name        string                 `json:"name"`
 	URL         string                 `json:"url"`
 	Credentials *Credentials           `json:"credentials,omitempty"`
@@ -86,15 +86,15 @@ type UpdateResourceInput struct {
 }
 
 // CreateResource provisions a new Resource from the given CreateResourceInput struct
-func (c *Client) CreateResource(ctx context.Context, resource *CreateResourceInput) (*Resource, error) {
+func (c *Client) CreateResource(ctx context.Context, input *CreateResourceInput) (*Resource, error) {
 	// url encode url username/password if needed
 	var err error
-	resource.URL, err = encodeURLCreds(resource.URL)
+	input.URL, err = encodeURLCreds(input.URL)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.MakeRequest(ctx, http.MethodPost, ResourcesBasePath, resource, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodPost, ResourcesBasePath, input, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -113,19 +113,19 @@ func (c *Client) CreateResource(ctx context.Context, resource *CreateResourceInp
 	return &r, nil
 }
 
-func (c *Client) UpdateResource(ctx context.Context, key string, resourceToUpdate UpdateResourceInput) (*Resource, error) {
+func (c *Client) UpdateResource(ctx context.Context, nameOrId string, input *UpdateResourceInput) (*Resource, error) {
 	// url encode url username/password if needed
 	var err error
 
-	if resourceToUpdate.URL != "" {
-		resourceToUpdate.URL, err = encodeURLCreds(resourceToUpdate.URL)
+	if input.URL != "" {
+		input.URL, err = encodeURLCreds(input.URL)
 
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	resp, err := c.MakeRequest(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", ResourcesBasePath, key), resourceToUpdate, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", ResourcesBasePath, nameOrId), input, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -144,16 +144,16 @@ func (c *Client) UpdateResource(ctx context.Context, key string, resourceToUpdat
 	return &r, nil
 }
 
-func (c *Client) RotateTunnelKeyForResource(ctx context.Context, id string) (*Resource, error) {
+func (c *Client) RotateTunnelKeyForResource(ctx context.Context, id int) (*Resource, error) {
 	return c.performResourceAction(ctx, id, "rotate_keys")
 }
 
-func (c *Client) ValidateResource(ctx context.Context, id string) (*Resource, error) {
+func (c *Client) ValidateResource(ctx context.Context, id int) (*Resource, error) {
 	return c.performResourceAction(ctx, id, "validate")
 }
 
-func (c *Client) performResourceAction(ctx context.Context, id string, action string) (*Resource, error) {
-	path := fmt.Sprintf("%s/%s/actions", ResourcesBasePath, id)
+func (c *Client) performResourceAction(ctx context.Context, id int, action string) (*Resource, error) {
+	path := fmt.Sprintf("%s/%d/actions", ResourcesBasePath, id)
 	body := struct {
 		Action string `json:"action"`
 	}{

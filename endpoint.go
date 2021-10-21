@@ -9,7 +9,7 @@ import (
 
 const endpointBasePath = "/v1/endpoints"
 
-type createEndpointRequest struct {
+type CreateEndpointInput struct {
 	Name     string `json:"name"`
 	Protocol string `json:"protocol"`
 	Stream   string `json:"stream"`
@@ -25,14 +25,8 @@ type Endpoint struct {
 	BasicAuthPassword string `json:"basic_auth_password"`
 }
 
-func (c *Client) CreateEndpoint(ctx context.Context, name, protocol, stream string) error {
-	body := createEndpointRequest{
-		Name:     name,
-		Protocol: protocol,
-		Stream:   stream,
-	}
-
-	resp, err := c.MakeRequest(ctx, http.MethodPost, endpointBasePath, body, nil)
+func (c *Client) CreateEndpoint(ctx context.Context, input *CreateEndpointInput) error {
+	resp, err := c.MakeRequest(ctx, http.MethodPost, endpointBasePath, input, nil)
 	if err != nil {
 		return err
 	}

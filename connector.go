@@ -70,8 +70,8 @@ func (c *Client) CreateConnector(ctx context.Context, input CreateConnectorInput
 }
 
 // UpdateConnectorStatus updates the status of a connector
-func (c *Client) UpdateConnectorStatus(ctx context.Context, connectorKey, state string) (*Connector, error) {
-	path := fmt.Sprintf("%s/%s/status", connectorsBasePath, connectorKey)
+func (c *Client) UpdateConnectorStatus(ctx context.Context, nameOrId, state string) (*Connector, error) {
+	path := fmt.Sprintf("%s/%s/status", connectorsBasePath, nameOrId)
 
 	cr := struct {
 		State string `json:"state,omitempty"`
@@ -99,10 +99,10 @@ func (c *Client) UpdateConnectorStatus(ctx context.Context, connectorKey, state 
 }
 
 // UpdateConnector updates the name, or a configuration of a connector
-func (c *Client) UpdateConnector(ctx context.Context, connectorKey string, connectorToUpdate UpdateConnectorInput) (*Connector, error) {
-	path := fmt.Sprintf("%s/%s", connectorsBasePath, connectorKey)
+func (c *Client) UpdateConnector(ctx context.Context, nameOrId string, input UpdateConnectorInput) (*Connector, error) {
+	path := fmt.Sprintf("%s/%s", connectorsBasePath, nameOrId)
 
-	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, connectorToUpdate, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, input, nil)
 	if err != nil {
 		return nil, err
 	}

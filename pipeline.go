@@ -24,6 +24,11 @@ type Pipeline struct {
 	State    PipelineState          `json:"state"`
 }
 
+type CreatePipelineInput struct {
+	Name     string                 `json:"name"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+}
+
 type UpdatePipelineInput struct {
 	Name     string                 `json:"name"`
 	Metadata map[string]interface{} `json:"metadata"`
@@ -50,8 +55,8 @@ type PipelineStage struct {
 }
 
 // CreatePipeline provisions a new Pipeline
-func (c *Client) CreatePipeline(ctx context.Context, pipeline *Pipeline) (*Pipeline, error) {
-	resp, err := c.MakeRequest(ctx, http.MethodPost, pipelinesBasePath, pipeline, nil)
+func (c *Client) CreatePipeline(ctx context.Context, input *CreatePipelineInput) (*Pipeline, error) {
+	resp, err := c.MakeRequest(ctx, http.MethodPost, pipelinesBasePath, input, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -71,10 +76,10 @@ func (c *Client) CreatePipeline(ctx context.Context, pipeline *Pipeline) (*Pipel
 }
 
 // UpdatePipeline updates a pipeline
-func (c *Client) UpdatePipeline(ctx context.Context, pipelineID int, pipelineToUpdate UpdatePipelineInput) (*Pipeline, error) {
+func (c *Client) UpdatePipeline(ctx context.Context, pipelineID int, input *UpdatePipelineInput) (*Pipeline, error) {
 	path := fmt.Sprintf("%s/%d", pipelinesBasePath, pipelineID)
 
-	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, pipelineToUpdate, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, input, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -94,11 +99,11 @@ func (c *Client) UpdatePipeline(ctx context.Context, pipelineID int, pipelineToU
 }
 
 // UpdatePipelineStatus updates the status of a pipeline
-func (c *Client) UpdatePipelineStatus(ctx context.Context, pipelineID int, state string) (*Pipeline, error) {
+func (c *Client) UpdatePipelineStatus(ctx context.Context, pipelineID int, state PipelineState) (*Pipeline, error) {
 	path := fmt.Sprintf("%s/%d/status", pipelinesBasePath, pipelineID)
 
 	cr := struct {
-		State string `json:"state,omitempty"`
+		State PipelineState `json:"state,omitempty"`
 	}{
 		State: state,
 	}
