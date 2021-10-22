@@ -37,7 +37,6 @@ type Credentials struct {
 
 // CreateResourceInput represents the input for a Meroxa Resource type we're creating within the Meroxa API
 type CreateResourceInput struct {
-	ID          int                     `json:"id"`
 	Type        ResourceType            `json:"type"`
 	Name        string                  `json:"name,omitempty"`
 	URL         string                  `json:"url"`

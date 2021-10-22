@@ -55,7 +55,7 @@ type UpdateConnectorInput struct {
 
 // CreateConnector provisions a connector between the Resource and the Meroxa
 // platform
-func (c *Client) CreateConnector(ctx context.Context, input CreateConnectorInput) (*Connector, error) {
+func (c *Client) CreateConnector(ctx context.Context, input *CreateConnectorInput) (*Connector, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodPost, connectorsBasePath, input, nil)
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (c *Client) CreateConnector(ctx context.Context, input CreateConnectorInput
 
 // @TODO implement connector status
 // UpdateConnectorStatus updates the status of a connector
-func (c *Client) UpdateConnectorStatus(ctx context.Context, nameOrId, state Action) (*Connector, error) {
+func (c *Client) UpdateConnectorStatus(ctx context.Context, nameOrId string, state Action) (*Connector, error) {
 	path := fmt.Sprintf("%s/%s/status", connectorsBasePath, nameOrId)
 
 	cr := struct {
@@ -106,7 +106,7 @@ func (c *Client) UpdateConnectorStatus(ctx context.Context, nameOrId, state Acti
 }
 
 // UpdateConnector updates the name, or a configuration of a connector
-func (c *Client) UpdateConnector(ctx context.Context, nameOrId string, input UpdateConnectorInput) (*Connector, error) {
+func (c *Client) UpdateConnector(ctx context.Context, nameOrId string, input *UpdateConnectorInput) (*Connector, error) {
 	path := fmt.Sprintf("%s/%s", connectorsBasePath, nameOrId)
 
 	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, input, nil)
