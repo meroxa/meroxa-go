@@ -18,17 +18,17 @@ const (
 
 // Pipeline represents the Meroxa Pipeline type within the Meroxa API
 type Pipeline struct {
-	ID       int                    `json:"id"`
-	Name     string                 `json:"name"`
-	State    PipelineState          `json:"state"`
+	ID    int           `json:"id"`
+	Name  string        `json:"name"`
+	State PipelineState `json:"state"`
 }
 
 type CreatePipelineInput struct {
-	Name     string                 `json:"name"`
+	Name string `json:"name"`
 }
 
 type UpdatePipelineInput struct {
-	Name     string                 `json:"name"`
+	Name string `json:"name"`
 }
 
 // ComponentKind enum for Component "kinds" within Pipeline stages

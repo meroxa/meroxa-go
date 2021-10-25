@@ -41,6 +41,7 @@ type CreateResourceInput struct {
 	Name        string                  `json:"name,omitempty"`
 	URL         string                  `json:"url"`
 	Credentials *Credentials            `json:"credentials,omitempty"`
+	Metadata    map[string]interface{}  `json:"metadata,omitempty"`
 	SSHTunnel   *ResourceSSHTunnelInput `json:"ssh_tunnel,omitempty"`
 }
 
@@ -67,6 +68,7 @@ type Resource struct {
 	Name        string                 `json:"name"`
 	URL         string                 `json:"url"`
 	Credentials *Credentials           `json:"credentials,omitempty"`
+	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	SSHTunnel   *ResourceSSHTunnel     `json:"ssh_tunnel,omitempty"`
 	Status      ResourceStatus         `json:"status"`
 	CreatedAt   time.Time              `json:"created_at"`
@@ -78,6 +80,7 @@ type UpdateResourceInput struct {
 	Name        string                  `json:"name,omitempty"`
 	URL         string                  `json:"url,omitempty"`
 	Credentials *Credentials            `json:"credentials,omitempty"`
+	Metadata    map[string]interface{}  `json:"metadata,omitempty"`
 	SSHTunnel   *ResourceSSHTunnelInput `json:"ssh_tunnel,omitempty"`
 }
 
