@@ -73,7 +73,7 @@ func TestHandleAPIErrors(t *testing.T) {
 					"type": {"invalid"},
 				},
 			},
-			"resource with name test already exists. 2 problems occured:\n1. name: \"too long\", \"invalid\"\n2. type: \"invalid\"",
+			"resource with name test already exists. 2 problems occurred:\n1. name: \"too long\", \"invalid\"\n2. type: \"invalid\"",
 		},
 		{http422JSONResponse(errorJSONResponse(`{ "code": "already_exists", "message": "resource with name test already exists", "details": { "type": ["invalid"] }}`)),
 			&errResponse{
@@ -83,7 +83,7 @@ func TestHandleAPIErrors(t *testing.T) {
 					"type": {"invalid"},
 				},
 			},
-			"resource with name test already exists. 1 problem occured:\n1. type: \"invalid\"",
+			"resource with name test already exists. 1 problem occurred:\n1. type: \"invalid\"",
 		},
 	}
 
