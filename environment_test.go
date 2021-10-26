@@ -17,7 +17,7 @@ func TestGetEnvironments(t *testing.T) {
 		Provider: "aws",
 		Region:   "us-east",
 		Type:     "dedicated",
-		Status:   EnvironmentStatus{State: "provisioned"},
+		Status:   EnvironmentState{State: "provisioned"},
 	}
 
 	environments := []*Environment{env}
@@ -181,7 +181,7 @@ func generateEnvironment(t, p, n string) Environment {
 		Name:     n,
 		Provider: p,
 		Region:   "us-east-1",
-		Status:   EnvironmentStatus{State: "provisioned"},
+		Status:   EnvironmentState{State: "provisioned"},
 		UUID:     "1a92d590-d59c-460b-94de-870f04ab35bf",
 	}
 }
