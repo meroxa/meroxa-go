@@ -33,6 +33,7 @@ type Connector struct {
 	Type          string                 `json:"type"`
 	Name          string                 `json:"name"`
 	Configuration map[string]interface{} `json:"config"`
+	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 	Streams       map[string]interface{} `json:"streams"`
 	State         ConnectorState         `json:"state"`
 	Trace         string                 `json:"trace,omitempty"`
@@ -46,11 +47,13 @@ type CreateConnectorInput struct {
 	PipelineID    int                    `json:"pipeline_id,omitempty"`
 	PipelineName  string                 `json:"pipeline_name,omitempty"`
 	Configuration map[string]interface{} `json:"config,omitempty"`
+	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type UpdateConnectorInput struct {
 	Name          string                 `json:"name,omitempty"`
 	Configuration map[string]interface{} `json:"config,omitempty"`
+	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // CreateConnector provisions a connector between the Resource and the Meroxa
