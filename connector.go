@@ -22,10 +22,17 @@ const (
 
 type Action string
 
-var (
+const (
 	ActionPause   Action = "pause"
 	ActionResume  Action = "resume"
 	ActionRestart Action = "restart"
+)
+
+type ConnectorType string
+
+const (
+	ConnectorTypeSource      ConnectorType = "source"
+	ConnectorTypeDestination               = "destination"
 )
 
 type Connector struct {
@@ -48,6 +55,8 @@ type CreateConnectorInput struct {
 	PipelineName  string                 `json:"pipeline_name,omitempty"`
 	Configuration map[string]interface{} `json:"config,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Type          ConnectorType          `json:"connector_type,omitempty"`
+	Input         string                 `json:"input,omitempty"`
 }
 
 type UpdateConnectorInput struct {
