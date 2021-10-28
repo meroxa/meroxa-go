@@ -40,7 +40,7 @@ type Connector struct {
 	Type          string                 `json:"type"`
 	Name          string                 `json:"name"`
 	Configuration map[string]interface{} `json:"config"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Metadata      map[string]interface{} `json:"metadata"`
 	Streams       map[string]interface{} `json:"streams"`
 	State         ConnectorState         `json:"state"`
 	Trace         string                 `json:"trace,omitempty"`
@@ -56,18 +56,22 @@ type CreateConnectorInput struct {
 	Configuration map[string]interface{} `json:"config,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata,omitempty"`
 	Type          ConnectorType          `json:"connector_type,omitempty"`
-	Input         string                 `json:"input,omitempty"`
+	Input         string                 `json:"input,omitempty"` // clearer name?
 }
 
 type UpdateConnectorInput struct {
 	Name          string                 `json:"name,omitempty"`
 	Configuration map[string]interface{} `json:"config,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Type          ConnectorType          `json:"connector_type,omitempty"` // i could... but should i?
+	Input         string                 `json:"input,omitempty"` // i could... but should i?
 }
 
 // CreateConnector provisions a connector between the Resource and the Meroxa
 // platform
 func (c *Client) CreateConnector(ctx context.Context, input *CreateConnectorInput) (*Connector, error) {
+	input.Metadata["input"] = input.Input
+	input.Metadata["mx:connectorType"] = input.Type
 	resp, err := c.MakeRequest(ctx, http.MethodPost, connectorsBasePath, input, nil)
 	if err != nil {
 		return nil, err
@@ -87,7 +91,7 @@ func (c *Client) CreateConnector(ctx context.Context, input *CreateConnectorInpu
 	return &con, nil
 }
 
-// @TODO implement connector status
+// @TODO implement connector actions
 // UpdateConnectorStatus updates the status of a connector
 func (c *Client) UpdateConnectorStatus(ctx context.Context, nameOrId string, state Action) (*Connector, error) {
 	path := fmt.Sprintf("%s/%s/status", connectorsBasePath, nameOrId)
