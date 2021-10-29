@@ -70,9 +70,9 @@ func (c *Client) CreateConnector(ctx context.Context, input *CreateConnectorInpu
 	if input.Configuration != nil {
 		input.Configuration["input"] = input.Input
 	} else {
-		input.Configuration = map[string]interface{}{"input":input.Input}
+		input.Configuration = map[string]interface{}{"input": input.Input}
 	}
-	input.Metadata = map[string]interface{}{"mx:connectorType":input.Type}
+	input.Metadata = map[string]interface{}{"mx:connectorType": input.Type}
 	resp, err := c.MakeRequest(ctx, http.MethodPost, connectorsBasePath, input, nil)
 	if err != nil {
 		return nil, err

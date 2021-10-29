@@ -9,20 +9,27 @@ import (
 
 const endpointBasePath = "/v1/endpoints"
 
+type EndpointProtocol string
+
+const (
+	EndpointProtocolHttp EndpointProtocol = "http"
+	EndpointProtocolGrpc                  = "grpc"
+)
+
 type CreateEndpointInput struct {
-	Name     string `json:"name"`
-	Protocol string `json:"protocol"`
-	Stream   string `json:"stream"`
+	Name     string           `json:"name"`
+	Protocol EndpointProtocol `json:"protocol"`
+	Stream   string           `json:"stream"`
 }
 
 type Endpoint struct {
-	Name              string `json:"name"`
-	Protocol          string `json:"protocol"`
-	Host              string `json:"host"`
-	Stream            string `json:"stream"`
-	Ready             bool   `json:"ready"`
-	BasicAuthUsername string `json:"basic_auth_username"`
-	BasicAuthPassword string `json:"basic_auth_password"`
+	Name              string           `json:"name"`
+	Protocol          EndpointProtocol `json:"protocol"`
+	Host              string           `json:"host"`
+	Stream            string           `json:"stream"`
+	Ready             bool             `json:"ready"`
+	BasicAuthUsername string           `json:"basic_auth_username"`
+	BasicAuthPassword string           `json:"basic_auth_password"`
 }
 
 func (c *Client) CreateEndpoint(ctx context.Context, input *CreateEndpointInput) error {
