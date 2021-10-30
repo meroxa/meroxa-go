@@ -9,6 +9,32 @@ import (
 
 const connectorsBasePath = "/v1/connectors"
 
+type ConnectorState string
+
+const (
+	ConnectorStatePending ConnectorState = "pending"
+	ConnectorStateRunning                = "running"
+	ConnectorStatePaused                 = "paused"
+	ConnectorStateCrashed                = "crashed"
+	ConnectorStateFailed                 = "failed"
+	ConnectorStateDOA                    = "doa"
+)
+
+type Action string
+
+const (
+	ActionPause   Action = "pause"
+	ActionResume  Action = "resume"
+	ActionRestart Action = "restart"
+)
+
+type ConnectorType string
+
+const (
+	ConnectorTypeSource      ConnectorType = "source"
+	ConnectorTypeDestination               = "destination"
+)
+
 type Connector struct {
 	ID            int                    `json:"id"`
 	Type          string                 `json:"type"`
@@ -16,7 +42,7 @@ type Connector struct {
 	Configuration map[string]interface{} `json:"config"`
 	Metadata      map[string]interface{} `json:"metadata"`
 	Streams       map[string]interface{} `json:"streams"`
-	State         string                 `json:"state"`
+	State         ConnectorState         `json:"state"`
 	Trace         string                 `json:"trace,omitempty"`
 	PipelineID    int                    `json:"pipeline_id"`
 	PipelineName  string                 `json:"pipeline_name"`
@@ -29,6 +55,8 @@ type CreateConnectorInput struct {
 	PipelineName  string                 `json:"pipeline_name,omitempty"`
 	Configuration map[string]interface{} `json:"config,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Type          ConnectorType          `json:"connector_type,omitempty"`
+	Input         string                 `json:"input,omitempty"`
 }
 
 type UpdateConnectorInput struct {
@@ -38,7 +66,13 @@ type UpdateConnectorInput struct {
 
 // CreateConnector provisions a connector between the Resource and the Meroxa
 // platform
-func (c *Client) CreateConnector(ctx context.Context, input CreateConnectorInput) (*Connector, error) {
+func (c *Client) CreateConnector(ctx context.Context, input *CreateConnectorInput) (*Connector, error) {
+	if input.Configuration != nil {
+		input.Configuration["input"] = input.Input
+	} else {
+		input.Configuration = map[string]interface{}{"input": input.Input}
+	}
+	input.Metadata = map[string]interface{}{"mx:connectorType": input.Type}
 	resp, err := c.MakeRequest(ctx, http.MethodPost, connectorsBasePath, input, nil)
 	if err != nil {
 		return nil, err
@@ -58,12 +92,13 @@ func (c *Client) CreateConnector(ctx context.Context, input CreateConnectorInput
 	return &con, nil
 }
 
+// @TODO implement connector actions
 // UpdateConnectorStatus updates the status of a connector
-func (c *Client) UpdateConnectorStatus(ctx context.Context, connectorKey, state string) (*Connector, error) {
-	path := fmt.Sprintf("%s/%s/status", connectorsBasePath, connectorKey)
+func (c *Client) UpdateConnectorStatus(ctx context.Context, nameOrId string, state Action) (*Connector, error) {
+	path := fmt.Sprintf("%s/%s/status", connectorsBasePath, nameOrId)
 
 	cr := struct {
-		State string `json:"state,omitempty"`
+		State Action `json:"state,omitempty"`
 	}{
 		State: state,
 	}
@@ -88,10 +123,10 @@ func (c *Client) UpdateConnectorStatus(ctx context.Context, connectorKey, state 
 }
 
 // UpdateConnector updates the name, or a configuration of a connector
-func (c *Client) UpdateConnector(ctx context.Context, connectorKey string, connectorToUpdate UpdateConnectorInput) (*Connector, error) {
-	path := fmt.Sprintf("%s/%s", connectorsBasePath, connectorKey)
+func (c *Client) UpdateConnector(ctx context.Context, nameOrId string, input *UpdateConnectorInput) (*Connector, error) {
+	path := fmt.Sprintf("%s/%s", connectorsBasePath, nameOrId)
 
-	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, connectorToUpdate, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, input, nil)
 	if err != nil {
 		return nil, err
 	}
