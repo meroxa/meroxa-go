@@ -12,8 +12,8 @@ const endpointBasePath = "/v1/endpoints"
 type EndpointProtocol string
 
 const (
-	EndpointProtocolHttp EndpointProtocol = "http"
-	EndpointProtocolGrpc                  = "grpc"
+	EndpointProtocolHttp EndpointProtocol = "HTTP"
+	EndpointProtocolGrpc                  = "GRPC"
 )
 
 type CreateEndpointInput struct {
