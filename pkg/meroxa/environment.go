@@ -89,7 +89,7 @@ type CreateEnvironmentInput struct {
 }
 
 // ListEnvironments returns an array of Environments (scoped to the calling user)
-func (c *Client) ListEnvironments(ctx context.Context) ([]*Environment, error) {
+func (c *client) ListEnvironments(ctx context.Context) ([]*Environment, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodGet, environmentsBasePath, nil, nil)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (c *Client) ListEnvironments(ctx context.Context) ([]*Environment, error) {
 }
 
 // CreateEnvironment creates a new Environment based on a CreateEnvironmentInput
-func (c *Client) CreateEnvironment(ctx context.Context, input *CreateEnvironmentInput) (*Environment, error) {
+func (c *client) CreateEnvironment(ctx context.Context, input *CreateEnvironmentInput) (*Environment, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodPost, environmentsBasePath, input, nil)
 	if err != nil {
 		return nil, err
@@ -130,7 +130,7 @@ func (c *Client) CreateEnvironment(ctx context.Context, input *CreateEnvironment
 	return &e, nil
 }
 
-func (c *Client) GetEnvironment(ctx context.Context, nameOrUUID string) (*Environment, error) {
+func (c *client) GetEnvironment(ctx context.Context, nameOrUUID string) (*Environment, error) {
 	path := fmt.Sprintf("%s/%s", environmentsBasePath, nameOrUUID)
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
@@ -151,7 +151,7 @@ func (c *Client) GetEnvironment(ctx context.Context, nameOrUUID string) (*Enviro
 	return e, nil
 }
 
-func (c *Client) DeleteEnvironment(ctx context.Context, nameOrUUID string) (*Environment, error) {
+func (c *client) DeleteEnvironment(ctx context.Context, nameOrUUID string) (*Environment, error) {
 	path := fmt.Sprintf("%s/%s", environmentsBasePath, nameOrUUID)
 	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {

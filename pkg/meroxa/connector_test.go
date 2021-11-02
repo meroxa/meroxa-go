@@ -78,7 +78,7 @@ func TestCreateConnector(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.CreateConnector(context.Background(), input)
+	resp, err := c.CreateConnector(context.Background(), &input)
 
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
@@ -115,7 +115,7 @@ func TestUpdateConnectorStatus(t *testing.T) {
 
 		// Return response to satisfy client and test response
 		c := generateConnector(connectorKey, 0, nil, nil)
-		c.State = state
+		c.State = ConnectorState(state)
 		json.NewEncoder(w).Encode(c)
 	}))
 	// Close the server when test finishes
@@ -123,12 +123,12 @@ func TestUpdateConnectorStatus(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdateConnectorStatus(context.Background(), connectorKey, state)
+	resp, err := c.UpdateConnectorStatus(context.Background(), connectorKey, Action(state))
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
 
-	if resp.State != state {
+	if resp.State != ConnectorState(state) {
 		t.Errorf("expected state %s, got %s", state, resp.State)
 	}
 }
@@ -167,7 +167,7 @@ func TestUpdateConnector(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdateConnector(context.Background(), connector.Name, connectorUpdate)
+	resp, err := c.UpdateConnector(context.Background(), connector.Name, &connectorUpdate)
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
@@ -177,9 +177,9 @@ func TestUpdateConnector(t *testing.T) {
 	}
 }
 
-func testClient(c *http.Client, u string) *Client {
+func testClient(c *http.Client, u string) Client {
 	parsedURL, _ := url.Parse(u)
-	return &Client{
+	return &client{
 		baseURL:    parsedURL,
 		httpClient: c,
 	}

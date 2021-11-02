@@ -17,7 +17,7 @@ func TestGetEnvironments(t *testing.T) {
 		Provider: "aws",
 		Region:   "us-east",
 		Type:     "dedicated",
-		Status:   EnvironmentState{State: "provisioned"},
+		Status:   EnvironmentViewStatus{State: "provisioned"},
 	}
 
 	environments := []*Environment{env}
@@ -154,7 +154,7 @@ func TestDeleteEnvironment(t *testing.T) {
 
 		defer req.Body.Close()
 
-		env.Status.State = deprovisioningState
+		env.Status.State = EnvironmentState(deprovisioningState)
 		json.NewEncoder(w).Encode(env)
 	}))
 	defer server.Close()
@@ -170,18 +170,18 @@ func TestDeleteEnvironment(t *testing.T) {
 		t.Errorf("expected response same as environment")
 	}
 
-	if resp.Status.State != deprovisioningState {
+	if string(resp.Status.State) != deprovisioningState {
 		t.Errorf("expected state %q, got %s", deprovisioningState, resp.Status.State)
 	}
 }
 
-func generateEnvironment(t, p, n string) Environment {
+func generateEnvironment(t EnvironmentType, p EnvironmentProvider, n string) Environment {
 	return Environment{
 		Type:     t,
 		Name:     n,
 		Provider: p,
 		Region:   "us-east-1",
-		Status:   EnvironmentState{State: "provisioned"},
+		Status:   EnvironmentViewStatus{State: "provisioned"},
 		UUID:     "1a92d590-d59c-460b-94de-870f04ab35bf",
 	}
 }
