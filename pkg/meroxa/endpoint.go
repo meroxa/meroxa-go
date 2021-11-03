@@ -13,7 +13,7 @@ type EndpointProtocol string
 
 const (
 	EndpointProtocolHttp EndpointProtocol = "HTTP"
-	EndpointProtocolGrpc                  = "GRPC"
+	EndpointProtocolGrpc EndpointProtocol = "GRPC"
 )
 
 type CreateEndpointInput struct {
@@ -32,7 +32,7 @@ type Endpoint struct {
 	BasicAuthPassword string           `json:"basic_auth_password"`
 }
 
-func (c *Client) CreateEndpoint(ctx context.Context, input *CreateEndpointInput) error {
+func (c *client) CreateEndpoint(ctx context.Context, input *CreateEndpointInput) error {
 	resp, err := c.MakeRequest(ctx, http.MethodPost, endpointBasePath, input, nil)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (c *Client) CreateEndpoint(ctx context.Context, input *CreateEndpointInput)
 	return handleAPIErrors(resp)
 }
 
-func (c *Client) GetEndpoint(ctx context.Context, name string) (*Endpoint, error) {
+func (c *client) GetEndpoint(ctx context.Context, name string) (*Endpoint, error) {
 	path := fmt.Sprintf("%s/%s", endpointBasePath, name)
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
@@ -61,7 +61,7 @@ func (c *Client) GetEndpoint(ctx context.Context, name string) (*Endpoint, error
 	return &end, nil
 }
 
-func (c *Client) DeleteEndpoint(ctx context.Context, name string) error {
+func (c *client) DeleteEndpoint(ctx context.Context, name string) error {
 	path := fmt.Sprintf("%s/%s", endpointBasePath, name)
 	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
 	if err != nil {
@@ -71,7 +71,7 @@ func (c *Client) DeleteEndpoint(ctx context.Context, name string) error {
 	return handleAPIErrors(resp)
 }
 
-func (c *Client) ListEndpoints(ctx context.Context) ([]Endpoint, error) {
+func (c *client) ListEndpoints(ctx context.Context) ([]Endpoint, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodGet, endpointBasePath, nil, nil)
 	if err != nil {
 		return nil, err

@@ -17,9 +17,9 @@ type ResourceState string
 
 const (
 	ResourceStatePending  ResourceState = "pending"
-	ResourceStateStarting               = "starting"
-	ResourceStateError                  = "error"
-	ResourceStateReady                  = "ready"
+	ResourceStateStarting ResourceState = "starting"
+	ResourceStateError    ResourceState = "error"
+	ResourceStateReady    ResourceState = "ready"
 )
 
 var ErrMissingScheme = errors.New("URL scheme required")
@@ -85,7 +85,7 @@ type UpdateResourceInput struct {
 }
 
 // CreateResource provisions a new Resource from the given CreateResourceInput struct
-func (c *Client) CreateResource(ctx context.Context, input *CreateResourceInput) (*Resource, error) {
+func (c *client) CreateResource(ctx context.Context, input *CreateResourceInput) (*Resource, error) {
 	// url encode url username/password if needed
 	var err error
 	input.URL, err = encodeURLCreds(input.URL)
@@ -112,7 +112,7 @@ func (c *Client) CreateResource(ctx context.Context, input *CreateResourceInput)
 	return &r, nil
 }
 
-func (c *Client) UpdateResource(ctx context.Context, nameOrId string, input *UpdateResourceInput) (*Resource, error) {
+func (c *client) UpdateResource(ctx context.Context, nameOrId string, input *UpdateResourceInput) (*Resource, error) {
 	// url encode url username/password if needed
 	var err error
 
@@ -143,15 +143,15 @@ func (c *Client) UpdateResource(ctx context.Context, nameOrId string, input *Upd
 	return &r, nil
 }
 
-func (c *Client) RotateTunnelKeyForResource(ctx context.Context, id int) (*Resource, error) {
+func (c *client) RotateTunnelKeyForResource(ctx context.Context, id int) (*Resource, error) {
 	return c.performResourceAction(ctx, id, "rotate_keys")
 }
 
-func (c *Client) ValidateResource(ctx context.Context, id int) (*Resource, error) {
+func (c *client) ValidateResource(ctx context.Context, id int) (*Resource, error) {
 	return c.performResourceAction(ctx, id, "validate")
 }
 
-func (c *Client) performResourceAction(ctx context.Context, id int, action string) (*Resource, error) {
+func (c *client) performResourceAction(ctx context.Context, id int, action string) (*Resource, error) {
 	path := fmt.Sprintf("%s/%d/actions", ResourcesBasePath, id)
 	body := struct {
 		Action string `json:"action"`
@@ -179,7 +179,7 @@ func (c *Client) performResourceAction(ctx context.Context, id int, action strin
 }
 
 // ListResources returns an array of Resources (scoped to the calling user)
-func (c *Client) ListResources(ctx context.Context) ([]*Resource, error) {
+func (c *client) ListResources(ctx context.Context) ([]*Resource, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodGet, ResourcesBasePath, nil, nil)
 	if err != nil {
 		return nil, err
@@ -200,7 +200,7 @@ func (c *Client) ListResources(ctx context.Context) ([]*Resource, error) {
 }
 
 // GetResource returns a Resource with the given id
-func (c *Client) GetResource(ctx context.Context, id int) (*Resource, error) {
+func (c *client) GetResource(ctx context.Context, id int) (*Resource, error) {
 	path := fmt.Sprintf("%s/%d", ResourcesBasePath, id)
 
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
@@ -223,7 +223,7 @@ func (c *Client) GetResource(ctx context.Context, id int) (*Resource, error) {
 }
 
 // GetResourceByName returns a Resource with the given name
-func (c *Client) GetResourceByName(ctx context.Context, name string) (*Resource, error) {
+func (c *client) GetResourceByName(ctx context.Context, name string) (*Resource, error) {
 	params := map[string][]string{
 		"name": []string{name},
 	}
@@ -248,7 +248,7 @@ func (c *Client) GetResourceByName(ctx context.Context, name string) (*Resource,
 }
 
 // DeleteResource deletes the Resource with the given id
-func (c *Client) DeleteResource(ctx context.Context, id int) error {
+func (c *client) DeleteResource(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s/%d", ResourcesBasePath, id)
 
 	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)

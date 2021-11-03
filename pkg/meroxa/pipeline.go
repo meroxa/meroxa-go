@@ -13,7 +13,7 @@ type PipelineState string
 
 const (
 	PipelineStateHealthy  PipelineState = "healthy"
-	PipelineStateDegraded               = "degraded"
+	PipelineStateDegraded PipelineState = "degraded"
 )
 
 // Pipeline represents the Meroxa Pipeline type within the Meroxa API
@@ -39,7 +39,7 @@ const (
 	ConnectorComponent ComponentKind = 0
 
 	// FunctionComponent is a Pipeline stage component of type Function
-	FunctionComponent = 1
+	FunctionComponent ComponentKind = 1
 )
 
 // PipelineStage represents the Meroxa PipelineStage type within the Meroxa API
@@ -51,7 +51,7 @@ type PipelineStage struct {
 }
 
 // CreatePipeline provisions a new Pipeline
-func (c *Client) CreatePipeline(ctx context.Context, input *CreatePipelineInput) (*Pipeline, error) {
+func (c *client) CreatePipeline(ctx context.Context, input *CreatePipelineInput) (*Pipeline, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodPost, pipelinesBasePath, input, nil)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (c *Client) CreatePipeline(ctx context.Context, input *CreatePipelineInput)
 }
 
 // UpdatePipeline updates a pipeline
-func (c *Client) UpdatePipeline(ctx context.Context, pipelineID int, input *UpdatePipelineInput) (*Pipeline, error) {
+func (c *client) UpdatePipeline(ctx context.Context, pipelineID int, input *UpdatePipelineInput) (*Pipeline, error) {
 	path := fmt.Sprintf("%s/%d", pipelinesBasePath, pipelineID)
 
 	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, input, nil)
@@ -96,7 +96,7 @@ func (c *Client) UpdatePipeline(ctx context.Context, pipelineID int, input *Upda
 
 // @TODO implement pipeline actions
 // UpdatePipelineStatus updates the status of a pipeline
-func (c *Client) UpdatePipelineStatus(ctx context.Context, pipelineID int, action Action) (*Pipeline, error) {
+func (c *client) UpdatePipelineStatus(ctx context.Context, pipelineID int, action Action) (*Pipeline, error) {
 	path := fmt.Sprintf("%s/%d/status", pipelinesBasePath, pipelineID)
 
 	cr := struct {
@@ -125,7 +125,7 @@ func (c *Client) UpdatePipelineStatus(ctx context.Context, pipelineID int, actio
 }
 
 // ListPipelines returns an array of Pipelines (scoped to the calling user)
-func (c *Client) ListPipelines(ctx context.Context) ([]*Pipeline, error) {
+func (c *client) ListPipelines(ctx context.Context) ([]*Pipeline, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodGet, pipelinesBasePath, nil, nil)
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (c *Client) ListPipelines(ctx context.Context) ([]*Pipeline, error) {
 }
 
 // GetPipelineByName returns a Pipeline with the given name
-func (c *Client) GetPipelineByName(ctx context.Context, name string) (*Pipeline, error) {
+func (c *client) GetPipelineByName(ctx context.Context, name string) (*Pipeline, error) {
 	params := map[string][]string{
 		"name": {name},
 	}
@@ -173,7 +173,7 @@ func (c *Client) GetPipelineByName(ctx context.Context, name string) (*Pipeline,
 // GetPipelineByName returns a Pipeline with the given name (scoped to the calling user)
 
 // GetPipeline returns a Pipeline with the given id
-func (c *Client) GetPipeline(ctx context.Context, pipelineID int) (*Pipeline, error) {
+func (c *client) GetPipeline(ctx context.Context, pipelineID int) (*Pipeline, error) {
 	path := fmt.Sprintf("%s/%d", pipelinesBasePath, pipelineID)
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
@@ -195,7 +195,7 @@ func (c *Client) GetPipeline(ctx context.Context, pipelineID int) (*Pipeline, er
 }
 
 // DeletePipeline deletes the Pipeline with the given id
-func (c *Client) DeletePipeline(ctx context.Context, id int) error {
+func (c *client) DeletePipeline(ctx context.Context, id int) error {
 	path := fmt.Sprintf("%s/%d", pipelinesBasePath, id)
 
 	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)

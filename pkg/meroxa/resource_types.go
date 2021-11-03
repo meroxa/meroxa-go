@@ -11,20 +11,20 @@ type ResourceType string
 
 const (
 	ResourceTypePostgres      ResourceType = "postgres"
-	ResourceTypeMysql                      = "mysql"
-	ResourceTypeRedshift                   = "redshift"
-	ResourceTypeUrl                        = "url"
-	ResourceTypeS3                         = "s3"
-	ResourceTypeMongodb                    = "mongodb"
-	ResourceTypeElasticsearch              = "elasticsearch"
-	ResourceTypeSnowflake                  = "snowflake"
-	ResourceTypeBigquery                   = "bigquery"
-	ResourceTypeSqlserver                  = "sqlserver"
-	ResourceTypeCosmosdb                   = "cosmosdb"
+	ResourceTypeMysql         ResourceType = "mysql"
+	ResourceTypeRedshift      ResourceType = "redshift"
+	ResourceTypeUrl           ResourceType = "url"
+	ResourceTypeS3            ResourceType = "s3"
+	ResourceTypeMongodb       ResourceType = "mongodb"
+	ResourceTypeElasticsearch ResourceType = "elasticsearch"
+	ResourceTypeSnowflake     ResourceType = "snowflake"
+	ResourceTypeBigquery      ResourceType = "bigquery"
+	ResourceTypeSqlserver     ResourceType = "sqlserver"
+	ResourceTypeCosmosdb      ResourceType = "cosmosdb"
 )
 
 // ListResourceTypes returns the list of supported resources
-func (c *Client) ListResourceTypes(ctx context.Context) ([]string, error) {
+func (c *client) ListResourceTypes(ctx context.Context) ([]string, error) {
 	path := fmt.Sprintf("/v1/resource-types")
 
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)

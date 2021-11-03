@@ -8,18 +8,17 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strconv"
 	"testing"
 	"time"
 )
 
 func Test_Resource_PerformActions(t *testing.T) {
-	for k, v := range map[string]func(c *Client, id int) (*Resource, error){
-		"validate": func(c *Client, id int) (*Resource, error) {
-			return c.ValidateResource(context.Background(), strconv.Itoa(id))
+	for k, v := range map[string]func(c Client, id int) (*Resource, error){
+		"validate": func(c Client, id int) (*Resource, error) {
+			return c.ValidateResource(context.Background(), id)
 		},
-		"rotate_keys": func(c *Client, id int) (*Resource, error) {
-			return c.RotateTunnelKeyForResource(context.Background(), strconv.Itoa(id))
+		"rotate_keys": func(c Client, id int) (*Resource, error) {
+			return c.RotateTunnelKeyForResource(context.Background(), id)
 		},
 	} {
 		action := k
@@ -167,7 +166,7 @@ func TestCreateResource(t *testing.T) {
 		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 	}
 
-	if want, got := "ready", resp.Status.State; want != got {
+	if want, got := ResourceStateReady, resp.Status.State; want != got {
 		t.Errorf("unexpected status state: want=%s got=%s", want, got)
 	}
 
@@ -231,7 +230,7 @@ func TestUpdateResource(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdateResource(context.Background(), resource.Name, resource)
+	resp, err := c.UpdateResource(context.Background(), resource.Name, &resource)
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
@@ -248,7 +247,7 @@ func TestUpdateResource(t *testing.T) {
 		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 	}
 
-	if want, got := "ready", resp.Status.State; want != got {
+	if want, got := ResourceStateReady, resp.Status.State; want != got {
 		t.Errorf("unexpected status state: want=%s got=%s", want, got)
 	}
 

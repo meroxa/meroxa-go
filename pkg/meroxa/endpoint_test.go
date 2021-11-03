@@ -15,22 +15,26 @@ func TestCreateEndpoint(t *testing.T) {
 		protocol = "http"
 		stream   = "stream-1"
 	)
+	er := &CreateEndpointInput{
+		Name:     name,
+		Protocol: EndpointProtocol(protocol),
+		Stream:   stream,
+	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := endpointBasePath, req.URL.Path; want != got {
 			t.Fatalf("Path mismatched: want=%v got=%v", want, got)
 		}
 
-		var er createEndpointRequest
-		if err := json.NewDecoder(req.Body).Decode(&er); err != nil {
+		if err := json.NewDecoder(req.Body).Decode(er); err != nil {
 			t.Fatal(err)
 		}
 		defer req.Body.Close()
 
 		if want, got := name, er.Name; want != got {
-			t.Fatalf("Name mismtached: want=%s got=%s", want, got)
+			t.Fatalf("Name mismatched: want=%s got=%s", want, got)
 		}
-		if want, got := protocol, er.Protocol; want != got {
+		if want, got := EndpointProtocol(protocol), er.Protocol; want != got {
 			t.Fatalf("Name protocol: want=%s got=%s", want, got)
 		}
 		if want, got := stream, er.Stream; want != got {
@@ -41,7 +45,7 @@ func TestCreateEndpoint(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	if err := c.CreateEndpoint(context.Background(), name, protocol, stream); err != nil {
+	if err := c.CreateEndpoint(context.Background(), er); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -49,7 +53,7 @@ func TestCreateEndpoint(t *testing.T) {
 func TestGetEndpoint(t *testing.T) {
 	end := &Endpoint{
 		Name:              "endpoint",
-		Protocol:          "http",
+		Protocol:          EndpointProtocolHttp,
 		Host:              "https://endpoint.test",
 		Stream:            "stream",
 		Ready:             true,

@@ -46,12 +46,12 @@ func TestUpdatePipelineStatus(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdatePipelineStatus(context.Background(), pipelineID, state)
+	resp, err := c.UpdatePipelineStatus(context.Background(), pipelineID, Action(state))
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
 
-	if resp.State != newState {
+	if string(resp.State) != newState {
 		t.Errorf("expected state %s, got %s", state, resp.State)
 	}
 }
@@ -61,7 +61,6 @@ func TestUpdatePipeline(t *testing.T) {
 	var pipeline = generatePipeline("", 0, "", nil)
 
 	pipelineUpdate.Name = pipeline.Name
-	pipelineUpdate.Metadata = pipeline.Metadata
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%d", pipelinesBasePath, pipeline.ID), req.URL.Path; want != got {
@@ -79,10 +78,6 @@ func TestUpdatePipeline(t *testing.T) {
 			t.Errorf("expected name %s, got %s", pipeline.Name, pi.Name)
 		}
 
-		if !reflect.DeepEqual(pi.Metadata, pipeline.Metadata) {
-			t.Errorf("expected same metadata")
-		}
-
 		// Return response to satisfy client and test response
 		json.NewEncoder(w).Encode(pipeline)
 	}))
@@ -91,7 +86,7 @@ func TestUpdatePipeline(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdatePipeline(context.Background(), pipeline.ID, pipelineUpdate)
+	resp, err := c.UpdatePipeline(context.Background(), pipeline.ID, &pipelineUpdate)
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
@@ -121,9 +116,8 @@ func generatePipeline(name string, id int, state string, metadata map[string]int
 	}
 
 	return Pipeline{
-		ID:       id,
-		Name:     name,
-		State:    state,
-		Metadata: metadata,
+		ID:    id,
+		Name:  name,
+		State: PipelineState(state),
 	}
 }
