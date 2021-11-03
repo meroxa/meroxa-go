@@ -37,7 +37,7 @@ const (
 
 type Connector struct {
 	ID            int                    `json:"id"`
-	Type          string                 `json:"type"`
+	Type          ConnectorType          `json:"type"`
 	Name          string                 `json:"name"`
 	Configuration map[string]interface{} `json:"config"`
 	Metadata      map[string]interface{} `json:"metadata"`
