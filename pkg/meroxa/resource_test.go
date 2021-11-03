@@ -166,7 +166,7 @@ func TestCreateResource(t *testing.T) {
 		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 	}
 
-	if want, got := ResourceStateReady, string(resp.Status.State); want != got {
+	if want, got := ResourceStateReady, resp.Status.State; want != got {
 		t.Errorf("unexpected status state: want=%s got=%s", want, got)
 	}
 
@@ -247,7 +247,7 @@ func TestUpdateResource(t *testing.T) {
 		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 	}
 
-	if want, got := ResourceStateReady, string(resp.Status.State); want != got {
+	if want, got := ResourceStateReady, resp.Status.State; want != got {
 		t.Errorf("unexpected status state: want=%s got=%s", want, got)
 	}
 
