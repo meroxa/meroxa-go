@@ -13,7 +13,7 @@ type PipelineState string
 
 const (
 	PipelineStateHealthy  PipelineState = "healthy"
-	PipelineStateDegraded               = "degraded"
+	PipelineStateDegraded PipelineState = "degraded"
 )
 
 // Pipeline represents the Meroxa Pipeline type within the Meroxa API
@@ -39,7 +39,7 @@ const (
 	ConnectorComponent ComponentKind = 0
 
 	// FunctionComponent is a Pipeline stage component of type Function
-	FunctionComponent = 1
+	FunctionComponent ComponentKind = 1
 )
 
 // PipelineStage represents the Meroxa PipelineStage type within the Meroxa API

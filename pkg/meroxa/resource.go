@@ -17,9 +17,9 @@ type ResourceState string
 
 const (
 	ResourceStatePending  ResourceState = "pending"
-	ResourceStateStarting               = "starting"
-	ResourceStateError                  = "error"
-	ResourceStateReady                  = "ready"
+	ResourceStateStarting ResourceState = "starting"
+	ResourceStateError    ResourceState = "error"
+	ResourceStateReady    ResourceState = "ready"
 )
 
 var ErrMissingScheme = errors.New("URL scheme required")

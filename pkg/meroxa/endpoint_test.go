@@ -16,9 +16,9 @@ func TestCreateEndpoint(t *testing.T) {
 		stream   = "stream-1"
 	)
 	er := &CreateEndpointInput{
-		Name: name,
+		Name:     name,
 		Protocol: EndpointProtocol(protocol),
-		Stream: stream,
+		Stream:   stream,
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {

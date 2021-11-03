@@ -116,8 +116,8 @@ func generatePipeline(name string, id int, state string, metadata map[string]int
 	}
 
 	return Pipeline{
-		ID:       id,
-		Name:     name,
-		State:    PipelineState(state),
+		ID:    id,
+		Name:  name,
+		State: PipelineState(state),
 	}
 }

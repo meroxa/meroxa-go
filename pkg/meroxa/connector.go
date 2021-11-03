@@ -13,11 +13,11 @@ type ConnectorState string
 
 const (
 	ConnectorStatePending ConnectorState = "pending"
-	ConnectorStateRunning                = "running"
-	ConnectorStatePaused                 = "paused"
-	ConnectorStateCrashed                = "crashed"
-	ConnectorStateFailed                 = "failed"
-	ConnectorStateDOA                    = "doa"
+	ConnectorStateRunning ConnectorState = "running"
+	ConnectorStatePaused  ConnectorState = "paused"
+	ConnectorStateCrashed ConnectorState = "crashed"
+	ConnectorStateFailed  ConnectorState = "failed"
+	ConnectorStateDOA     ConnectorState = "doa"
 )
 
 type Action string
@@ -32,7 +32,7 @@ type ConnectorType string
 
 const (
 	ConnectorTypeSource      ConnectorType = "source"
-	ConnectorTypeDestination               = "destination"
+	ConnectorTypeDestination ConnectorType = "destination"
 )
 
 type Connector struct {

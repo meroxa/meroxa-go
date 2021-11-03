@@ -13,7 +13,7 @@ type EndpointProtocol string
 
 const (
 	EndpointProtocolHttp EndpointProtocol = "HTTP"
-	EndpointProtocolGrpc                  = "GRPC"
+	EndpointProtocolGrpc EndpointProtocol = "GRPC"
 )
 
 type CreateEndpointInput struct {
