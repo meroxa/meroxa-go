@@ -13,11 +13,11 @@ import (
 )
 
 func Test_Resource_PerformActions(t *testing.T) {
-	for k, v := range map[string]func(c Client, id int) (*Resource, error){
-		"validate": func(c Client, id int) (*Resource, error) {
+	for k, v := range map[string]func(c Client, id string) (*Resource, error){
+		"validate": func(c Client, id string) (*Resource, error) {
 			return c.ValidateResource(context.Background(), id)
 		},
-		"rotate_keys": func(c Client, id int) (*Resource, error) {
+		"rotate_keys": func(c Client, id string) (*Resource, error) {
 			return c.RotateTunnelKeyForResource(context.Background(), id)
 		},
 	} {
@@ -54,7 +54,7 @@ func Test_Resource_PerformActions(t *testing.T) {
 
 			c := testClient(server.Client(), server.URL)
 
-			resp, err := f(c, resID)
+			resp, err := f(c, fmt.Sprint(resID))
 			if err != nil {
 				t.Errorf("expected no error, got %+v", err)
 			}
