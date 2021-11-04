@@ -64,7 +64,7 @@ func TestCreateConnector(t *testing.T) {
 			t.Errorf("expected configuration %+v, got %+v", input.Configuration, cr.Configuration)
 		}
 
-		if len(input.Metadata) != len(cr.Metadata) || ConnectorType(cr.Metadata["mx:connectorType"].(string)) != input.Metadata["mx:connectorType"] {
+		if !reflect.DeepEqual(input.Metadata, cr.Metadata) {
 			t.Errorf("expected metadata %+v, got %+v", input.Metadata, cr.Metadata)
 		}
 		defer req.Body.Close()
