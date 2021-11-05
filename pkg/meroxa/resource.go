@@ -200,7 +200,7 @@ func (c *client) ListResources(ctx context.Context) ([]*Resource, error) {
 }
 
 // GetResourceByNameOrID returns a Resource with the given identifier
-func (c *client) GetResourceByName(ctx context.Context, nameOrID string) (*Resource, error) {
+func (c *client) GetResourceByNameOrID(ctx context.Context, nameOrID string) (*Resource, error) {
 	path := fmt.Sprintf("%s/%d", ResourcesBasePath, nameOrID)
 
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
