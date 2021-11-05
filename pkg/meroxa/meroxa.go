@@ -30,7 +30,7 @@ type Client interface {
 	CreateConnector(ctx context.Context, input *CreateConnectorInput) (*Connector, error)
 	DeleteConnector(ctx context.Context, nameOrID string) error
 	GetConnectorByNameOrID(ctx context.Context, nameOrID string) (*Connector, error)
-	GetConnectorLogs(ctx context.Context, connectorName string) (*http.Response, error)
+	GetConnectorLogs(ctx context.Context, nameOrID string) (*http.Response, error)
 	ListConnectors(ctx context.Context) ([]*Connector, error)
 	UpdateConnector(ctx context.Context, nameOrID string, input *UpdateConnectorInput) (*Connector, error)
 	UpdateConnectorStatus(ctx context.Context, nameOrID string, state Action) (*Connector, error)

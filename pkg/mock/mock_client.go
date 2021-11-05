@@ -198,18 +198,18 @@ func (mr *MockClientMockRecorder) GetConnectorByNameOrID(ctx, nameOrID interface
 }
 
 // GetConnectorLogs mocks base method.
-func (m *MockClient) GetConnectorLogs(ctx context.Context, connectorName string) (*http.Response, error) {
+func (m *MockClient) GetConnectorLogs(ctx context.Context, nameOrID string) (*http.Response, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetConnectorLogs", ctx, connectorName)
+	ret := m.ctrl.Call(m, "GetConnectorLogs", ctx, nameOrID)
 	ret0, _ := ret[0].(*http.Response)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetConnectorLogs indicates an expected call of GetConnectorLogs.
-func (mr *MockClientMockRecorder) GetConnectorLogs(ctx, connectorName interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) GetConnectorLogs(ctx, nameOrID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConnectorLogs", reflect.TypeOf((*MockClient)(nil).GetConnectorLogs), ctx, connectorName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConnectorLogs", reflect.TypeOf((*MockClient)(nil).GetConnectorLogs), ctx, nameOrID)
 }
 
 // GetEndpoint mocks base method.
