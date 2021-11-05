@@ -191,7 +191,7 @@ func (c *client) ListConnectors(ctx context.Context) ([]*Connector, error) {
 
 // GetConnectorByNameOrID returns a Connector with the given identifier
 func (c *client) GetConnectorByNameOrID(ctx context.Context, nameOrID string) (*Connector, error) {
-	path := fmt.Sprintf("%s/%d", connectorsBasePath, nameOrID)
+	path := fmt.Sprintf("%s/%s", connectorsBasePath, nameOrID)
 
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {

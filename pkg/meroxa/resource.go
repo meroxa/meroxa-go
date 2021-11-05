@@ -201,7 +201,7 @@ func (c *client) ListResources(ctx context.Context) ([]*Resource, error) {
 
 // GetResourceByNameOrID returns a Resource with the given identifier
 func (c *client) GetResourceByNameOrID(ctx context.Context, nameOrID string) (*Resource, error) {
-	path := fmt.Sprintf("%s/%d", ResourcesBasePath, nameOrID)
+	path := fmt.Sprintf("%s/%s", ResourcesBasePath, nameOrID)
 
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
 	if err != nil {
