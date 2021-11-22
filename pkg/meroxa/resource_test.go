@@ -75,15 +75,15 @@ func TestEncodeURLCreds(t *testing.T) {
 		want string
 		err  error
 	}{
-		{"s3://KAHDKJKSA:askkshe+skje/fhds@us-east-1/bucket", "s3://KAHDKJKSA:askkshe+skje%2Ffhds@us-east-1/bucket", nil},
-		{"s3://KAHDKJKSA:secretsecret@us-east-1/bucket", "s3://KAHDKJKSA:secretsecret@us-east-1/bucket", nil},
-		{"s3://us-east-1/bucket", "s3://us-east-1/bucket", nil},
-		{"s3://:apassword@us-east-1/bucket", "s3://:apassword@us-east-1/bucket", nil},
-		{"s3://foo@bar:/barfoo/+@us-east-1/bucket", "s3://foo%40bar:%2Fbarfoo%2F+@us-east-1/bucket", nil},
-		{"s3://foo@us-east-1/bucket", "s3://foo:@us-east-1/bucket", nil},
-		{"s3://foo:@us-east-1/bucket", "s3://foo:@us-east-1/bucket", nil},
-		{"s3://:bar@us-east-1/bucket", "s3://:bar@us-east-1/bucket", nil},
-		{"not a URL", "", ErrMissingScheme},
+		{in: "s3://KAHDKJKSA:askkshe+skje/fhds@us-east-1/bucket", want: "s3://KAHDKJKSA:askkshe+skje%2Ffhds@us-east-1/bucket", err: nil},
+		{in: "s3://KAHDKJKSA:secretsecret@us-east-1/bucket", want: "s3://KAHDKJKSA:secretsecret@us-east-1/bucket", err: nil},
+		{in: "s3://us-east-1/bucket", want: "s3://us-east-1/bucket", err: nil},
+		{in: "s3://:apassword@us-east-1/bucket", want: "s3://:apassword@us-east-1/bucket", err: nil},
+		{in: "s3://foo@bar:/barfoo/+@us-east-1/bucket", want: "s3://foo%40bar:%2Fbarfoo%2F+@us-east-1/bucket", err: nil},
+		{in: "s3://foo@us-east-1/bucket", want: "s3://foo:@us-east-1/bucket", err: nil},
+		{in: "s3://foo:@us-east-1/bucket", want: "s3://foo:@us-east-1/bucket", err: nil},
+		{in: "s3://:bar@us-east-1/bucket", want: "s3://:bar@us-east-1/bucket", err: nil},
+		{in: "not a URL", want: "", err: ErrMissingScheme},
 	}
 
 	for _, tt := range tests {
@@ -98,84 +98,135 @@ func TestEncodeURLCreds(t *testing.T) {
 }
 
 func TestCreateResource(t *testing.T) {
-	var resource CreateResourceInput
+	tests := []struct {
+		desc  string
+		input func() CreateResourceInput
+	}{
+		{
+			desc: "resource without an environment",
+			input: func() CreateResourceInput {
+				var resource CreateResourceInput
 
-	resource.Name = "resource-name"
-	resource.URL = "http://foo.com"
-	resource.Metadata = map[string]interface{}{
-		"key": "value",
-	}
-	resource.SSHTunnel = &ResourceSSHTunnelInput{
-		Address:    "test@host.com",
-		PrivateKey: "1234",
-	}
+				resource.Name = "resource-name"
+				resource.URL = "http://foo.com"
+				resource.Metadata = map[string]interface{}{
+					"key": "value",
+				}
+				resource.SSHTunnel = &ResourceSSHTunnelInput{
+					Address:    "test@host.com",
+					PrivateKey: "1234",
+				}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s", ResourcesBasePath), req.URL.Path; want != got {
-			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
-		}
+				return resource
+			},
+		},
+		{
+			desc: "resource with an environment",
+			input: func() CreateResourceInput {
+				var resource CreateResourceInput
+				var env = &ResourceEnvironmentInput{
+					Name: "my-environment",
+				}
 
-		var rr *CreateResourceInput
-		if err := json.NewDecoder(req.Body).Decode(&rr); err != nil {
-			t.Errorf("expected no error, got %+v", err)
-		}
-		defer req.Body.Close()
+				resource.Environment = env
+				resource.Name = "resource-name"
+				resource.URL = "http://foo.com"
+				resource.Metadata = map[string]interface{}{
+					"key": "value",
+				}
+				resource.SSHTunnel = &ResourceSSHTunnelInput{
+					Address:    "test@host.com",
+					PrivateKey: "1234",
+				}
 
-		if rr.URL != resource.URL {
-			t.Errorf("expected URL %s, got %s", resource.URL, rr.URL)
-		}
-
-		if !reflect.DeepEqual(rr.Metadata, resource.Metadata) {
-			t.Errorf("expected same metadata")
-		}
-
-		if !reflect.DeepEqual(rr.SSHTunnel, resource.SSHTunnel) {
-			t.Errorf("expected same ssh tunnel")
-		}
-
-		// Return response to satisfy client and test response
-		c := generateResource(resource.Name, 0, "", nil)
-		c.URL = resource.URL
-		c.Metadata = resource.Metadata
-		c.SSHTunnel = &ResourceSSHTunnel{
-			Address:   resource.SSHTunnel.Address,
-			PublicKey: "1234",
-		}
-		json.NewEncoder(w).Encode(c)
-	}))
-
-	// Close the server when test finishes
-	defer server.Close()
-
-	c := testClient(server.Client(), server.URL)
-
-	resp, err := c.CreateResource(context.Background(), &resource)
-	if err != nil {
-		t.Errorf("expected no error, got %+v", err)
+				return resource
+			},
+		},
 	}
 
-	if resp.URL != resource.URL {
-		t.Errorf("expected url %s, got %s", resource.URL, resp.URL)
-	}
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			var resource = tc.input()
 
-	if want, got := resource.SSHTunnel.Address, resp.SSHTunnel.Address; want != got {
-		t.Errorf("unexpected ssh tunnel address: want=%s got=%s", want, got)
-	}
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				if want, got := fmt.Sprintf("%s", ResourcesBasePath), req.URL.Path; want != got {
+					t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+				}
 
-	if want, got := "1234", resp.SSHTunnel.PublicKey; want != got {
-		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
-	}
+				var rr *CreateResourceInput
+				if err := json.NewDecoder(req.Body).Decode(&rr); err != nil {
+					t.Errorf("expected no error, got %+v", err)
+				}
+				defer req.Body.Close()
 
-	if want, got := ResourceStateReady, resp.Status.State; want != got {
-		t.Errorf("unexpected status state: want=%s got=%s", want, got)
-	}
+				if rr.URL != resource.URL {
+					t.Errorf("expected URL %s, got %s", resource.URL, rr.URL)
+				}
 
-	if want, got := "your resource is ready to use", resp.Status.Details; want != got {
-		t.Errorf("unexpected status details: want=%s got=%s", want, got)
-	}
+				if !reflect.DeepEqual(rr.Metadata, resource.Metadata) {
+					t.Errorf("expected same metadata")
+				}
 
-	if resp.Status.LastUpdatedAt.IsZero() {
-		t.Errorf("expected time to not be null: got=%s", resp.Status.LastUpdatedAt)
+				if !reflect.DeepEqual(rr.SSHTunnel, resource.SSHTunnel) {
+					t.Errorf("expected same ssh tunnel")
+				}
+
+				// Return response to satisfy client and test response
+				c := generateResource(resource.Name, 0, "", nil)
+				c.URL = resource.URL
+				c.Metadata = resource.Metadata
+				c.SSHTunnel = &ResourceSSHTunnel{
+					Address:   resource.SSHTunnel.Address,
+					PublicKey: "1234",
+				}
+
+				if resource.Environment != nil {
+					c.Environment.Name = resource.Environment.Name
+				}
+
+				json.NewEncoder(w).Encode(c)
+			}))
+
+			// Close the server when test finishes
+			defer server.Close()
+
+			c := testClient(server.Client(), server.URL)
+
+			resp, err := c.CreateResource(context.Background(), &resource)
+			if err != nil {
+				t.Errorf("expected no error, got %+v", err)
+			}
+
+			if resp.URL != resource.URL {
+				t.Errorf("expected url %s, got %s", resource.URL, resp.URL)
+			}
+
+			if want, got := resource.SSHTunnel.Address, resp.SSHTunnel.Address; want != got {
+				t.Errorf("unexpected ssh tunnel address: want=%s got=%s", want, got)
+			}
+
+			if want, got := "1234", resp.SSHTunnel.PublicKey; want != got {
+				t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
+			}
+
+			if want, got := ResourceStateReady, resp.Status.State; want != got {
+				t.Errorf("unexpected status state: want=%s got=%s", want, got)
+			}
+
+			if want, got := "your resource is ready to use", resp.Status.Details; want != got {
+				t.Errorf("unexpected status details: want=%s got=%s", want, got)
+			}
+
+			if resp.Status.LastUpdatedAt.IsZero() {
+				t.Errorf("expected time to not be null: got=%s", resp.Status.LastUpdatedAt)
+			}
+
+			if resource.Environment != nil {
+				if want, got := resource.Environment.Name, resp.Environment.Name; want != got {
+					t.Errorf("unexpected environment name: want=%s got=%s", want, got)
+				}
+			}
+		})
 	}
 }
 
