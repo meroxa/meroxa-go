@@ -214,3 +214,120 @@ func generateConnector(name string, id int, config, metadata map[string]interfac
 		Metadata:      metadata,
 	}
 }
+
+func TestGetConnectorByName(t *testing.T) {
+	var connector = generateConnector("my-connector", 0, nil, nil)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s", connectorsBasePath, connector.Name), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		json.NewEncoder(w).Encode(connector)
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.GetConnectorByNameOrID(context.Background(), connector.Name)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &connector) {
+		t.Errorf("expected response same as connector")
+	}
+}
+
+func TestGetConnectorByID(t *testing.T) {
+	var connector = generateConnector("", 10, nil, nil)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%d", connectorsBasePath, connector.ID), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		json.NewEncoder(w).Encode(connector)
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.GetConnectorByNameOrID(context.Background(), fmt.Sprint(connector.ID))
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &connector) {
+		t.Errorf("expected response same as connector")
+	}
+}
+
+func TestListPipelineConnectors(t *testing.T) {
+	p := generatePipeline("", 0, fmt.Sprint(PipelineStateHealthy), nil)
+	connector := generateConnector("", 0, nil, nil)
+	connector.PipelineID = p.ID
+	list := []*Connector{&connector}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("/v1/pipelines/%d/connectors", p.ID), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		json.NewEncoder(w).Encode(list)
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.ListPipelineConnectors(context.Background(), p.ID)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, list) {
+		t.Errorf("expected response same as list")
+	}
+}
+
+func TestListConnectors(t *testing.T) {
+	c1 := generateConnector("", 10, nil, nil)
+	c2 := generateConnector("", 10, nil, nil)
+	list := []*Connector{&c1, &c2}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s", connectorsBasePath), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		json.NewEncoder(w).Encode(list)
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.ListConnectors(context.Background())
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, list) {
+		t.Errorf("expected response same as list")
+	}
+}
