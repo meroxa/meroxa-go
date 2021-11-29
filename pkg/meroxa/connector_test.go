@@ -216,7 +216,7 @@ func generateConnector(name string, id int, config, metadata map[string]interfac
 }
 
 func TestGetConnectorByName(t *testing.T) {
-	var connector = generateConnector("my-connector", 0, nil, nil)
+	connector := generateConnector("my-connector", 0, nil, nil)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", connectorsBasePath, connector.Name), req.URL.Path; want != got {
