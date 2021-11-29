@@ -129,7 +129,7 @@ func TestCreateResource(t *testing.T) {
 			desc: "resource with an environment",
 			input: func() CreateResourceInput {
 				var resource CreateResourceInput
-				var env = &ResourceEnvironment{
+				var env = &EnvironmentIdentifier{
 					Name: "my-environment",
 				}
 
@@ -185,7 +185,7 @@ func TestCreateResource(t *testing.T) {
 				}
 
 				if resource.Environment != nil {
-					c.Environment.Name = resource.Environment.Name
+					c.Environment = &EnvironmentIdentifier{Name: resource.Environment.Name}
 				}
 
 				json.NewEncoder(w).Encode(c)
