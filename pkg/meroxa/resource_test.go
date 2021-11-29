@@ -12,6 +12,11 @@ import (
 	"time"
 )
 
+const (
+	address    = "test@host.com"
+	privateKey = "1234"
+)
+
 func Test_Resource_PerformActions(t *testing.T) {
 	for k, v := range map[string]func(c Client, id string) (*Resource, error){
 		"validate": func(c Client, id string) (*Resource, error) {
@@ -113,8 +118,8 @@ func TestCreateResource(t *testing.T) {
 					"key": "value",
 				}
 				resource.SSHTunnel = &ResourceSSHTunnelInput{
-					Address:    "test@host.com",
-					PrivateKey: "1234",
+					Address:    address,
+					PrivateKey: privateKey,
 				}
 
 				return resource
@@ -124,7 +129,7 @@ func TestCreateResource(t *testing.T) {
 			desc: "resource with an environment",
 			input: func() CreateResourceInput {
 				var resource CreateResourceInput
-				var env = &ResourceEnvironmentInput{
+				var env = &ResourceEnvironment{
 					Name: "my-environment",
 				}
 
@@ -135,10 +140,9 @@ func TestCreateResource(t *testing.T) {
 					"key": "value",
 				}
 				resource.SSHTunnel = &ResourceSSHTunnelInput{
-					Address:    "test@host.com",
-					PrivateKey: "1234",
+					Address:    address,
+					PrivateKey: privateKey,
 				}
-
 				return resource
 			},
 		},
@@ -177,7 +181,7 @@ func TestCreateResource(t *testing.T) {
 				c.Metadata = resource.Metadata
 				c.SSHTunnel = &ResourceSSHTunnel{
 					Address:   resource.SSHTunnel.Address,
-					PublicKey: "1234",
+					PublicKey: privateKey,
 				}
 
 				if resource.Environment != nil {
@@ -205,7 +209,7 @@ func TestCreateResource(t *testing.T) {
 				t.Errorf("unexpected ssh tunnel address: want=%s got=%s", want, got)
 			}
 
-			if want, got := "1234", resp.SSHTunnel.PublicKey; want != got {
+			if want, got := privateKey, resp.SSHTunnel.PublicKey; want != got {
 				t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 			}
 
@@ -271,7 +275,7 @@ func TestUpdateResource(t *testing.T) {
 		c.Metadata = resource.Metadata
 		c.SSHTunnel = &ResourceSSHTunnel{
 			Address:   resource.SSHTunnel.Address,
-			PublicKey: "1234",
+			PublicKey: privateKey,
 		}
 		json.NewEncoder(w).Encode(c)
 	}))
@@ -294,7 +298,7 @@ func TestUpdateResource(t *testing.T) {
 		t.Errorf("unexpected ssh tunnel address: want=%s got=%s", want, got)
 	}
 
-	if want, got := "1234", resp.SSHTunnel.PublicKey; want != got {
+	if want, got := privateKey, resp.SSHTunnel.PublicKey; want != got {
 		t.Errorf("unexpected ssh tunnel public key: want=%s got=%s", want, got)
 	}
 
