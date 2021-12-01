@@ -163,7 +163,7 @@ func TestCreatePipeline(t *testing.T) {
 
 	pi := CreatePipelineInput{
 		Name:        p.Name,
-		Environment: &PipelineEnvironment{Name: p.Environment.Name},
+		Environment: &EnvironmentIdentifier{Name: p.Environment.Name},
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -241,7 +241,7 @@ func generatePipeline(name string, id int, state string, metadata map[string]int
 func generatePipelineWithEnvironment(name string) Pipeline {
 	p := generatePipeline(name, 0, "", nil)
 
-	p.Environment = &PipelineEnvironment{
+	p.Environment = &EnvironmentIdentifier{
 		UUID: "9c73bbc5-75c2-400d-a270-d8aefe727c15",
 		Name: "my-environment",
 	}
