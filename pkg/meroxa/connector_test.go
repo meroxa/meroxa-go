@@ -212,7 +212,7 @@ func generateConnector(name string, id int, config, metadata map[string]interfac
 		Name:          name,
 		Configuration: config,
 		Metadata:      metadata,
-		Environment: &EnvironmentIdentifier{Name: "my-env"},
+		Environment:   &EnvironmentIdentifier{Name: "my-env"},
 	}
 }
 
