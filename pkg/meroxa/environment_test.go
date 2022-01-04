@@ -16,7 +16,7 @@ func TestGetEnvironments(t *testing.T) {
 		Name:     "environment-1234",
 		Provider: "aws",
 		Region:   "us-east",
-		Type:     "dedicated",
+		Type:     "private",
 		Status:   EnvironmentViewStatus{State: "provisioned"},
 	}
 
@@ -108,7 +108,7 @@ func TestCreateEnvironment(t *testing.T) {
 }
 
 func TestGetEnvironment(t *testing.T) {
-	env := generateEnvironment("dedicated", "environment-1234", "aws")
+	env := generateEnvironment("private", "environment-1234", "aws")
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		path := fmt.Sprintf("%s/%s", environmentsBasePath, env.UUID)
@@ -144,7 +144,7 @@ func TestGetEnvironment(t *testing.T) {
 }
 
 func TestDeleteEnvironment(t *testing.T) {
-	env := generateEnvironment("dedicated", "environment-1234", "aws")
+	env := generateEnvironment("private", "environment-1234", "aws")
 	deprovisioningState := "deprovisioning"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
