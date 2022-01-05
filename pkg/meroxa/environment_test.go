@@ -176,7 +176,7 @@ func TestDeleteEnvironment(t *testing.T) {
 }
 
 func TestUpdateEnvironment(t *testing.T) {
-	env := generateEnvironment("dedicated", "environment-1234", "aws")
+	env := generateEnvironment("private", "environment-1234", "aws")
 	updatedName := "new-name"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
