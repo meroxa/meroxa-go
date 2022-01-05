@@ -90,7 +90,7 @@ type CreateEnvironmentInput struct {
 
 type UpdateEnvironmentInput struct {
 	Name          string                 `json:"name,omitempty"`
-	Configuration map[string]interface{} `json:"config"`
+	Configuration map[string]interface{} `json:"config,omitempty"`
 }
 
 // ListEnvironments returns an array of Environments (scoped to the calling user)
