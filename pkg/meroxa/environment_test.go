@@ -175,6 +175,34 @@ func TestDeleteEnvironment(t *testing.T) {
 	}
 }
 
+func TestUpdateEnvironment(t *testing.T) {
+	env := generateEnvironment("private", "environment-1234", "aws")
+	updatedName := "new-name"
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s", environmentsBasePath, env.UUID), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		env.Name = updatedName
+		json.NewEncoder(w).Encode(env)
+	}))
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.UpdateEnvironment(context.Background(), env.UUID, &UpdateEnvironmentInput{Name: updatedName})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(resp, &env) {
+		t.Errorf("expected response to be updated environment")
+	}
+}
+
 func generateEnvironment(t EnvironmentType, p EnvironmentProvider, n string) Environment {
 	return Environment{
 		Type:     t,
