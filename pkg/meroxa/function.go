@@ -28,14 +28,14 @@ type FunctionStatus struct {
 }
 
 type CreateFunctionInput struct {
-	Name         string            `json:"name"`
-	InputStream  string            `json:"input_stream"`
-	OutputStream string            `json:"output_stream"`
-	PipelineName string            `json:"pipeline_name"`
-	Image        string            `json:"image"`
-	Command      []string          `json:"command"`
-	Args         []string          `json:"args"`
-	EnvVars      map[string]string `json:"env_vars"`
+	Name         string             `json:"name"`
+	InputStream  string             `json:"input_stream"`
+	OutputStream string             `json:"output_stream"`
+	Pipeline     PipelineIdentifier `json:"pipeline"`
+	Image        string             `json:"image"`
+	Command      []string           `json:"command"`
+	Args         []string           `json:"args"`
+	EnvVars      map[string]string  `json:"env_vars"`
 }
 
 func (c *client) CreateFunction(ctx context.Context, input *CreateFunctionInput) (*Function, error) {
@@ -78,7 +78,7 @@ func (c *client) GetFunction(ctx context.Context, nameOrUUID string) (*Function,
 	return &fun, nil
 }
 
-func (c *client) ListFunctions(ctx context.Context) ([]Function, error) {
+func (c *client) ListFunctions(ctx context.Context) ([]*Function, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodGet, functionsBasePath, nil, nil)
 	if err != nil {
 		return nil, err
@@ -89,11 +89,33 @@ func (c *client) ListFunctions(ctx context.Context) ([]Function, error) {
 		return nil, err
 	}
 
-	var funs []Function
+	var funs []*Function
 	err = json.NewDecoder(resp.Body).Decode(&funs)
 	if err != nil {
 		return nil, err
 	}
 
 	return funs, nil
+}
+
+func (c *client) DeleteFunction(ctx context.Context, nameOrUUID string) (*Function, error) {
+	path := fmt.Sprintf("%s/%s", functionsBasePath, nameOrUUID)
+
+	resp, err := c.MakeRequest(ctx, http.MethodDelete, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var fun Function
+	err = json.NewDecoder(resp.Body).Decode(&fun)
+	if err != nil {
+		return nil, err
+	}
+
+	return &fun, nil
 }
