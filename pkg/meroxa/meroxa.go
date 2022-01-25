@@ -42,6 +42,8 @@ type Client interface {
 	UpdateConnectorStatus(ctx context.Context, nameOrID string, state Action) (*Connector, error)
 
 	CreateFunction(ctx context.Context, input *CreateFunctionInput) (*Function, error)
+	GetFunction(ctx context.Context, nameOrUUID string) (*Function, error)
+	ListFunctions(ctx context.Context) ([]Function, error)
 
 	CreateEndpoint(ctx context.Context, input *CreateEndpointInput) error
 	DeleteEndpoint(ctx context.Context, name string) error
