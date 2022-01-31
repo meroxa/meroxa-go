@@ -5,12 +5,11 @@ This repo defines a Go wrapper around the Platform API. It provides functions fo
 ## Install dependencies
 
 ```bash
-go mod tidy
-go mod vendor
+make gomod
 ```
 
 ## Run tests
 
-```
-go test ./...
+```bash
+make test
 ```
