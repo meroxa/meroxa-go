@@ -12,5 +12,5 @@ go mod vendor
 ## Run tests
 
 ```
-go mod test ./...
+go test ./...
 ```
