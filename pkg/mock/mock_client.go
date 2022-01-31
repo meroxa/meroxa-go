@@ -497,6 +497,21 @@ func (mr *MockClientMockRecorder) UpdateEnvironment(ctx, nameOrUUID, input inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEnvironment", reflect.TypeOf((*MockClient)(nil).UpdateEnvironment), ctx, nameOrUUID, input)
 }
 
+// PerformActionOnEnvironment default mock method
+func (m *MockClient) PerformActionOnEnvironment(ctx context.Context, nameOrUUID string, input interface{}) (*meroxa.Environment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PerformActionOnEnvironment", ctx, nameOrUUID, input)
+	ret0, _ := ret[0].(*meroxa.Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PerformActionOnEnvironment indicates an expected call of PerformActionOnEnvironment.
+func (mr *MockClientMockRecorder) PerformActionOnEnvironment(ctx, nameOrUUID, input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PerformActionOnEnvironment", reflect.TypeOf((*MockClient)(nil).PerformActionOnEnvironment), ctx, nameOrUUID, input)
+}
+
 // UpdatePipeline mocks base method.
 func (m *MockClient) UpdatePipeline(ctx context.Context, pipelineID int, input *meroxa.UpdatePipelineInput) (*meroxa.Pipeline, error) {
 	m.ctrl.T.Helper()
