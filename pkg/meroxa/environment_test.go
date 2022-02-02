@@ -203,6 +203,44 @@ func TestUpdateEnvironment(t *testing.T) {
 	}
 }
 
+func TestRepairEnvironment(t *testing.T) {
+	env := generateEnvironment("private", "environment-awaiting-repair", "aws")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if expected, actual := fmt.Sprintf("%s/%s/%s", environmentsBasePath, env.UUID, "actions"), req.URL.Path; expected != actual {
+			t.Fatalf("mismatched of request path: expected=%s actual=%s", expected, actual)
+		}
+
+		expectedActionName := EnvironmentActionRepair
+		var re *RepairEnvironmentInput
+
+		if err := json.NewDecoder(req.Body).Decode(&re); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+
+		if re.Action != expectedActionName {
+			t.Errorf("expected action parameter %q, got %q", expectedActionName, re.Action)
+		}
+
+		defer req.Body.Close()
+
+		env.Status.State = "repairing"
+		json.NewEncoder(w).Encode(env)
+	}))
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.PerformActionOnEnvironment(context.Background(), env.UUID, &RepairEnvironmentInput{Action: EnvironmentActionRepair})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(resp, &env) {
+		t.Errorf("expected response to be environment in repairing state")
+	}
+}
+
 func generateEnvironment(t EnvironmentType, p EnvironmentProvider, n string) Environment {
 	return Environment{
 		Type:     t,
