@@ -43,8 +43,8 @@ type PreflightLimits struct {
 }
 
 type PreflightDetails struct {
-	PreflightPermissions PreflightPermissions `json:"permissions"`
-	PreflightLimits      PreflightLimits      `json:"limits"`
+	PreflightPermissions *PreflightPermissions `json:"permissions"`
+	PreflightLimits      *PreflightLimits      `json:"limits"`
 }
 
 type EnvironmentViewStatus struct {
