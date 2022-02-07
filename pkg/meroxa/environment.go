@@ -236,3 +236,21 @@ func (c *client) UpdateEnvironment(ctx context.Context, nameOrUUID string, input
 
 	return e, nil
 }
+
+func (c *client) PerformActionOnEnvironment(ctx context.Context, nameOrUUID string, input *RepairEnvironmentInput) (*Environment, error) {
+	path := fmt.Sprintf("%s/%s/%s", environmentsBasePath, nameOrUUID, "actions")
+	resp, err := c.MakeRequest(ctx, http.MethodPost, path, input, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var e *Environment
+	err = json.NewDecoder(resp.Body).Decode(&e)
+
+	return e, nil
+}
