@@ -13,23 +13,26 @@ const environmentsBasePath = "/v1/environments"
 type EnvironmentState string
 
 const (
-	EnvironmentStateProvisioning     EnvironmentState = "provisioning"
-	EnvironmentStateProvisioned      EnvironmentState = "provisioned"
-	EnvironmentStateUpdating         EnvironmentState = "updating"
-	EnvironmentStateError            EnvironmentState = "error"
-	EnvironmentStateRepairing        EnvironmentState = "repairing"
-	EnvironmentStateDeprovisioning   EnvironmentState = "deprovisioning"
-	EnvironmentStateDeprovisioned    EnvironmentState = "deprovisioned"
-	EnvironmentStatePreflightSuccess EnvironmentState = "preflight_success"
-	EnvironmentStatePreflightError   EnvironmentState = "preflight_error"
+	EnvironmentStateProvisioning        EnvironmentState = "provisioning"
+	EnvironmentStateProvisioningError   EnvironmentState = "provisioning_error"
+	EnvironmentStateReady               EnvironmentState = "ready"
+	EnvironmentStateUpdating            EnvironmentState = "updating"
+	EnvironmentStateUpdatingError       EnvironmentState = "updating_error"
+	EnvironmentStateRepairing           EnvironmentState = "repairing"
+	EnvironmentStateRepairingError      EnvironmentState = "repairing_error"
+	EnvironmentStateDeprovisioning      EnvironmentState = "deprovisioning"
+	EnvironmentStateDeprovisioningError EnvironmentState = "deprovisioning_error"
+	EnvironmentStateDeprovisioned       EnvironmentState = "deprovisioned"
+	EnvironmentStatePreflightSuccess    EnvironmentState = "preflight_success"
+	EnvironmentStatePreflightError      EnvironmentState = "preflight_error"
 )
 
 type PreflightPermissions struct {
-	EC2            []string `json:"ec2"`
 	S3             []string `json:"s3"`
 	ServiceQuotas  []string `json:"servicequotas"`
 	MSK            []string `json:"msk"`
 	EKS            []string `json:"eks"`
+	EC2            []string `json:"ec2"`
 	KMS            []string `json:"kms"`
 	IAM            []string `json:"iam"`
 	Cloudformation []string `json:"cloudformation"`
@@ -125,6 +128,16 @@ type UpdateEnvironmentInput struct {
 	Configuration map[string]interface{} `json:"config,omitempty"`
 }
 
+type EnvironmentAction string
+
+const (
+	EnvironmentActionRepair EnvironmentAction = "repair"
+)
+
+type RepairEnvironmentInput struct {
+	Action EnvironmentAction `json:"action"`
+}
+
 // ListEnvironments returns an array of Environments (scoped to the calling user)
 func (c *client) ListEnvironments(ctx context.Context) ([]*Environment, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodGet, environmentsBasePath, nil, nil)
@@ -209,6 +222,24 @@ func (c *client) DeleteEnvironment(ctx context.Context, nameOrUUID string) (*Env
 func (c *client) UpdateEnvironment(ctx context.Context, nameOrUUID string, input *UpdateEnvironmentInput) (*Environment, error) {
 	path := fmt.Sprintf("%s/%s", environmentsBasePath, nameOrUUID)
 	resp, err := c.MakeRequest(ctx, http.MethodPatch, path, input, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var e *Environment
+	err = json.NewDecoder(resp.Body).Decode(&e)
+
+	return e, nil
+}
+
+func (c *client) PerformActionOnEnvironment(ctx context.Context, nameOrUUID string, input *RepairEnvironmentInput) (*Environment, error) {
+	path := fmt.Sprintf("%s/%s/%s", environmentsBasePath, nameOrUUID, "actions")
+	resp, err := c.MakeRequest(ctx, http.MethodPost, path, input, nil)
 	if err != nil {
 		return nil, err
 	}
