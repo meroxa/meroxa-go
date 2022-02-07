@@ -26,8 +26,10 @@ const (
 
 type PreflightPermissions struct {
 	S3             []string `json:"s3"`
+	ServiceQuotas  []string `json:"servicequotas"`
 	MSK            []string `json:"msk"`
 	EKS            []string `json:"eks"`
+	EC2            []string `json:"ec2"`
 	KMS            []string `json:"kms"`
 	IAM            []string `json:"iam"`
 	Cloudformation []string `json:"cloudformation"`
@@ -35,20 +37,20 @@ type PreflightPermissions struct {
 }
 
 type PreflightLimits struct {
-	VPC []string `json:"vpc"`
-	EIP []string `json:"eip"`
-	NAT []string `json:"nat_gateway"`
+	VPC string `json:"vpc"`
+	EIP string `json:"eip"`
+	NAT string `json:"nat_gateway"`
 }
 
 type PreflightDetails struct {
-	PreflightPermissions PreflightPermissions `json:"permissions"`
-	PreflightLimits      PreflightLimits      `json:"limits"`
+	PreflightPermissions *PreflightPermissions `json:"permissions"`
+	PreflightLimits      *PreflightLimits      `json:"limits"`
 }
 
 type EnvironmentViewStatus struct {
-	State            EnvironmentState `json:"state"`
-	Details          string           `json:"details,omitempty"`
-	PreflightDetails PreflightDetails `json:"preflight_details"`
+	State            EnvironmentState  `json:"state"`
+	Details          string            `json:"details,omitempty"`
+	PreflightDetails *PreflightDetails `json:"preflight_details"`
 }
 
 /*
@@ -130,7 +132,7 @@ const (
 )
 
 type RepairEnvironmentInput struct {
-	Action        EnvironmentAction       `json:"action"`
+	Action EnvironmentAction `json:"action"`
 }
 
 // ListEnvironments returns an array of Environments (scoped to the calling user)
