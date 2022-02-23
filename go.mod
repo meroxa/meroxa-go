@@ -6,6 +6,7 @@ require (
 	github.com/cristalhq/jwt/v3 v3.0.14
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.5
+	github.com/google/uuid v1.3.0
 	golang.org/x/oauth2 v0.0.0-20210413134643-5e61552d6c78
 )
 
