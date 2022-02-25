@@ -13,8 +13,9 @@ import (
 )
 
 func TestCreateApplication(t *testing.T) {
-	input := ApplicationInput{
-		Name: "test",
+	input := CreateApplicationInput{
+		Name:     "test",
+		Language: "golang",
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -190,7 +191,7 @@ func TestUpdateApplication(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdateApplication(context.Background(), app.UUID, &ApplicationInput{Name: updatedName})
+	resp, err := c.UpdateApplication(context.Background(), app.UUID, &UpdateApplicationInput{Name: updatedName})
 	if err != nil {
 		t.Fatal(err)
 	}

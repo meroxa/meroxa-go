@@ -38,7 +38,7 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // CreateApplication mocks base method.
-func (m *MockClient) CreateApplication(ctx context.Context, input *meroxa.ApplicationInput) (*meroxa.Application, error) {
+func (m *MockClient) CreateApplication(ctx context.Context, input *meroxa.CreateApplicationInput) (*meroxa.Application, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateApplication", ctx, input)
 	ret0, _ := ret[0].(*meroxa.Application)
@@ -602,7 +602,7 @@ func (mr *MockClientMockRecorder) RotateTunnelKeyForResource(ctx, nameOrID inter
 }
 
 // UpdateApplication mocks base method.
-func (m *MockClient) UpdateApplication(ctx context.Context, uuid string, input *meroxa.ApplicationInput) (*meroxa.Application, error) {
+func (m *MockClient) UpdateApplication(ctx context.Context, uuid string, input *meroxa.UpdateApplicationInput) (*meroxa.Application, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateApplication", ctx, uuid, input)
 	ret0, _ := ret[0].(*meroxa.Application)

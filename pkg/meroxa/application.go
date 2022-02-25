@@ -20,13 +20,20 @@ const applicationsBasePath = "/v1/applications"
 type Application struct {
 	UUID      string            `json:"uuid"`
 	Name      string            `json:"name"`
+	Language  string            `json:"language"`
 	Status    ApplicationStatus `json:"status,omitempty"`
 	CreatedAt time.Time         `json:"created_at"`
 	UpdatedAt time.Time         `json:"updated_at"`
 }
 
-// ApplicationInput represents the input for a Meroxa Application create or update operation in the API
-type ApplicationInput struct {
+// CreateApplicationInput represents the input for a Meroxa Application create operation in the API
+type CreateApplicationInput struct {
+	Name     string `json:"name"`
+	Language string `json:"language"`
+}
+
+// UpdateApplicationInput represents the input for a Meroxa Application update operation in the API
+type UpdateApplicationInput struct {
 	Name string `json:"name"`
 }
 
@@ -35,7 +42,7 @@ type ApplicationStatus struct {
 	Details string           `json:"details,omitempty"`
 }
 
-func (c *client) CreateApplication(ctx context.Context, input *ApplicationInput) (*Application, error) {
+func (c *client) CreateApplication(ctx context.Context, input *CreateApplicationInput) (*Application, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodPost, applicationsBasePath, input, nil)
 	if err != nil {
 		return nil, err
@@ -104,7 +111,7 @@ func (c *client) ListApplications(ctx context.Context) ([]*Application, error) {
 	return aa, nil
 }
 
-func (c *client) UpdateApplication(ctx context.Context, uuid string, input *ApplicationInput) (*Application, error) {
+func (c *client) UpdateApplication(ctx context.Context, uuid string, input *UpdateApplicationInput) (*Application, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodPatch, fmt.Sprintf("%s/%s", applicationsBasePath, uuid), input, nil)
 	if err != nil {
 		return nil, err
