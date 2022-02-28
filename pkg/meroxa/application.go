@@ -25,6 +25,7 @@ type Application struct {
 	Functions []Function        `json:"functions,omitempty"`
 	CreatedAt time.Time         `json:"created_at"`
 	UpdatedAt time.Time         `json:"updated_at"`
+	DeletedAt time.Time         `json:"deleted_at,omitempty"`
 }
 
 // CreateApplicationInput represents the input for a Meroxa Application create operation in the API
