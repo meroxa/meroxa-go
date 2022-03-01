@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/volatiletech/null/v8"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,7 +18,10 @@ func TestCreateFunction(t *testing.T) {
 		InputStream:  "input_stream",
 		OutputStream: "output_stream",
 		Pipeline: PipelineIdentifier{
-			Name: "pipeline_name",
+			Name: null.StringFrom("pipeline_name"),
+		},
+		Application: ApplicationIdentifier{
+			Name: null.StringFrom("application_name"),
 		},
 		Image:   "meroxa/image",
 		Command: []string{"echo", "hello"},
@@ -38,7 +42,10 @@ func TestCreateFunction(t *testing.T) {
 			Details: "Details",
 		},
 		Pipeline: PipelineIdentifier{
-			Name: "my_pipeline",
+			Name: null.StringFrom("my_pipeline"),
+		},
+		Application: ApplicationIdentifier{
+			Name: null.StringFrom("application_name"),
 		},
 	}
 
@@ -47,7 +54,8 @@ func TestCreateFunction(t *testing.T) {
 			t.Fatalf("mismatched of request method (-want +got): %s", diff)
 		}
 
-		if diff := cmp.Diff(functionsBasePath, req.URL.Path); diff != "" {
+		path := fmt.Sprintf("%s/%s/%s", applicationsBasePath, input.Application.Name.String, functionsSubPath)
+		if diff := cmp.Diff(path, req.URL.Path); diff != "" {
 			t.Fatalf("mismatched of request path (-want +got): %s", diff)
 		}
 
@@ -91,7 +99,10 @@ func TestGetFunction(t *testing.T) {
 			Details: "Details",
 		},
 		Pipeline: PipelineIdentifier{
-			Name: "my_pipeline",
+			Name: null.StringFrom("my_pipeline"),
+		},
+		Application: ApplicationIdentifier{
+			Name: null.StringFrom("application_name"),
 		},
 	}
 
@@ -136,7 +147,10 @@ func TestListFunctions(t *testing.T) {
 				Details: "Details",
 			},
 			Pipeline: PipelineIdentifier{
-				Name: "my_pipeline",
+				Name: null.StringFrom("my_pipeline"),
+			},
+			Application: ApplicationIdentifier{
+				Name: null.StringFrom("application_name"),
 			},
 		},
 	}
@@ -181,7 +195,10 @@ func TestDeleteFunction(t *testing.T) {
 			Details: "Details",
 		},
 		Pipeline: PipelineIdentifier{
-			Name: "my_pipeline",
+			Name: null.StringFrom("my_pipeline"),
+		},
+		Application: ApplicationIdentifier{
+			Name: null.StringFrom("application_name"),
 		},
 	}
 
