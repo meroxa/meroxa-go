@@ -95,6 +95,9 @@ func TestGetApplicationByName(t *testing.T) {
 
 func TestGetApplicationByUUID(t *testing.T) {
 	app := generateApplication("")
+	app.Functions = make([]FunctionView, 0)
+	app.Functions = append(app.Functions, FunctionView{Name: "fun1"})
+	app.Functions = append(app.Functions, FunctionView{Name: "fun2"})
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
@@ -170,33 +173,5 @@ func TestDeleteApplication(t *testing.T) {
 	err := c.DeleteApplication(context.Background(), app.UUID)
 	if err != nil {
 		t.Fatal(err)
-	}
-}
-
-func TestUpdateApplication(t *testing.T) {
-	app := generateApplication("not-updated-app")
-	updatedName := "new-name"
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
-			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
-		}
-
-		defer req.Body.Close()
-
-		app.Name = updatedName
-		json.NewEncoder(w).Encode(app)
-	}))
-	defer server.Close()
-
-	c := testClient(server.Client(), server.URL)
-
-	resp, err := c.UpdateApplication(context.Background(), app.UUID, &UpdateApplicationInput{Name: updatedName})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(resp, &app) {
-		t.Errorf("expected response to be updated application")
 	}
 }
