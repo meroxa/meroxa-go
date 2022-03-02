@@ -95,9 +95,9 @@ func TestGetApplicationByName(t *testing.T) {
 
 func TestGetApplicationByUUID(t *testing.T) {
 	app := generateApplication("")
-	app.Functions = make([]FunctionView, 0)
-	app.Functions = append(app.Functions, FunctionView{Name: "fun1"})
-	app.Functions = append(app.Functions, FunctionView{Name: "fun2"})
+	app.Functions = make([]FunctionIdentifier, 0)
+	app.Functions = append(app.Functions, FunctionIdentifier{Name: "fun1", UUID: "123"})
+	app.Functions = append(app.Functions, FunctionIdentifier{Name: "fun2", UUID: "abc"})
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
