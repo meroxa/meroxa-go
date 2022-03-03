@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/volatiletech/null/v8"
 	"net/http"
 	"time"
+
+	"github.com/volatiletech/null/v8"
 )
 
 const pipelinesBasePath = "/v1/pipelines"

@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/volatiletech/null/v8"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/volatiletech/null/v8"
 )
 
 func TestCreateFunction(t *testing.T) {
