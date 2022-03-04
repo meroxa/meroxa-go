@@ -32,11 +32,8 @@ func TestGetConnectorLogs(t *testing.T) {
 }
 
 func TestGetFunctionLogs(t *testing.T) {
-	appName := "app-name"
-	funcName := "my-func"
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		want := functionsPath(appName, funcName) + "/logs"
-		if got := req.URL.Path; want != got {
+		if want, got := "/v1/functions/my-func/logs", req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -46,7 +43,7 @@ func TestGetFunctionLogs(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.GetFunctionLogs(context.Background(), appName, funcName)
+	resp, err := c.GetFunctionLogs(context.Background(), "my-func")
 	if err != nil {
 		t.Fatal(err)
 	}
