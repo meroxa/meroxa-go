@@ -57,8 +57,11 @@ func (c *client) CreateFunction(ctx context.Context, input *CreateFunctionInput)
 	var appID string
 	if input.Application.Name.Valid && input.Application.Name.String != "" {
 		appID = input.Application.Name.String
-	} else {
+	} else if input.Application.UUID.Valid && input.Application.UUID.String != "" {
 		appID = input.Application.UUID.String
+	}
+	if appID == "" {
+		return nil, fmt.Errorf("application identifier not provided")
 	}
 	path := functionsPath(appID, "")
 	resp, err := c.MakeRequest(ctx, http.MethodPost, path, input, nil)
