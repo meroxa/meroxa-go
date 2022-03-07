@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/volatiletech/null/v8"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/volatiletech/null/v8"
 )
 
 func TestCreateApplication(t *testing.T) {
@@ -96,9 +96,12 @@ func TestGetApplicationByName(t *testing.T) {
 
 func TestGetApplicationByUUID(t *testing.T) {
 	app := generateApplication("")
-	app.Functions = make([]FunctionIdentifier, 0)
-	app.Functions = append(app.Functions, FunctionIdentifier{Name: null.StringFrom("fun1"), UUID: null.StringFrom("123")})
-	app.Functions = append(app.Functions, FunctionIdentifier{Name: null.StringFrom("fun2"), UUID: null.StringFrom("abc")})
+	app.Functions = make([]EntityIdentifier, 0)
+	app.Functions = append(app.Functions, EntityIdentifier{Name: null.StringFrom("fun1")})
+	app.Connectors = make([]EntityIdentifier, 0)
+	app.Connectors = append(app.Connectors, EntityIdentifier{Name: null.StringFrom("conn1")})
+	app.Resources = make([]EntityIdentifier, 0)
+	app.Resources = append(app.Resources, EntityIdentifier{Name: null.StringFrom("resource1")})
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
