@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/volatiletech/null/v8"
 )
 
 type ApplicationState string
@@ -20,19 +18,16 @@ const applicationsBasePath = "/v1/applications"
 
 // Application represents the Meroxa Application type within the Meroxa API
 type Application struct {
-	UUID      string               `json:"uuid"`
-	Name      string               `json:"name"`
-	Language  string               `json:"language"`
-	Status    ApplicationStatus    `json:"status,omitempty"`
-	Functions []FunctionIdentifier `json:"functions,omitempty"`
-	CreatedAt time.Time            `json:"created_at"`
-	UpdatedAt time.Time            `json:"updated_at"`
-	DeletedAt time.Time            `json:"deleted_at,omitempty"`
-}
-
-type ApplicationIdentifier struct {
-	UUID null.String `json:"uuid,omitempty"`
-	Name null.String `json:"name,omitempty"`
+	UUID       string             `json:"uuid"`
+	Name       string             `json:"name"`
+	Language   string             `json:"language"`
+	Status     ApplicationStatus  `json:"status,omitempty"`
+	Connectors []EntityIdentifier `json:"connectors,omitempty"`
+	Functions  []EntityIdentifier `json:"functions,omitempty"`
+	Resources  []EntityIdentifier `json:"resources,omitempty"`
+	CreatedAt  time.Time          `json:"created_at"`
+	UpdatedAt  time.Time          `json:"updated_at"`
+	DeletedAt  time.Time          `json:"deleted_at,omitempty"`
 }
 
 // CreateApplicationInput represents the input for a Meroxa Application create operation in the API
