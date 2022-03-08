@@ -32,8 +32,9 @@ type Application struct {
 
 // CreateApplicationInput represents the input for a Meroxa Application create operation in the API
 type CreateApplicationInput struct {
-	Name     string `json:"name"`
-	Language string `json:"language"`
+	Name     string           `json:"name"`
+	Language string           `json:"language"`
+	Pipeline EntityIdentifier `json:"pipeline"`
 }
 
 type ApplicationStatus struct {
