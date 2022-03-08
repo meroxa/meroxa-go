@@ -17,6 +17,8 @@ func TestCreateApplication(t *testing.T) {
 	input := CreateApplicationInput{
 		Name:     "test",
 		Language: "golang",
+		GitSha:   "abc",
+		Pipeline: EntityIdentifier{UUID: null.StringFrom("def")},
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -62,7 +64,7 @@ func generateApplication(name string) Application {
 		name = "test"
 	}
 
-	return Application{Name: name, UUID: uuid.NewString()}
+	return Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateReady}}
 }
 
 func TestGetApplicationByName(t *testing.T) {

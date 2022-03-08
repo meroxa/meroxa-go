@@ -21,6 +21,7 @@ type Application struct {
 	UUID       string             `json:"uuid"`
 	Name       string             `json:"name"`
 	Language   string             `json:"language"`
+	GitSha     string             `json:"git_sha"`
 	Status     ApplicationStatus  `json:"status,omitempty"`
 	Connectors []EntityIdentifier `json:"connectors,omitempty"`
 	Functions  []EntityIdentifier `json:"functions,omitempty"`
@@ -34,6 +35,7 @@ type Application struct {
 type CreateApplicationInput struct {
 	Name     string           `json:"name"`
 	Language string           `json:"language"`
+	GitSha   string           `json:"git_sha"`
 	Pipeline EntityIdentifier `json:"pipeline"`
 }
 
