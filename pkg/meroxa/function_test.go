@@ -3,12 +3,12 @@ package meroxa
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/volatiletech/null/v8"
 )
 
 func TestCreateFunction(t *testing.T) {
@@ -17,10 +17,7 @@ func TestCreateFunction(t *testing.T) {
 		InputStream:  "input_stream",
 		OutputStream: "output_stream",
 		Pipeline: PipelineIdentifier{
-			Name: null.StringFrom("pipeline_name"),
-		},
-		Application: ApplicationIdentifier{
-			Name: null.StringFrom("application_name"),
+			Name: "pipeline_name",
 		},
 		Image:   "meroxa/image",
 		Command: []string{"echo", "hello"},
@@ -41,10 +38,7 @@ func TestCreateFunction(t *testing.T) {
 			Details: "Details",
 		},
 		Pipeline: PipelineIdentifier{
-			Name: null.StringFrom("my_pipeline"),
-		},
-		Application: ApplicationIdentifier{
-			Name: null.StringFrom("application_name"),
+			Name: "my_pipeline",
 		},
 	}
 
@@ -53,8 +47,7 @@ func TestCreateFunction(t *testing.T) {
 			t.Fatalf("mismatched of request method (-want +got): %s", diff)
 		}
 
-		wantedPath := functionsPath(output.Application.Name.String, "")
-		if diff := cmp.Diff(wantedPath, req.URL.Path); diff != "" {
+		if diff := cmp.Diff(functionsBasePath, req.URL.Path); diff != "" {
 			t.Fatalf("mismatched of request path (-want +got): %s", diff)
 		}
 
@@ -98,10 +91,7 @@ func TestGetFunction(t *testing.T) {
 			Details: "Details",
 		},
 		Pipeline: PipelineIdentifier{
-			Name: null.StringFrom("my_pipeline"),
-		},
-		Application: ApplicationIdentifier{
-			Name: null.StringFrom("application_name"),
+			Name: "my_pipeline",
 		},
 	}
 
@@ -110,8 +100,7 @@ func TestGetFunction(t *testing.T) {
 			t.Fatalf("mismatched of request method (-want +got): %s", diff)
 		}
 
-		wantedPath := functionsPath(output.Application.Name.String, output.Name)
-		if diff := cmp.Diff(wantedPath, req.URL.Path); diff != "" {
+		if diff := cmp.Diff(fmt.Sprintf("%s/%s", functionsBasePath, output.Name), req.URL.Path); diff != "" {
 			t.Fatalf("mismatched of request path (-want +got): %s", diff)
 		}
 
@@ -121,7 +110,7 @@ func TestGetFunction(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	gotOutput, err := c.GetFunction(context.Background(), output.Application.Name.String, output.Name)
+	gotOutput, err := c.GetFunction(context.Background(), output.Name)
 	if err != nil {
 		t.Fatalf("expected no error, got %+v", err)
 	}
@@ -147,10 +136,7 @@ func TestListFunctions(t *testing.T) {
 				Details: "Details",
 			},
 			Pipeline: PipelineIdentifier{
-				Name: null.StringFrom("my_pipeline"),
-			},
-			Application: ApplicationIdentifier{
-				Name: null.StringFrom("application_name"),
+				Name: "my_pipeline",
 			},
 		},
 	}
@@ -160,8 +146,7 @@ func TestListFunctions(t *testing.T) {
 			t.Fatalf("mismatched of request method (-want +got): %s", diff)
 		}
 
-		wantedPath := functionsPath(output[0].Application.Name.String, "")
-		if diff := cmp.Diff(wantedPath, req.URL.Path); diff != "" {
+		if diff := cmp.Diff(functionsBasePath, req.URL.Path); diff != "" {
 			t.Fatalf("mismatched of request path (-want +got): %s", diff)
 		}
 
@@ -171,7 +156,7 @@ func TestListFunctions(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	gotOutput, err := c.ListFunctions(context.Background(), output[0].Application.Name.String)
+	gotOutput, err := c.ListFunctions(context.Background())
 	if err != nil {
 		t.Fatalf("expected no error, got %+v", err)
 	}
@@ -196,10 +181,7 @@ func TestDeleteFunction(t *testing.T) {
 			Details: "Details",
 		},
 		Pipeline: PipelineIdentifier{
-			Name: null.StringFrom("my_pipeline"),
-		},
-		Application: ApplicationIdentifier{
-			Name: null.StringFrom("application_name"),
+			Name: "my_pipeline",
 		},
 	}
 
@@ -208,8 +190,7 @@ func TestDeleteFunction(t *testing.T) {
 			t.Fatalf("mismatched of request method (-want +got): %s", diff)
 		}
 
-		wantedPath := functionsPath(output.Application.Name.String, output.Name)
-		if diff := cmp.Diff(wantedPath, req.URL.Path); diff != "" {
+		if diff := cmp.Diff(fmt.Sprintf("%s/%s", functionsBasePath, output.Name), req.URL.Path); diff != "" {
 			t.Fatalf("mismatched of request path (-want +got): %s", diff)
 		}
 
@@ -219,7 +200,7 @@ func TestDeleteFunction(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	gotOutput, err := c.DeleteFunction(context.Background(), output.Application.Name.String, output.Name)
+	gotOutput, err := c.DeleteFunction(context.Background(), output.Name)
 	if err != nil {
 		t.Fatalf("expected no error, got %+v", err)
 	}
