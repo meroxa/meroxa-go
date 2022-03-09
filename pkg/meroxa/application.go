@@ -21,6 +21,7 @@ type Application struct {
 	UUID       string             `json:"uuid"`
 	Name       string             `json:"name"`
 	Language   string             `json:"language"`
+	GitSha     string             `json:"git_sha"`
 	Status     ApplicationStatus  `json:"status,omitempty"`
 	Connectors []EntityIdentifier `json:"connectors,omitempty"`
 	Functions  []EntityIdentifier `json:"functions,omitempty"`
@@ -32,8 +33,10 @@ type Application struct {
 
 // CreateApplicationInput represents the input for a Meroxa Application create operation in the API
 type CreateApplicationInput struct {
-	Name     string `json:"name"`
-	Language string `json:"language"`
+	Name     string           `json:"name"`
+	Language string           `json:"language"`
+	GitSha   string           `json:"git_sha"`
+	Pipeline EntityIdentifier `json:"pipeline"`
 }
 
 type ApplicationStatus struct {
