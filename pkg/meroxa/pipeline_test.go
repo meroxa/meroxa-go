@@ -4,21 +4,22 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"github.com/volatiletech/null/v8"
 )
 
 func TestUpdatePipelineStatus(t *testing.T) {
 	name := "test"
-	pipelineID := 1234567
+	pipelineName := "pipeline-1234567"
 	state := "pause"
 	newState := "healthy"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%d/status", pipelinesBasePath, pipelineID), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s/status", pipelinesBasePath, pipelineName), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -38,7 +39,7 @@ func TestUpdatePipelineStatus(t *testing.T) {
 		}
 
 		// Return response to satisfy client and test response
-		p := generatePipeline(name, pipelineID, newState, nil)
+		p := generatePipeline(name, newState, nil)
 		json.NewEncoder(w).Encode(p)
 	}))
 	// Close the server when test finishes
@@ -46,7 +47,7 @@ func TestUpdatePipelineStatus(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdatePipelineStatus(context.Background(), pipelineID, Action(state))
+	resp, err := c.UpdatePipelineStatus(context.Background(), pipelineName, Action(state))
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
@@ -58,12 +59,12 @@ func TestUpdatePipelineStatus(t *testing.T) {
 
 func TestUpdatePipeline(t *testing.T) {
 	var pipelineUpdate UpdatePipelineInput
-	var pipeline = generatePipeline("", 0, "", nil)
+	var pipeline = generatePipeline("", "", nil)
 
 	pipelineUpdate.Name = pipeline.Name
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%d", pipelinesBasePath, pipeline.ID), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s", pipelinesBasePath, pipeline.Name), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -86,7 +87,7 @@ func TestUpdatePipeline(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.UpdatePipeline(context.Background(), pipeline.ID, &pipelineUpdate)
+	resp, err := c.UpdatePipeline(context.Background(), pipeline.Name, &pipelineUpdate)
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
@@ -97,7 +98,7 @@ func TestUpdatePipeline(t *testing.T) {
 }
 
 func TestGetPipelines(t *testing.T) {
-	pBase := generatePipeline("without-env", 0, "", nil)
+	pBase := generatePipeline("without-env", "", nil)
 	pWithEnv := generatePipelineWithEnvironment("with-env")
 
 	pipelines := []*Pipeline{&pBase, &pWithEnv}
@@ -163,7 +164,7 @@ func TestCreatePipeline(t *testing.T) {
 
 	pi := CreatePipelineInput{
 		Name:        p.Name,
-		Environment: &EnvironmentIdentifier{Name: p.Environment.Name},
+		Environment: &EntityIdentifier{Name: p.Environment.Name},
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -185,9 +186,9 @@ func TestCreatePipeline(t *testing.T) {
 			t.Errorf("expected same environment")
 		}
 
-		rP := generatePipeline(pi.Name, 0, "", nil)
+		rP := generatePipeline(pi.Name, "", nil)
 		rP.Environment = pi.Environment
-		rP.Environment.UUID = "067fc522-7f3c-4c71-8749-68f3698c2c68"
+		rP.Environment.UUID = null.StringFrom("067fc522-7f3c-4c71-8749-68f3698c2c68")
 
 		// Return response to satisfy client and test response
 		json.NewEncoder(w).Encode(rP)
@@ -212,17 +213,13 @@ func TestCreatePipeline(t *testing.T) {
 	}
 }
 
-func generatePipeline(name string, id int, state string, metadata map[string]interface{}) Pipeline {
+func generatePipeline(name string, state string, metadata map[string]interface{}) Pipeline {
 	if name == "" {
 		name = "test"
 	}
 
 	if state == "" {
 		state = "healthy"
-	}
-
-	if id == 0 {
-		id = rand.Intn(10000)
 	}
 
 	if metadata == nil {
@@ -232,18 +229,17 @@ func generatePipeline(name string, id int, state string, metadata map[string]int
 	}
 
 	return Pipeline{
-		ID:    id,
 		Name:  name,
 		State: PipelineState(state),
 	}
 }
 
 func generatePipelineWithEnvironment(name string) Pipeline {
-	p := generatePipeline(name, 0, "", nil)
+	p := generatePipeline(name, "", nil)
 
-	p.Environment = &EnvironmentIdentifier{
-		UUID: "9c73bbc5-75c2-400d-a270-d8aefe727c15",
-		Name: "my-environment",
+	p.Environment = &EntityIdentifier{
+		UUID: null.StringFrom("9c73bbc5-75c2-400d-a270-d8aefe727c15"),
+		Name: null.StringFrom("my-environment"),
 	}
 	return p
 }

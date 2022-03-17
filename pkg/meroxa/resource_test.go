@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/volatiletech/null/v8"
 )
 
 const (
@@ -19,20 +20,20 @@ const (
 
 func Test_Resource_PerformActions(t *testing.T) {
 	for k, v := range map[string]func(c Client, id string) (*Resource, error){
-		"validate": func(c Client, id string) (*Resource, error) {
-			return c.ValidateResource(context.Background(), id)
+		"validate": func(c Client, name string) (*Resource, error) {
+			return c.ValidateResource(context.Background(), name)
 		},
-		"rotate_keys": func(c Client, id string) (*Resource, error) {
-			return c.RotateTunnelKeyForResource(context.Background(), id)
+		"rotate_keys": func(c Client, name string) (*Resource, error) {
+			return c.RotateTunnelKeyForResource(context.Background(), name)
 		},
 	} {
 		action := k
 		f := v
 
 		t.Run(action, func(t *testing.T) {
-			resID := 1
+			resName := "resource-1"
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-				if want, got := fmt.Sprintf("%s/%d/actions", ResourcesBasePath, resID), req.URL.Path; want != got {
+				if want, got := fmt.Sprintf("%s/%s/actions", ResourcesBasePath, resName), req.URL.Path; want != got {
 					t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 				}
 
@@ -50,7 +51,7 @@ func Test_Resource_PerformActions(t *testing.T) {
 				}
 
 				// Return response to satisfy client and test response
-				c := generateResource("test", resID, "", nil)
+				c := generateResource(resName, "", nil)
 				json.NewEncoder(w).Encode(c)
 			}))
 
@@ -59,13 +60,13 @@ func Test_Resource_PerformActions(t *testing.T) {
 
 			c := testClient(server.Client(), server.URL)
 
-			resp, err := f(c, fmt.Sprint(resID))
+			resp, err := f(c, resName)
 			if err != nil {
 				t.Errorf("expected no error, got %+v", err)
 			}
 
-			if want, got := resID, resp.ID; want != got {
-				t.Errorf("unexpected resource ID: want=%d got %d", want, got)
+			if want, got := resName, resp.Name; want != got {
+				t.Errorf("unexpected resource name: want=%s got %s", want, got)
 			}
 
 		})
@@ -129,8 +130,8 @@ func TestCreateResource(t *testing.T) {
 			desc: "resource with an environment",
 			input: func() CreateResourceInput {
 				var resource CreateResourceInput
-				var env = &EnvironmentIdentifier{
-					Name: "my-environment",
+				var env = &EntityIdentifier{
+					Name: null.StringFrom("my-environment"),
 				}
 
 				resource.Environment = env
@@ -176,7 +177,7 @@ func TestCreateResource(t *testing.T) {
 				}
 
 				// Return response to satisfy client and test response
-				c := generateResource(resource.Name, 0, "", nil)
+				c := generateResource(resource.Name, "", nil)
 				c.URL = resource.URL
 				c.Metadata = resource.Metadata
 				c.SSHTunnel = &ResourceSSHTunnel{
@@ -185,7 +186,7 @@ func TestCreateResource(t *testing.T) {
 				}
 
 				if resource.Environment != nil {
-					c.Environment = &EnvironmentIdentifier{Name: resource.Environment.Name}
+					c.Environment = &EntityIdentifier{Name: resource.Environment.Name}
 				}
 
 				json.NewEncoder(w).Encode(c)
@@ -226,7 +227,7 @@ func TestCreateResource(t *testing.T) {
 			}
 
 			if resource.Environment != nil {
-				if want, got := resource.Environment.Name, resp.Environment.Name; want != got {
+				if want, got := resource.Environment.Name.String, resp.Environment.Name.String; want != got {
 					t.Errorf("unexpected environment name: want=%s got=%s", want, got)
 				}
 			}
@@ -270,7 +271,7 @@ func TestUpdateResource(t *testing.T) {
 		}
 
 		// Return response to satisfy client and test response
-		c := generateResource(resource.Name, 0, "", nil)
+		c := generateResource(resource.Name, "", nil)
 		c.URL = resource.URL
 		c.Metadata = resource.Metadata
 		c.SSHTunnel = &ResourceSSHTunnel{
@@ -315,17 +316,12 @@ func TestUpdateResource(t *testing.T) {
 	}
 }
 
-func generateResource(name string, id int, url string, metadata map[string]interface{}) Resource {
+func generateResource(name string, url string, metadata map[string]interface{}) Resource {
 	if name == "" {
 		name = "test"
 	}
 
-	if id == 0 {
-		id = rand.Intn(10000)
-	}
-
 	return Resource{
-		ID:       id,
 		Type:     "postgres",
 		Name:     name,
 		URL:      url,
