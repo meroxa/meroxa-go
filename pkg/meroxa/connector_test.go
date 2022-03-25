@@ -4,19 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"testing"
+
+	"github.com/volatiletech/null/v8"
 )
 
 func TestCreateConnector(t *testing.T) {
 	input := CreateConnectorInput{
 		Name:         "test",
-		ResourceID:   1,
-		PipelineID:   2,
+		ResourceName: "my-resource",
 		PipelineName: "my-pipeline",
 
 		Configuration: map[string]interface{}{
@@ -32,8 +32,7 @@ func TestCreateConnector(t *testing.T) {
 		type connectionRequest struct {
 			Name          string                 `json:"name"`
 			Configuration map[string]interface{} `json:"config"`
-			ResourceID    int                    `json:"resource_id"`
-			PipelineID    int                    `json:"pipeline_id"`
+			ResourceName  string                 `json:"resource_name"`
 			PipelineName  string                 `json:"pipeline_name"`
 			Metadata      map[string]interface{} `json:"metadata"`
 		}
@@ -48,12 +47,8 @@ func TestCreateConnector(t *testing.T) {
 			t.Errorf("expected name %s, got %s", input.Name, cr.Name)
 		}
 
-		if cr.ResourceID != input.ResourceID {
-			t.Errorf("expected resource ID %d, got %d", input.ResourceID, cr.ResourceID)
-		}
-
-		if cr.PipelineID != input.PipelineID {
-			t.Errorf("expected pipeline ID %d, got %d", input.PipelineID, cr.PipelineID)
+		if cr.ResourceName != input.ResourceName {
+			t.Errorf("expected resource Name %s, got %s", input.ResourceName, cr.ResourceName)
 		}
 
 		if cr.PipelineName != input.PipelineName {
@@ -70,7 +65,7 @@ func TestCreateConnector(t *testing.T) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		c := generateConnector(input.Name, input.ResourceID, input.Configuration, input.Metadata)
+		c := generateConnector(input.Name, input.Configuration, input.Metadata)
 		json.NewEncoder(w).Encode(c)
 	}))
 	// Close the server when test finishes
@@ -114,7 +109,7 @@ func TestUpdateConnectorStatus(t *testing.T) {
 		}
 
 		// Return response to satisfy client and test response
-		c := generateConnector(connectorKey, 0, nil, nil)
+		c := generateConnector(connectorKey, nil, nil)
 		c.State = ConnectorState(state)
 		json.NewEncoder(w).Encode(c)
 	}))
@@ -134,7 +129,7 @@ func TestUpdateConnectorStatus(t *testing.T) {
 }
 
 func TestUpdateConnector(t *testing.T) {
-	var connector = generateConnector("", 0, nil, nil)
+	var connector = generateConnector("", nil, nil)
 	var connectorUpdate UpdateConnectorInput
 	connectorUpdate.Name = connector.Name
 	connectorUpdate.Configuration = connector.Configuration
@@ -185,13 +180,9 @@ func testClient(c *http.Client, u string) Client {
 	}
 }
 
-func generateConnector(name string, id int, config, metadata map[string]interface{}) Connector {
+func generateConnector(name string, config, metadata map[string]interface{}) Connector {
 	if name == "" {
 		name = "test"
-	}
-
-	if id == 0 {
-		id = rand.Intn(10000)
 	}
 
 	if config == nil {
@@ -207,17 +198,16 @@ func generateConnector(name string, id int, config, metadata map[string]interfac
 	}
 
 	return Connector{
-		ID:            id,
 		Type:          "postgres",
 		Name:          name,
 		Configuration: config,
 		Metadata:      metadata,
-		Environment:   &EnvironmentIdentifier{Name: "my-env"},
+		Environment:   &EntityIdentifier{Name: null.StringFrom("my-env")},
 	}
 }
 
 func TestGetConnectorByName(t *testing.T) {
-	connector := generateConnector("my-connector", 0, nil, nil)
+	connector := generateConnector("my-connector", nil, nil)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", connectorsBasePath, connector.Name), req.URL.Path; want != got {
@@ -244,42 +234,14 @@ func TestGetConnectorByName(t *testing.T) {
 	}
 }
 
-func TestGetConnectorByID(t *testing.T) {
-	connector := generateConnector("", 10, nil, nil)
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%d", connectorsBasePath, connector.ID), req.URL.Path; want != got {
-			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
-		}
-
-		defer req.Body.Close()
-
-		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(connector)
-	}))
-	// Close the server when test finishes
-	defer server.Close()
-
-	c := testClient(server.Client(), server.URL)
-
-	resp, err := c.GetConnectorByNameOrID(context.Background(), fmt.Sprint(connector.ID))
-	if err != nil {
-		t.Errorf("expected no error, got %+v", err)
-	}
-
-	if !reflect.DeepEqual(resp, &connector) {
-		t.Errorf("expected response same as connector")
-	}
-}
-
 func TestListPipelineConnectors(t *testing.T) {
-	p := generatePipeline("", 0, fmt.Sprint(PipelineStateHealthy), nil)
-	connector := generateConnector("", 0, nil, nil)
-	connector.PipelineID = p.ID
+	p := generatePipeline("", fmt.Sprint(PipelineStateHealthy), nil)
+	connector := generateConnector("", nil, nil)
+	connector.PipelineName = p.Name
 	list := []*Connector{&connector}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("/v1/pipelines/%d/connectors", p.ID), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("/v1/pipelines/%s/connectors", p.Name), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -293,7 +255,7 @@ func TestListPipelineConnectors(t *testing.T) {
 
 	c := testClient(server.Client(), server.URL)
 
-	resp, err := c.ListPipelineConnectors(context.Background(), p.ID)
+	resp, err := c.ListPipelineConnectors(context.Background(), p.Name)
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
@@ -304,8 +266,8 @@ func TestListPipelineConnectors(t *testing.T) {
 }
 
 func TestListConnectors(t *testing.T) {
-	c1 := generateConnector("", 10, nil, nil)
-	c2 := generateConnector("", 10, nil, nil)
+	c1 := generateConnector("", nil, nil)
+	c2 := generateConnector("", nil, nil)
 	list := []*Connector{&c1, &c2}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
