@@ -57,6 +57,7 @@ type Client interface {
 	ListApplications(ctx context.Context) ([]*Application, error)
 
 	CreateBuild(ctx context.Context, input *CreateBuildInput) (*Build, error)
+	GetBuild(ctx context.Context, uuid string) (*Build, error)
 
 	CreateConnector(ctx context.Context, input *CreateConnectorInput) (*Connector, error)
 	DeleteConnector(ctx context.Context, nameOrID string) error

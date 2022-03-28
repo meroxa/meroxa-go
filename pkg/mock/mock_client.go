@@ -286,6 +286,21 @@ func (mr *MockClientMockRecorder) GetApplication(ctx, name interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplication", reflect.TypeOf((*MockClient)(nil).GetApplication), ctx, name)
 }
 
+// GetBuild mocks base method.
+func (m *MockClient) GetBuild(ctx context.Context, uuid string) (*meroxa.Build, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBuild", ctx, uuid)
+	ret0, _ := ret[0].(*meroxa.Build)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBuild indicates an expected call of GetBuild.
+func (mr *MockClientMockRecorder) GetBuild(ctx, uuid interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBuild", reflect.TypeOf((*MockClient)(nil).GetBuild), ctx, uuid)
+}
+
 // GetConnectorByNameOrID mocks base method.
 func (m *MockClient) GetConnectorByNameOrID(ctx context.Context, nameOrID string) (*meroxa.Connector, error) {
 	m.ctrl.T.Helper()
