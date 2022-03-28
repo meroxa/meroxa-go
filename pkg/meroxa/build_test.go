@@ -36,8 +36,8 @@ func TestCreateBuild(t *testing.T) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		c := generateBuild("", input.SourceBlob.Url)
-		json.NewEncoder(w).Encode(c)
+		b := generateBuild("", input.SourceBlob.Url)
+		json.NewEncoder(w).Encode(b)
 	}))
 	// Close the server when test finishes
 	defer server.Close()
