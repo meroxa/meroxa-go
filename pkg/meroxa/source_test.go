@@ -37,7 +37,7 @@ func TestCreateSource(t *testing.T) {
 	}
 }
 
-func generateSource(getUrl, putUrl string) Source{
+func generateSource(getUrl, putUrl string) Source {
 	if getUrl == "" {
 		getUrl = "https://meroxa-get-url.com"
 	}
