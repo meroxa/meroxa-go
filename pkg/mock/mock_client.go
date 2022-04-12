@@ -185,6 +185,21 @@ func (mr *MockClientMockRecorder) DeleteApplication(ctx, name interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteApplication", reflect.TypeOf((*MockClient)(nil).DeleteApplication), ctx, name)
 }
 
+// DeleteApplicationResources mocks base method.
+func (m *MockClient) DeleteApplicationResources(ctx context.Context, name string) (*http.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteApplicationResources", ctx, name)
+	ret0, _ := ret[0].(*http.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteApplicationResources indicates an expected call of DeleteApplicationResources.
+func (mr *MockClientMockRecorder) DeleteApplicationResources(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteApplicationResources", reflect.TypeOf((*MockClient)(nil).DeleteApplicationResources), ctx, name)
+}
+
 // DeleteConnector mocks base method.
 func (m *MockClient) DeleteConnector(ctx context.Context, nameOrID string) error {
 	m.ctrl.T.Helper()
