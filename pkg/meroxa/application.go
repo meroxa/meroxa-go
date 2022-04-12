@@ -11,7 +11,8 @@ import (
 type ApplicationState string
 
 const (
-	ApplicationStateReady ApplicationState = "ready"
+	ApplicationStateRunning  ApplicationState = "running"
+	ApplicationStateDegraded ApplicationState = "degraded"
 )
 
 const applicationsBasePath = "/v1/applications"

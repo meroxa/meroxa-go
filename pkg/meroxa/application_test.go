@@ -64,7 +64,7 @@ func generateApplication(name string) Application {
 		name = "test"
 	}
 
-	return Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateReady}}
+	return Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateRunning}}
 }
 
 func TestGetApplicationByName(t *testing.T) {
