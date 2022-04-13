@@ -13,7 +13,6 @@ func TestGetConnectorLogs(t *testing.T) {
 		if want, got := "/v1/connectors/test/logs", req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
-
 		w.Write([]byte("[timestamp] log message"))
 	}))
 	defer server.Close()

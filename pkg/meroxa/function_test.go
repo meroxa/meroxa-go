@@ -77,23 +77,7 @@ func TestCreateFunction(t *testing.T) {
 }
 
 func TestGetFunction(t *testing.T) {
-	output := &Function{
-		UUID:         "1234",
-		Name:         "my_func",
-		InputStream:  "input_stream",
-		OutputStream: "output_stream",
-		Image:        "meroxa/image",
-		Command:      []string{"echo", "hello"},
-		Args:         []string{"arg"},
-		EnvVars:      map[string]string{"key": "val"},
-		Status: FunctionStatus{
-			State:   "RUNNING",
-			Details: "Details",
-		},
-		Pipeline: PipelineIdentifier{
-			Name: "my_pipeline",
-		},
-	}
+	output := generateFunction()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if diff := cmp.Diff(http.MethodGet, req.Method); diff != "" {
@@ -167,23 +151,7 @@ func TestListFunctions(t *testing.T) {
 }
 
 func TestDeleteFunction(t *testing.T) {
-	output := &Function{
-		UUID:         "1234",
-		Name:         "my_func",
-		InputStream:  "input_stream",
-		OutputStream: "output_stream",
-		Image:        "meroxa/image",
-		Command:      []string{"echo", "hello"},
-		Args:         []string{"arg"},
-		EnvVars:      map[string]string{"key": "val"},
-		Status: FunctionStatus{
-			State:   "RUNNING",
-			Details: "Details",
-		},
-		Pipeline: PipelineIdentifier{
-			Name: "my_pipeline",
-		},
-	}
+	output := generateFunction()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if diff := cmp.Diff(http.MethodDelete, req.Method); diff != "" {
@@ -207,5 +175,25 @@ func TestDeleteFunction(t *testing.T) {
 
 	if diff := cmp.Diff(output, gotOutput); diff != "" {
 		t.Fatalf("mismatch of function output (-want +got): %s", diff)
+	}
+}
+
+func generateFunction() *Function {
+	return &Function{
+		UUID:         "1234",
+		Name:         "my_func",
+		InputStream:  "input_stream",
+		OutputStream: "output_stream",
+		Image:        "meroxa/image",
+		Command:      []string{"echo", "hello"},
+		Args:         []string{"arg"},
+		EnvVars:      map[string]string{"key": "val"},
+		Status: FunctionStatus{
+			State:   "RUNNING",
+			Details: "Details",
+		},
+		Pipeline: PipelineIdentifier{
+			Name: "my_pipeline",
+		},
 	}
 }

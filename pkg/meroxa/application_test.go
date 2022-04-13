@@ -181,3 +181,95 @@ func TestDeleteApplication(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestDeleteApplicationEntitiesWithAppNotFound(t *testing.T) {
+	appName := "test"
+	pipelineName := fmt.Sprintf("turbine-pipeline-%s", appName)
+	pipeline := generatePipeline(pipelineName,"", nil)
+
+	connectorSrc := generateConnector("src-connector", nil, nil)
+	connectorSrc.PipelineName = pipeline.Name
+
+	function := generateFunction()
+	function.Pipeline = PipelineIdentifier{Name: pipeline.Name}
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc(fmt.Sprintf("%s/%s", applicationsBasePath, appName), func(res http.ResponseWriter, req *http.Request) {
+		res.WriteHeader(http.StatusNotFound)
+		defer req.Body.Close()
+	})
+
+	mux.HandleFunc(pipelinesBasePath, func(res http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("name=%s", pipeline.Name), req.URL.RawQuery; want != got {
+			t.Fatalf("mismatched of request query parameter: want=%s got=%s", want, got)
+		}
+		json.NewEncoder(res).Encode(pipeline)
+		defer req.Body.Close()
+	})
+	mux.HandleFunc(fmt.Sprintf("%s/%s/connectors", pipelinesBasePath, pipelineName), func(res http.ResponseWriter, req *http.Request) {
+		list := []*Connector{&connectorSrc}
+		json.NewEncoder(res).Encode(list)
+	})
+	mux.HandleFunc(functionsBasePath, func(res http.ResponseWriter, req *http.Request) {
+		list := []*Function{function}
+		json.NewEncoder(res).Encode(list)
+	})
+	mux.HandleFunc(fmt.Sprintf("%s/%s", connectorsBasePath, connectorSrc.Name), func(res http.ResponseWriter, req *http.Request) {
+		if req.Method == http.MethodDelete {
+			res.WriteHeader(http.StatusOK)
+		}
+		defer req.Body.Close()
+	})
+	mux.HandleFunc(fmt.Sprintf("%s/%s", functionsBasePath, function.Name), func(res http.ResponseWriter, req *http.Request) {
+		if req.Method == http.MethodDelete {
+			res.WriteHeader(http.StatusOK)
+		}
+		defer req.Body.Close()
+	})
+	mux.HandleFunc(fmt.Sprintf("%s/%s", pipelinesBasePath, pipeline.Name), func(res http.ResponseWriter, req *http.Request) {
+		if req.Method == http.MethodDelete {
+			res.WriteHeader(http.StatusOK)
+		}
+		defer req.Body.Close()
+	})
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.DeleteApplicationEntities(context.Background(), appName)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("got %v, expected %v", resp.StatusCode, http.StatusOK)
+	}
+}
+
+func TestDeleteApplicationEntitiesWithAppFound(t *testing.T) {
+	app := generateApplication("another-app")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.Name), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		json.NewEncoder(w).Encode(app)
+	}))
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.DeleteApplicationEntities(context.Background(), app.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != http.StatusNoContent {
+		t.Errorf("got %v, expected %v", resp.StatusCode, http.StatusNoContent)
+	}
+}
