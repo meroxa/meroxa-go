@@ -75,9 +75,9 @@ func (c *client) DeleteApplication(ctx context.Context, name string) error {
 	return handleAPIErrors(resp)
 }
 
-// DeleteApplicationResources does a bit more than DeleteApplication. Its main purpose is to remove underneath's app resources
+// DeleteApplicationEntities does a bit more than DeleteApplication. Its main purpose is to remove underneath's app resources
 // even in the event the application didn't exist.
-func (c *client) DeleteApplicationResources(ctx context.Context, name string) (*http.Response, error) {
+func (c *client) DeleteApplicationEntities(ctx context.Context, name string) (*http.Response, error) {
 	respAppDelete, err := c.MakeRequest(ctx, http.MethodDelete, fmt.Sprintf("%s/%s", applicationsBasePath, name), nil, nil)
 	if err != nil {
 		return respAppDelete, err
