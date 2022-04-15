@@ -89,7 +89,7 @@ func TestUpdateConnectorStatus(t *testing.T) {
 	state := "pause"
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("/v1/connectors/%s/status", connectorKey), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s/status", connectorsBasePath, connectorKey), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -241,10 +241,9 @@ func TestListPipelineConnectors(t *testing.T) {
 	list := []*Connector{&connector}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("/v1/pipelines/%s/connectors", p.Name), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s/connectors", pipelinesBasePath, p.Name), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
-
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
