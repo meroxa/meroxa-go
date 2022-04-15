@@ -244,8 +244,8 @@ func TestDeleteApplicationEntitiesWithAppNotFound(t *testing.T) {
 		t.Errorf("expected no error, got %+v", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("got %v, expected %v", resp.StatusCode, http.StatusOK)
+	if resp.StatusCode != http.StatusNoContent {
+		t.Errorf("got %v, expected %v", resp.StatusCode, http.StatusNoContent)
 	}
 }
 
@@ -269,7 +269,7 @@ func TestDeleteApplicationEntitiesWithAppFound(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp.StatusCode != http.StatusNoContent {
-		t.Errorf("got %v, expected %v", resp.StatusCode, http.StatusNoContent)
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("got %v, expected %v", resp.StatusCode, http.StatusOK)
 	}
 }

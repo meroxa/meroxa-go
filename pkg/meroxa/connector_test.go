@@ -293,3 +293,47 @@ func TestListConnectors(t *testing.T) {
 		t.Errorf("expected response same as list")
 	}
 }
+
+func TestFilterConnectorsPerType(t *testing.T) {
+	srcMetadata := map[string]interface{}{"mx:connectorType": "source"}
+	dstMetadata := map[string]interface{}{"mx:connectorType": "destination"}
+
+	srcConnector1 := generateConnector("src-connector-1", nil, srcMetadata)
+	srcConnector2 := generateConnector("src-connector-2", nil, srcMetadata)
+	dstConnector1 := generateConnector("dst-connector-1", nil, dstMetadata)
+	dstConnector2 := generateConnector("dst-connector-2", nil, dstMetadata)
+
+	connectorsList := []*Connector{&srcConnector1, &srcConnector2, &dstConnector1, &dstConnector2}
+
+	tests := []struct {
+		desc string
+		cType ConnectorType
+		expectedList []*Connector
+	}{
+		{
+			desc: "Filtering source connectors",
+			cType: ConnectorTypeSource,
+			expectedList: []*Connector{&srcConnector1, &srcConnector2},
+		},
+		{
+			desc: "Filtering destination connectors",
+			cType: ConnectorTypeDestination,
+			expectedList: []*Connector{&dstConnector1, &dstConnector2},
+		},
+		{
+			desc: "Filtering non determined type",
+			cType: ConnectorType("FooType"),
+			expectedList: []*Connector{},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			connectors := filterConnectorsPerType(connectorsList, tc.cType)
+
+			if !reflect.DeepEqual(connectors, tc.expectedList) {
+				t.Errorf("expected %+v, got, %+v", tc.expectedList, connectors)
+			}
+		})
+	}
+}
