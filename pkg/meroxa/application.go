@@ -98,11 +98,7 @@ func (c *client) DeleteApplicationEntities(ctx context.Context, name string) (*h
 		const passes = 2
 		for i := 0; i < passes; i++ {
 			for _, connector := range respConnectorsList {
-				if i == 0 && connector.Type == ConnectorTypeDestination {
-					_ = c.DeleteConnector(ctx, connector.Name)
-				} else if i == 1 && connector.Type == ConnectorTypeSource {
-					_ = c.DeleteConnector(ctx, connector.Name)
-				}
+				_ = c.DeleteConnector(ctx, connector.Name)
 			}
 		}
 
