@@ -59,6 +59,13 @@ type ApplicationStatus struct {
 	Details string           `json:"details,omitempty"`
 }
 
+type ApplicationResource struct {
+	EntityIdentifier
+	Collection  string `json:"collection_name,omitempty"`
+	Source      string `json:"source,omitempty"`
+	Destination string `json:"destination,omitempty"`
+}
+
 func (c *client) CreateApplication(ctx context.Context, input *CreateApplicationInput) (*Application, error) {
 	resp, err := c.MakeRequest(ctx, http.MethodPost, applicationsBasePath, input, nil, nil)
 	if err != nil {
