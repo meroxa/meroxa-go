@@ -101,9 +101,31 @@ func TestGetApplicationByUUID(t *testing.T) {
 	app.Functions = make([]EntityIdentifier, 0)
 	app.Functions = append(app.Functions, EntityIdentifier{Name: null.StringFrom("fun1")})
 	app.Connectors = make([]EntityIdentifier, 0)
-	app.Connectors = append(app.Connectors, EntityIdentifier{Name: null.StringFrom("conn1")})
-	app.Resources = make([]EntityIdentifier, 0)
-	app.Resources = append(app.Resources, EntityIdentifier{Name: null.StringFrom("resource1")})
+	app.Connectors = append(
+		app.Connectors,
+		EntityIdentifier{Name: null.StringFrom("conn1")},
+		EntityIdentifier{Name: null.StringFrom("conn2")})
+	app.Resources = make([]ApplicationResource, 0)
+	app.Resources = append(
+		app.Resources,
+		ApplicationResource{
+			EntityIdentifier: EntityIdentifier{
+				Name: null.StringFrom("resource1"),
+			},
+			Collection: ResourceCollection{
+				Name:   null.StringFrom("table"),
+				Source: null.StringFrom("true"),
+			},
+		},
+		ApplicationResource{
+			EntityIdentifier: EntityIdentifier{
+				Name: null.StringFrom("resource1"),
+			},
+			Collection: ResourceCollection{
+				Name:        null.StringFrom("table_out"),
+				Destination: null.StringFrom("true"),
+			},
+		})
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
@@ -185,7 +207,7 @@ func TestDeleteApplication(t *testing.T) {
 func TestDeleteApplicationEntitiesWithAppNotFound(t *testing.T) {
 	appName := "test"
 	pipelineName := fmt.Sprintf("turbine-pipeline-%s", appName)
-	pipeline := generatePipeline(pipelineName,"", nil)
+	pipeline := generatePipeline(pipelineName, "", nil)
 
 	connectorSrc := generateConnector("src-connector", nil, nil)
 	connectorSrc.PipelineName = pipeline.Name
