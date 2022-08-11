@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"testing"
 )
 
@@ -21,14 +20,6 @@ func errorJSONResponse(msg string) io.ReadCloser {
 
 // create a new reader with an HTML response
 var errorHTMLResponse = ioutil.NopCloser(bytes.NewReader([]byte(`<h1>Error!</h1>`)))
-
-var http503JSONResponse = &http.Response{
-	StatusCode: 503,
-	Status:     "503 Service Unavailable",
-	Body:       errorJSONResponse(`{ "error": "api error" }`),
-	Proto:      "HTTP/1.0",
-	Header:     make(http.Header),
-}
 
 var http422JSONResponse = func(body io.ReadCloser) *http.Response {
 	return &http.Response{
@@ -90,7 +81,7 @@ func TestHandleAPIErrors(t *testing.T) {
 	for _, tt := range tests {
 		err := handleAPIErrors(tt.in)
 
-		if !reflect.DeepEqual(err, tt.err) {
+		if err != nil && (err.Error() != tt.err.Error()) {
 			t.Errorf("expected %+v, got %+v", tt.err, err)
 		}
 

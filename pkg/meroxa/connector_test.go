@@ -66,7 +66,9 @@ func TestCreateConnector(t *testing.T) {
 
 		// Return response to satisfy client and test response
 		c := generateConnector(input.Name, input.Configuration, input.Metadata)
-		json.NewEncoder(w).Encode(c)
+		if err := json.NewEncoder(w).Encode(c); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -111,7 +113,9 @@ func TestUpdateConnectorStatus(t *testing.T) {
 		// Return response to satisfy client and test response
 		c := generateConnector(connectorKey, nil, nil)
 		c.State = ConnectorState(state)
-		json.NewEncoder(w).Encode(c)
+		if err := json.NewEncoder(w).Encode(c); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -155,7 +159,9 @@ func TestUpdateConnector(t *testing.T) {
 		}
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(connector)
+		if err := json.NewEncoder(w).Encode(connector); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -217,7 +223,9 @@ func TestGetConnectorByName(t *testing.T) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(connector)
+		if err := json.NewEncoder(w).Encode(connector); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -235,7 +243,7 @@ func TestGetConnectorByName(t *testing.T) {
 }
 
 func TestListPipelineConnectors(t *testing.T) {
-	p := generatePipeline("", fmt.Sprint(PipelineStateHealthy), nil)
+	p := generatePipeline("", fmt.Sprint(PipelineStateHealthy))
 	connector := generateConnector("", nil, nil)
 	connector.PipelineName = p.Name
 	list := []*Connector{&connector}
@@ -247,7 +255,9 @@ func TestListPipelineConnectors(t *testing.T) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(list)
+		if err := json.NewEncoder(w).Encode(list); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -258,7 +268,6 @@ func TestListPipelineConnectors(t *testing.T) {
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
 	}
-
 	if !reflect.DeepEqual(resp, list) {
 		t.Errorf("expected response same as list")
 	}
@@ -270,14 +279,16 @@ func TestListConnectors(t *testing.T) {
 	list := []*Connector{&c1, &c2}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s", connectorsBasePath), req.URL.Path; want != got {
+		if want, got := connectorsBasePath, req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(list)
+		if err := json.NewEncoder(w).Encode(list); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -306,23 +317,23 @@ func TestFilterConnectorsPerType(t *testing.T) {
 	connectorsList := []*Connector{&srcConnector1, &srcConnector2, &dstConnector1, &dstConnector2}
 
 	tests := []struct {
-		desc string
-		cType ConnectorType
+		desc         string
+		cType        ConnectorType
 		expectedList []*Connector
 	}{
 		{
-			desc: "Filtering source connectors",
-			cType: ConnectorTypeSource,
+			desc:         "Filtering source connectors",
+			cType:        ConnectorTypeSource,
 			expectedList: []*Connector{&srcConnector1, &srcConnector2},
 		},
 		{
-			desc: "Filtering destination connectors",
-			cType: ConnectorTypeDestination,
+			desc:         "Filtering destination connectors",
+			cType:        ConnectorTypeDestination,
 			expectedList: []*Connector{&dstConnector1, &dstConnector2},
 		},
 		{
-			desc: "Filtering non determined type",
-			cType: ConnectorType("FooType"),
+			desc:         "Filtering non determined type",
+			cType:        ConnectorType("FooType"),
 			expectedList: []*Connector{},
 		},
 	}

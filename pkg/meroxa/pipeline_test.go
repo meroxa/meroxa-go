@@ -39,8 +39,10 @@ func TestUpdatePipelineStatus(t *testing.T) {
 		}
 
 		// Return response to satisfy client and test response
-		p := generatePipeline(name, newState, nil)
-		json.NewEncoder(w).Encode(p)
+		p := generatePipeline(name, newState)
+		if err := json.NewEncoder(w).Encode(p); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -59,7 +61,7 @@ func TestUpdatePipelineStatus(t *testing.T) {
 
 func TestUpdatePipeline(t *testing.T) {
 	var pipelineUpdate UpdatePipelineInput
-	var pipeline = generatePipeline("", "", nil)
+	var pipeline = generatePipeline("", "")
 
 	pipelineUpdate.Name = pipeline.Name
 
@@ -80,7 +82,9 @@ func TestUpdatePipeline(t *testing.T) {
 		}
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(pipeline)
+		if err := json.NewEncoder(w).Encode(pipeline); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -98,7 +102,7 @@ func TestUpdatePipeline(t *testing.T) {
 }
 
 func TestGetPipelines(t *testing.T) {
-	pBase := generatePipeline("without-env", "", nil)
+	pBase := generatePipeline("without-env", "")
 	pWithEnv := generatePipelineWithEnvironment("with-env")
 
 	pipelines := []*Pipeline{&pBase, &pWithEnv}
@@ -168,7 +172,7 @@ func TestCreatePipeline(t *testing.T) {
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s", pipelinesBasePath), req.URL.Path; want != got {
+		if want, got := pipelinesBasePath, req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -186,12 +190,14 @@ func TestCreatePipeline(t *testing.T) {
 			t.Errorf("expected same environment")
 		}
 
-		rP := generatePipeline(pi.Name, "", nil)
+		rP := generatePipeline(pi.Name, "")
 		rP.Environment = pi.Environment
 		rP.Environment.UUID = null.StringFrom("067fc522-7f3c-4c71-8749-68f3698c2c68")
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(rP)
+		if err := json.NewEncoder(w).Encode(rP); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -213,19 +219,13 @@ func TestCreatePipeline(t *testing.T) {
 	}
 }
 
-func generatePipeline(name string, state string, metadata map[string]interface{}) Pipeline {
+func generatePipeline(name string, state string) Pipeline {
 	if name == "" {
 		name = "test"
 	}
 
 	if state == "" {
 		state = "healthy"
-	}
-
-	if metadata == nil {
-		metadata = map[string]interface{}{
-			"custom_metadata": true,
-		}
 	}
 
 	return Pipeline{
@@ -235,7 +235,7 @@ func generatePipeline(name string, state string, metadata map[string]interface{}
 }
 
 func generatePipelineWithEnvironment(name string) Pipeline {
-	p := generatePipeline(name, "", nil)
+	p := generatePipeline(name, "")
 
 	p.Environment = &EntityIdentifier{
 		UUID: null.StringFrom("9c73bbc5-75c2-400d-a270-d8aefe727c15"),

@@ -3,7 +3,6 @@ package meroxa
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -25,7 +24,7 @@ const (
 
 // ListResourceTypes returns the list of supported resources
 func (c *client) ListResourceTypes(ctx context.Context) ([]string, error) {
-	path := fmt.Sprintf("/v1/resource-types")
+	path := "/v1/resource-types"
 
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil, nil)
 	if err != nil {
