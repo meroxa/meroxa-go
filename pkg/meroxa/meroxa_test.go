@@ -51,6 +51,9 @@ func TestClient_MakeRequest(t *testing.T) {
 		t.Errorf("expected http path %s, got %s", "/api/test", response.Request.URL.Path)
 	}
 	b, err := io.ReadAll(response.Body)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
 	if bytes.Equal(body.Bytes(), b) {
 		t.Errorf("expected http body %s, got %s", body, b)
 	}

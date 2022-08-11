@@ -60,7 +60,9 @@ func TestCreateFunction(t *testing.T) {
 			t.Fatalf("mismatch of function input (-want +got): %s", diff)
 		}
 
-		json.NewEncoder(w).Encode(output)
+		if err := json.NewEncoder(w).Encode(output); err != nil {
+			t.Fatalf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -88,7 +90,9 @@ func TestGetFunction(t *testing.T) {
 			t.Fatalf("mismatched of request path (-want +got): %s", diff)
 		}
 
-		json.NewEncoder(w).Encode(output)
+		if err := json.NewEncoder(w).Encode(output); err != nil {
+			t.Fatalf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -134,7 +138,9 @@ func TestListFunctions(t *testing.T) {
 			t.Fatalf("mismatched of request path (-want +got): %s", diff)
 		}
 
-		json.NewEncoder(w).Encode(output)
+		if err := json.NewEncoder(w).Encode(output); err != nil {
+			t.Fatalf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -162,7 +168,9 @@ func TestDeleteFunction(t *testing.T) {
 			t.Fatalf("mismatched of request path (-want +got): %s", diff)
 		}
 
-		json.NewEncoder(w).Encode(output)
+		if err := json.NewEncoder(w).Encode(output); err != nil {
+			t.Fatalf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 

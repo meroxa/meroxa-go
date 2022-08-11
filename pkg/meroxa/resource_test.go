@@ -52,7 +52,9 @@ func Test_Resource_PerformActions(t *testing.T) {
 
 				// Return response to satisfy client and test response
 				c := generateResource(resName, "", nil)
-				json.NewEncoder(w).Encode(c)
+				if err := json.NewEncoder(w).Encode(c); err != nil {
+					t.Errorf("expected no error, got %+v", err)
+				}
 			}))
 
 			// Close the server when test finishes
@@ -154,7 +156,7 @@ func TestCreateResource(t *testing.T) {
 			var resource = tc.input()
 
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-				if want, got := fmt.Sprintf("%s", ResourcesBasePath), req.URL.Path; want != got {
+				if want, got := ResourcesBasePath, req.URL.Path; want != got {
 					t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 				}
 
@@ -189,7 +191,9 @@ func TestCreateResource(t *testing.T) {
 					c.Environment = &EntityIdentifier{Name: resource.Environment.Name}
 				}
 
-				json.NewEncoder(w).Encode(c)
+				if err := json.NewEncoder(w).Encode(c); err != nil {
+					t.Errorf("expected no error, got %+v", err)
+				}
 			}))
 
 			// Close the server when test finishes
@@ -278,7 +282,9 @@ func TestUpdateResource(t *testing.T) {
 			Address:   resource.SSHTunnel.Address,
 			PublicKey: privateKey,
 		}
-		json.NewEncoder(w).Encode(c)
+		if err := json.NewEncoder(w).Encode(c); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 
 	// Close the server when test finishes

@@ -16,7 +16,9 @@ func TestCreateSource(t *testing.T) {
 
 		// Return response to satisfy client and test response
 		s := generateSource(getUrl, putUrl)
-		json.NewEncoder(w).Encode(s)
+		if err := json.NewEncoder(w).Encode(s); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()

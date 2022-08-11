@@ -41,7 +41,9 @@ func TestCreateApplication(t *testing.T) {
 
 		// Return response to satisfy client and test response
 		c := generateApplication(input.Name)
-		json.NewEncoder(w).Encode(c)
+		if err := json.NewEncoder(w).Encode(c); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -79,7 +81,9 @@ func TestGetApplicationByName(t *testing.T) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(app)
+		if err := json.NewEncoder(w).Encode(app); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -135,7 +139,9 @@ func TestGetApplicationByUUID(t *testing.T) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(app)
+		if err := json.NewEncoder(w).Encode(app); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -158,14 +164,16 @@ func TestListApplications(t *testing.T) {
 	list := []*Application{&a1, &a2}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s", applicationsBasePath), req.URL.Path; want != got {
+		if want, got := applicationsBasePath, req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(list)
+		if err := json.NewEncoder(w).Encode(list); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -192,7 +200,9 @@ func TestDeleteApplication(t *testing.T) {
 
 		defer req.Body.Close()
 
-		json.NewEncoder(w).Encode(app)
+		if err := json.NewEncoder(w).Encode(app); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -207,7 +217,7 @@ func TestDeleteApplication(t *testing.T) {
 func TestDeleteApplicationEntitiesWithAppNotFound(t *testing.T) {
 	appName := "test"
 	pipelineName := fmt.Sprintf("turbine-pipeline-%s", appName)
-	pipeline := generatePipeline(pipelineName, "", nil)
+	pipeline := generatePipeline(pipelineName, "")
 
 	connectorSrc := generateConnector("src-connector", nil, nil)
 	connectorSrc.PipelineName = pipeline.Name
@@ -226,16 +236,22 @@ func TestDeleteApplicationEntitiesWithAppNotFound(t *testing.T) {
 		if want, got := fmt.Sprintf("name=%s", pipeline.Name), req.URL.RawQuery; want != got {
 			t.Fatalf("mismatched of request query parameter: want=%s got=%s", want, got)
 		}
-		json.NewEncoder(res).Encode(pipeline)
+		if err := json.NewEncoder(res).Encode(pipeline); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 		defer req.Body.Close()
 	})
 	mux.HandleFunc(fmt.Sprintf("%s/%s/connectors", pipelinesBasePath, pipelineName), func(res http.ResponseWriter, req *http.Request) {
 		list := []*Connector{&connectorSrc}
-		json.NewEncoder(res).Encode(list)
+		if err := json.NewEncoder(res).Encode(list); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	})
 	mux.HandleFunc(functionsBasePath, func(res http.ResponseWriter, req *http.Request) {
 		list := []*Function{function}
-		json.NewEncoder(res).Encode(list)
+		if err := json.NewEncoder(res).Encode(list); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	})
 	mux.HandleFunc(fmt.Sprintf("%s/%s", connectorsBasePath, connectorSrc.Name), func(res http.ResponseWriter, req *http.Request) {
 		if req.Method == http.MethodDelete {
@@ -281,7 +297,9 @@ func TestDeleteApplicationEntitiesWithAppFound(t *testing.T) {
 
 		defer req.Body.Close()
 
-		json.NewEncoder(w).Encode(app)
+		if err := json.NewEncoder(w).Encode(app); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 

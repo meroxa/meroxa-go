@@ -49,7 +49,7 @@ func TestCreateEnvironment(t *testing.T) {
 	environment := &CreateEnvironmentInput{}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s", environmentsBasePath), req.URL.Path; want != got {
+		if want, got := environmentsBasePath, req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -81,7 +81,9 @@ func TestCreateEnvironment(t *testing.T) {
 
 		// Return response to satisfy client and test response
 		c := generateEnvironment(environment.Type, environment.Provider, environment.Name, EnvironmentViewStatus{State: "private"})
-		json.NewEncoder(w).Encode(c)
+		if err := json.NewEncoder(w).Encode(c); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -115,7 +117,7 @@ func TestCreateBadEnvironment(t *testing.T) {
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s", environmentsBasePath), req.URL.Path; want != got {
+		if want, got := environmentsBasePath, req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -147,7 +149,9 @@ func TestCreateBadEnvironment(t *testing.T) {
 
 		// Return response to satisfy client and test response
 		c := generateEnvironment(environment.Type, environment.Provider, environment.Name, EnvironmentViewStatus{State: "preflight_error", PreflightDetails: &PreflightDetails{PreflightPermissions: &PreflightPermissions{S3: []string{"missing read permission for S3", "missing write permissions for S3"}}}})
-		json.NewEncoder(w).Encode(c)
+		if err := json.NewEncoder(w).Encode(c); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -220,7 +224,9 @@ func TestDeleteEnvironment(t *testing.T) {
 		defer req.Body.Close()
 
 		env.Status.State = EnvironmentState(deprovisioningState)
-		json.NewEncoder(w).Encode(env)
+		if err := json.NewEncoder(w).Encode(env); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -252,7 +258,9 @@ func TestUpdateEnvironment(t *testing.T) {
 		defer req.Body.Close()
 
 		env.Name = updatedName
-		json.NewEncoder(w).Encode(env)
+		if err := json.NewEncoder(w).Encode(env); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -290,7 +298,9 @@ func TestRepairEnvironment(t *testing.T) {
 		defer req.Body.Close()
 
 		env.Status.State = "repairing"
-		json.NewEncoder(w).Encode(env)
+		if err := json.NewEncoder(w).Encode(env); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 

@@ -37,7 +37,9 @@ func TestCreateBuild(t *testing.T) {
 
 		// Return response to satisfy client and test response
 		b := generateBuild("", input.SourceBlob.Url)
-		json.NewEncoder(w).Encode(b)
+		if err := json.NewEncoder(w).Encode(b); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
@@ -67,7 +69,9 @@ func TestGetBuild(t *testing.T) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		json.NewEncoder(w).Encode(build)
+		if err := json.NewEncoder(w).Encode(build); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	// Close the server when test finishes
 	defer server.Close()
