@@ -69,6 +69,9 @@ type Client interface {
 	UpdateConnector(ctx context.Context, nameOrID string, input *UpdateConnectorInput) (*Connector, error)
 	UpdateConnectorStatus(ctx context.Context, nameOrID string, state Action) (*Connector, error)
 
+	GetLatestDeployment(ctx context.Context, appName string) (*Deployment, error)
+	CreateDeployment(ctx context.Context, input *CreateDeploymentInput) (*Deployment, error)
+
 	CreateFunction(ctx context.Context, input *CreateFunctionInput) (*Function, error)
 	GetFunction(ctx context.Context, nameOrUUID string) (*Function, error)
 	GetFunctionLogs(ctx context.Context, nameOrUUID string) (*http.Response, error)
@@ -121,9 +124,10 @@ type Client interface {
 // which takes care of authentication.
 //
 // Example creating an authenticated client:
-//  c, err := New(
-//      WithAuthentication(auth.DefaultConfig(), accessToken, refreshToken),
-//  )
+//
+//	c, err := New(
+//	    WithAuthentication(auth.DefaultConfig(), accessToken, refreshToken),
+//	)
 func New(options ...Option) (Client, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {

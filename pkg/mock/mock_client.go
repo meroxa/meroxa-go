@@ -82,6 +82,21 @@ func (mr *MockClientMockRecorder) CreateConnector(ctx, input interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConnector", reflect.TypeOf((*MockClient)(nil).CreateConnector), ctx, input)
 }
 
+// CreateDeployment mocks base method.
+func (m *MockClient) CreateDeployment(ctx context.Context, input *meroxa.CreateDeploymentInput) (*meroxa.Deployment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDeployment", ctx, input)
+	ret0, _ := ret[0].(*meroxa.Deployment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateDeployment indicates an expected call of CreateDeployment.
+func (mr *MockClientMockRecorder) CreateDeployment(ctx, input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDeployment", reflect.TypeOf((*MockClient)(nil).CreateDeployment), ctx, input)
+}
+
 // CreateEndpoint mocks base method.
 func (m *MockClient) CreateEndpoint(ctx context.Context, input *meroxa.CreateEndpointInput) error {
 	m.ctrl.T.Helper()
@@ -419,6 +434,21 @@ func (m *MockClient) GetFunctionLogs(ctx context.Context, nameOrUUID string) (*h
 func (mr *MockClientMockRecorder) GetFunctionLogs(ctx, nameOrUUID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFunctionLogs", reflect.TypeOf((*MockClient)(nil).GetFunctionLogs), ctx, nameOrUUID)
+}
+
+// GetLatestDeployment mocks base method.
+func (m *MockClient) GetLatestDeployment(ctx context.Context, appName string) (*meroxa.Deployment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLatestDeployment", ctx, appName)
+	ret0, _ := ret[0].(*meroxa.Deployment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLatestDeployment indicates an expected call of GetLatestDeployment.
+func (mr *MockClientMockRecorder) GetLatestDeployment(ctx, appName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestDeployment", reflect.TypeOf((*MockClient)(nil).GetLatestDeployment), ctx, appName)
 }
 
 // GetPipeline mocks base method.
