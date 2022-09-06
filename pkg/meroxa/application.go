@@ -19,6 +19,11 @@ const (
 
 const applicationsBasePath = "/v1/applications"
 
+type ApplicationIdentifier struct {
+	UUID string `json:"uuid"`
+	Name string `json:"name"`
+}
+
 type ResourceCollection struct {
 	Name        null.String `json:"name,omitempty"`
 	Source      null.String `json:"source,omitempty"`
@@ -32,26 +37,27 @@ type ApplicationResource struct {
 
 // Application represents the Meroxa Application type within the Meroxa API
 type Application struct {
-	UUID       string                `json:"uuid"`
-	Name       string                `json:"name"`
-	Language   string                `json:"language"`
-	GitSha     string                `json:"git_sha"`
-	Status     ApplicationStatus     `json:"status,omitempty"`
-	Pipeline   EntityIdentifier      `json:"pipeline,omitempty"`
-	Connectors []EntityIdentifier    `json:"connectors,omitempty"`
-	Functions  []EntityIdentifier    `json:"functions,omitempty"`
-	Resources  []ApplicationResource `json:"resources,omitempty"`
-	CreatedAt  time.Time             `json:"created_at"`
-	UpdatedAt  time.Time             `json:"updated_at"`
-	DeletedAt  time.Time             `json:"deleted_at,omitempty"`
+	UUID        string                `json:"uuid"`
+	Name        string                `json:"name"`
+	Language    string                `json:"language"`
+	GitSha      string                `json:"git_sha,omitempty"`
+	Status      ApplicationStatus     `json:"status,omitempty"`
+	Pipeline    EntityIdentifier      `json:"pipeline,omitempty"`
+	Connectors  []EntityIdentifier    `json:"connectors,omitempty"`
+	Functions   []EntityIdentifier    `json:"functions,omitempty"`
+	Resources   []ApplicationResource `json:"resources,omitempty"`
+	Deployments []EntityIdentifier    `json:"deployments,omitempty"`
+	CreatedAt   time.Time             `json:"created_at"`
+	UpdatedAt   time.Time             `json:"updated_at"`
+	DeletedAt   time.Time             `json:"deleted_at,omitempty"`
 }
 
 // CreateApplicationInput represents the input for a Meroxa Application create operation in the API
 type CreateApplicationInput struct {
 	Name     string           `json:"name"`
 	Language string           `json:"language"`
-	GitSha   string           `json:"git_sha"`
-	Pipeline EntityIdentifier `json:"pipeline"`
+	GitSha   string           `json:"git_sha"`  // this could be omitted.
+	Pipeline EntityIdentifier `json:"pipeline"` // this could be omitted.
 }
 
 type ApplicationStatus struct {
