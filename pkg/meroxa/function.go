@@ -29,14 +29,15 @@ type FunctionStatus struct {
 }
 
 type CreateFunctionInput struct {
-	Name         string             `json:"name"`
-	InputStream  string             `json:"input_stream"`
-	OutputStream string             `json:"output_stream"`
-	Pipeline     PipelineIdentifier `json:"pipeline"`
-	Image        string             `json:"image"`
-	Command      []string           `json:"command"`
-	Args         []string           `json:"args"`
-	EnvVars      map[string]string  `json:"env_vars"`
+	Name         string                `json:"name"`
+	InputStream  string                `json:"input_stream"`
+	OutputStream string                `json:"output_stream"`
+	Pipeline     PipelineIdentifier    `json:"pipeline"`
+	Application  ApplicationIdentifier `json:"application"`
+	Image        string                `json:"image"`
+	Command      []string              `json:"command"`
+	Args         []string              `json:"args"`
+	EnvVars      map[string]string     `json:"env_vars"`
 }
 
 func (c *client) CreateFunction(ctx context.Context, input *CreateFunctionInput) (*Function, error) {

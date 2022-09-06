@@ -46,6 +46,7 @@ type Connector struct {
 	Environment   *EntityIdentifier      `json:"environment,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata"`
 	Name          string                 `json:"name"`
+	Application   ApplicationIdentifier  `json:"application"`
 	PipelineName  string                 `json:"pipeline_name"`
 	ResourceName  string                 `json:"resource_name"`
 	Streams       map[string]interface{} `json:"streams"`
@@ -59,6 +60,7 @@ type Connector struct {
 type CreateConnectorInput struct {
 	Name          string                 `json:"name,omitempty"`
 	ResourceName  string                 `json:"resource_name"`
+	Application   ApplicationIdentifier  `json:"application"`
 	PipelineName  string                 `json:"pipeline_name"`
 	Configuration map[string]interface{} `json:"config,omitempty"`
 	Metadata      map[string]interface{} `json:"metadata,omitempty"`
