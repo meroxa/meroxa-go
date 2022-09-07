@@ -52,6 +52,21 @@ func (mr *MockClientMockRecorder) CreateApplication(ctx, input interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateApplication", reflect.TypeOf((*MockClient)(nil).CreateApplication), ctx, input)
 }
 
+// CreateApplicationV2 mocks base method.
+func (m *MockClient) CreateApplicationV2(ctx context.Context, input *meroxa.CreateApplicationInput) (*meroxa.Application, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateApplicationV2", ctx, input)
+	ret0, _ := ret[0].(*meroxa.Application)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateApplicationV2 indicates an expected call of CreateApplicationV2.
+func (mr *MockClientMockRecorder) CreateApplicationV2(ctx, input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateApplicationV2", reflect.TypeOf((*MockClient)(nil).CreateApplicationV2), ctx, input)
+}
+
 // CreateBuild mocks base method.
 func (m *MockClient) CreateBuild(ctx context.Context, input *meroxa.CreateBuildInput) (*meroxa.Build, error) {
 	m.ctrl.T.Helper()
