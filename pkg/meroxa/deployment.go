@@ -14,14 +14,15 @@ type DeploymentState string
 
 const (
 	DeploymentStateDeploying        DeploymentState = "deploying"
-	DeploymentStateDeployingErrored DeploymentState = "deploying_error"
+	DeploymentStateDeployingError   DeploymentState = "deploying_error"
 	DeploymentStateRollingBack      DeploymentState = "rolling_back"
+	DeploymentStateRollingBackError DeploymentState = "rolling_back_error"
 	DeploymentStateDeployed         DeploymentState = "deployed"
 )
 
 type DeploymentStatus struct {
 	State   DeploymentState `json:"state"`
-	Details string          `json:"details,omitempty"`
+	Details null.String     `json:"details,omitempty"`
 }
 
 type Deployment struct {
@@ -31,10 +32,10 @@ type Deployment struct {
 	OutputLog   null.String      `json:"output_log,omitempty"`
 	CreatedAt   time.Time        `json:"created_at"`
 	DeletedAt   time.Time        `json:"deleted_at,omitempty"`
-	State       DeploymentStatus `json:"state"`
+	Status      DeploymentStatus `json:"status"`
 	Spec        null.String      `json:"spec,omitempty"`
 	SpecVersion null.String      `json:"spec_version,omitempty"`
-	// createdBy?
+	CreatedBy   string           `json:"created_by"`
 }
 
 type CreateDeploymentInput struct {
@@ -44,8 +45,8 @@ type CreateDeploymentInput struct {
 	SpecVersion null.String      `json:"spec_version,omitempty"`
 }
 
-func (c *client) GetLatestDeployment(ctx context.Context, appName string) (*Deployment, error) {
-	resp, err := c.MakeRequest(ctx, http.MethodGet, fmt.Sprintf("%s/%s/deployments/latest", applicationsBasePath, appName), nil, nil, nil)
+func (c *client) GetLatestDeployment(ctx context.Context, appIdentifier string) (*Deployment, error) {
+	resp, err := c.MakeRequest(ctx, http.MethodGet, fmt.Sprintf("%s/%s/deployments/latest", applicationsBasePath, appIdentifier), nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}

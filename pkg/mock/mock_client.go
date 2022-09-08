@@ -452,18 +452,18 @@ func (mr *MockClientMockRecorder) GetFunctionLogs(ctx, nameOrUUID interface{}) *
 }
 
 // GetLatestDeployment mocks base method.
-func (m *MockClient) GetLatestDeployment(ctx context.Context, appName string) (*meroxa.Deployment, error) {
+func (m *MockClient) GetLatestDeployment(ctx context.Context, appIdentifier string) (*meroxa.Deployment, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLatestDeployment", ctx, appName)
+	ret := m.ctrl.Call(m, "GetLatestDeployment", ctx, appIdentifier)
 	ret0, _ := ret[0].(*meroxa.Deployment)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetLatestDeployment indicates an expected call of GetLatestDeployment.
-func (mr *MockClientMockRecorder) GetLatestDeployment(ctx, appName interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) GetLatestDeployment(ctx, appIdentifier interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestDeployment", reflect.TypeOf((*MockClient)(nil).GetLatestDeployment), ctx, appName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLatestDeployment", reflect.TypeOf((*MockClient)(nil).GetLatestDeployment), ctx, appIdentifier)
 }
 
 // GetPipeline mocks base method.

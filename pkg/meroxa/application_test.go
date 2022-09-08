@@ -17,7 +17,7 @@ func TestCreateApplication(t *testing.T) {
 	input := CreateApplicationInput{
 		Name:     "test",
 		Language: "golang",
-		GitSha:   "abc",
+		GitSha:   null.StringFrom("abc"),
 		Pipeline: EntityIdentifier{UUID: null.StringFrom("def")},
 	}
 

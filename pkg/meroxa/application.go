@@ -52,7 +52,7 @@ type Application struct {
 type CreateApplicationInput struct {
 	Name     string           `json:"name"`
 	Language string           `json:"language"`
-	GitSha   string           `json:"git_sha,omitempty"`
+	GitSha   null.String      `json:"git_sha,omitempty"`
 	Pipeline EntityIdentifier `json:"pipeline,omitempty"`
 }
 

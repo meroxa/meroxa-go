@@ -70,7 +70,7 @@ type Client interface {
 	UpdateConnector(ctx context.Context, nameOrID string, input *UpdateConnectorInput) (*Connector, error)
 	UpdateConnectorStatus(ctx context.Context, nameOrID string, state Action) (*Connector, error)
 
-	GetLatestDeployment(ctx context.Context, appName string) (*Deployment, error)
+	GetLatestDeployment(ctx context.Context, appIdentifier string) (*Deployment, error)
 	CreateDeployment(ctx context.Context, input *CreateDeploymentInput) (*Deployment, error)
 
 	CreateFunction(ctx context.Context, input *CreateFunctionInput) (*Function, error)
