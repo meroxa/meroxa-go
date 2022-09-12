@@ -20,6 +20,7 @@ const (
 	ResourceTypeBigquery       ResourceType = "bigquery"
 	ResourceTypeSqlserver      ResourceType = "sqlserver"
 	ResourceTypeCosmosdb       ResourceType = "cosmosdb"
+	ResourceTypeKafka          ResourceType = "kafka"
 	ResourceTypeConfluentCloud ResourceType = "confluentcloud"
 )
 
