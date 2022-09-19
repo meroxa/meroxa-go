@@ -87,14 +87,12 @@ func (c *client) CreateApplicationV2(ctx context.Context, input *CreateApplicati
 		return nil, err
 	}
 
-	err = handleAPIErrors(resp)
-	if err != nil {
+	if err = handleAPIErrors(resp); err != nil {
 		return nil, err
 	}
 
 	var a *Application
-	err = json.NewDecoder(resp.Body).Decode(&a)
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&a); err != nil {
 		return nil, err
 	}
 

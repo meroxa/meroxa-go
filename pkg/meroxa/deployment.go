@@ -51,14 +51,12 @@ func (c *client) GetLatestDeployment(ctx context.Context, appIdentifier string) 
 		return nil, err
 	}
 
-	err = handleAPIErrors(resp)
-	if err != nil {
+	if err = handleAPIErrors(resp); err != nil {
 		return nil, err
 	}
 
 	var d *Deployment
-	err = json.NewDecoder(resp.Body).Decode(&d)
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&d); err != nil {
 		return nil, err
 	}
 
@@ -77,14 +75,12 @@ func (c *client) CreateDeployment(ctx context.Context, input *CreateDeploymentIn
 		return nil, err
 	}
 
-	err = handleAPIErrors(resp)
-	if err != nil {
+	if err = handleAPIErrors(resp); err != nil {
 		return nil, err
 	}
 
 	var d *Deployment
-	err = json.NewDecoder(resp.Body).Decode(&d)
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&d); err != nil {
 		return nil, err
 	}
 
