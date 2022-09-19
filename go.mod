@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/cristalhq/jwt/v3 v3.1.0
 	github.com/golang/mock v1.6.0
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
 	github.com/volatiletech/null/v8 v8.1.2
 	golang.org/x/oauth2 v0.0.0-20220630143837-2104d58473e0
