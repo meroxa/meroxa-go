@@ -17,7 +17,7 @@ func TestCreateApplication(t *testing.T) {
 	input := CreateApplicationInput{
 		Name:     "test",
 		Language: "golang",
-		GitSha:   "abc",
+		GitSha:   null.StringFrom("abc"),
 		Pipeline: EntityIdentifier{UUID: null.StringFrom("def")},
 	}
 
@@ -67,6 +67,53 @@ func generateApplication(name string) Application {
 	}
 
 	return Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateRunning}}
+}
+
+func TestCreateApplicationV2(t *testing.T) {
+	input := CreateApplicationInput{
+		Name:     "test",
+		Language: "golang",
+		GitSha:   null.StringFrom("abc"),
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		// Test request
+		type connectionRequest struct {
+			Name string `json:"name"`
+		}
+
+		var cr connectionRequest
+		err := json.NewDecoder(req.Body).Decode(&cr)
+		if err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+
+		if cr.Name != input.Name {
+			t.Errorf("expected name %s, got %s", input.Name, cr.Name)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		c := generateApplication(input.Name)
+		if err := json.NewEncoder(w).Encode(c); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	resp, err := c.CreateApplicationV2(context.Background(), &input)
+
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if resp.Name != input.Name {
+		t.Errorf("expected name %s, got %s", input.Name, resp.Name)
+	}
 }
 
 func TestGetApplicationByName(t *testing.T) {
