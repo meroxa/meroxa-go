@@ -11,7 +11,15 @@ import (
 )
 
 func TestGetUser(t *testing.T) {
-	u := generateUser("", "", "", "", "", true, time.Time{}, []string{"great-feature"})
+	u := generateUser(
+		"",
+		"",
+		"",
+		"",
+		"",
+		true,
+		time.Time{},
+		[]string{"great-feature"})
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := usersPath+"/me", req.URL.Path; want != got {
@@ -25,7 +33,7 @@ func TestGetUser(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	gotUser, err := c.GetUser(context.Background())
 	if err != nil {
@@ -33,7 +41,7 @@ func TestGetUser(t *testing.T) {
 	}
 
 	if want, got := &u, gotUser; !reflect.DeepEqual(want, got) {
-		t.Fatalf("User mismatched: want=%v got=%v", want, got)
+		t.Fatalf("User mismatched:\nwant=%+v\ngot= %+v", want, got)
 	}
 }
 

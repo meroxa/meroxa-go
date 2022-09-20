@@ -43,7 +43,7 @@ func TestCreateEndpoint(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	if err := c.CreateEndpoint(context.Background(), er); err != nil {
 		t.Fatal(err)
@@ -73,7 +73,7 @@ func TestGetEndpoint(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	gotEnd, err := c.GetEndpoint(context.Background(), end.Name)
 	if err != nil {

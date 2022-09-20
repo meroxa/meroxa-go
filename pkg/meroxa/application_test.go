@@ -48,7 +48,7 @@ func TestCreateApplication(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.CreateApplication(context.Background(), &input)
 
@@ -88,7 +88,7 @@ func TestGetApplicationByName(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetApplication(context.Background(), app.Name)
 	if err != nil {
@@ -146,7 +146,7 @@ func TestGetApplicationByUUID(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetApplication(context.Background(), fmt.Sprint(app.UUID))
 	if err != nil {
@@ -178,7 +178,7 @@ func TestListApplications(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.ListApplications(context.Background())
 	if err != nil {
@@ -206,7 +206,7 @@ func TestDeleteApplication(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	err := c.DeleteApplication(context.Background(), app.UUID)
 	if err != nil {
@@ -275,7 +275,7 @@ func TestDeleteApplicationEntitiesWithAppNotFound(t *testing.T) {
 	server := httptest.NewServer(mux)
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.DeleteApplicationEntities(context.Background(), appName)
 	if err != nil {
@@ -303,7 +303,7 @@ func TestDeleteApplicationEntitiesWithAppFound(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.DeleteApplicationEntities(context.Background(), app.Name)
 	if err != nil {

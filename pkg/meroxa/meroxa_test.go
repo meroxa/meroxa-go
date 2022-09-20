@@ -23,9 +23,11 @@ func TestClient_MakeRequest(t *testing.T) {
 		t.Errorf("expected no error, got %+v", err)
 	}
 	c := &client{
-		baseURL:    u,
-		userAgent:  "meroxa-go",
-		httpClient: svr.Client(),
+		requester: &Requester{
+			baseURL:    u,
+			userAgent:  "meroxa-go",
+			httpClient: svr.Client(),
+		},
 	}
 
 	body := bytes.NewBuffer([]byte("test body"))

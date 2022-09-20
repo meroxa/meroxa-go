@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"testing"
 )
@@ -15,11 +14,11 @@ var httpNoErrorResponse = &http.Response{
 
 // create a new reader with a JSON response
 func errorJSONResponse(msg string) io.ReadCloser {
-	return ioutil.NopCloser(bytes.NewReader([]byte(msg)))
+	return io.NopCloser(bytes.NewReader([]byte(msg)))
 }
 
 // create a new reader with an HTML response
-var errorHTMLResponse = ioutil.NopCloser(bytes.NewReader([]byte(`<h1>Error!</h1>`)))
+var errorHTMLResponse = io.NopCloser(bytes.NewReader([]byte(`<h1>Error!</h1>`)))
 
 var http422JSONResponse = func(body io.ReadCloser) *http.Response {
 	return &http.Response{
