@@ -2,7 +2,7 @@ package meroxa
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,14 +19,14 @@ func TestGetConnectorLogs(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetConnectorLogs(context.Background(), "test")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("expected no error, got %+v", err)
 	}
@@ -47,14 +47,14 @@ func TestGetFunctionLogs(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetFunctionLogs(context.Background(), "my-func")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("expected no error, got %+v", err)
 	}
@@ -75,14 +75,14 @@ func TestGetBuildLogs(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetBuildLogs(context.Background(), "my-build")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("expected no error, got %+v", err)
 	}

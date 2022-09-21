@@ -66,7 +66,7 @@ func TestCreateFunction(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	gotOutput, err := c.CreateFunction(context.Background(), input)
 	if err != nil {
@@ -96,7 +96,7 @@ func TestGetFunction(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	gotOutput, err := c.GetFunction(context.Background(), output.Name)
 	if err != nil {
@@ -144,7 +144,7 @@ func TestListFunctions(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	gotOutput, err := c.ListFunctions(context.Background())
 	if err != nil {
@@ -174,7 +174,7 @@ func TestDeleteFunction(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	gotOutput, err := c.DeleteFunction(context.Background(), output.Name)
 	if err != nil {

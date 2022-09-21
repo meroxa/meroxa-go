@@ -73,7 +73,7 @@ func TestCreateConnector(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.CreateConnector(context.Background(), &input)
 
@@ -120,7 +120,7 @@ func TestUpdateConnectorStatus(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.UpdateConnectorStatus(context.Background(), connectorKey, Action(state))
 	if err != nil {
@@ -166,7 +166,7 @@ func TestUpdateConnector(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.UpdateConnector(context.Background(), connector.Name, &connectorUpdate)
 	if err != nil {
@@ -178,12 +178,16 @@ func TestUpdateConnector(t *testing.T) {
 	}
 }
 
-func testClient(c *http.Client, u string) Client {
+func testRequester(c *http.Client, u string) *Requester {
 	parsedURL, _ := url.Parse(u)
-	return &client{
+	return &Requester{
 		baseURL:    parsedURL,
 		httpClient: c,
 	}
+}
+
+func testClient(r requester) *client {
+	return &client{requester: r}
 }
 
 func generateConnector(name string, config, metadata map[string]interface{}) Connector {
@@ -230,7 +234,7 @@ func TestGetConnectorByName(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetConnectorByNameOrID(context.Background(), connector.Name)
 	if err != nil {
@@ -262,7 +266,7 @@ func TestListPipelineConnectors(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.ListPipelineConnectors(context.Background(), p.Name)
 	if err != nil {
@@ -293,7 +297,7 @@ func TestListConnectors(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.ListConnectors(context.Background())
 	if err != nil {

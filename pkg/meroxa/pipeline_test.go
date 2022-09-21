@@ -47,7 +47,7 @@ func TestUpdatePipelineStatus(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.UpdatePipelineStatus(context.Background(), pipelineName, Action(state))
 	if err != nil {
@@ -89,7 +89,7 @@ func TestUpdatePipeline(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.UpdatePipeline(context.Background(), pipeline.Name, &pipelineUpdate)
 	if err != nil {
@@ -119,7 +119,7 @@ func TestGetPipelines(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	gotEnv, err := c.ListPipelines(context.Background())
 	if err != nil {
@@ -146,7 +146,7 @@ func TestGetPipeline(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetPipelineByName(context.Background(), p.Name)
 
@@ -202,7 +202,7 @@ func TestCreatePipeline(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.CreatePipeline(context.Background(), &pi)
 

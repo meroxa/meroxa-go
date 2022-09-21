@@ -33,7 +33,7 @@ func TestGetEnvironments(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	gotEnv, err := c.ListEnvironments(context.Background())
 	if err != nil {
@@ -88,7 +88,7 @@ func TestCreateEnvironment(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.CreateEnvironment(context.Background(), environment)
 
@@ -156,7 +156,7 @@ func TestCreateBadEnvironment(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.CreateEnvironment(context.Background(), environment)
 
@@ -191,7 +191,7 @@ func TestGetEnvironment(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetEnvironment(context.Background(), env.UUID)
 
@@ -230,7 +230,7 @@ func TestDeleteEnvironment(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.DeleteEnvironment(context.Background(), env.UUID)
 	if err != nil {
@@ -264,7 +264,7 @@ func TestUpdateEnvironment(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.UpdateEnvironment(context.Background(), env.UUID, &UpdateEnvironmentInput{Name: updatedName})
 	if err != nil {
@@ -304,7 +304,7 @@ func TestRepairEnvironment(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.PerformActionOnEnvironment(context.Background(), env.UUID, &RepairEnvironmentInput{Action: EnvironmentActionRepair})
 	if err != nil {

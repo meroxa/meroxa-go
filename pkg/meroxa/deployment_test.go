@@ -56,7 +56,7 @@ func TestCreateDeployment(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.CreateDeployment(context.Background(), &input)
 
@@ -97,7 +97,7 @@ func TestGetLatestDeployment(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.GetLatestDeployment(context.Background(), appName)
 	if err != nil {

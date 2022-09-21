@@ -60,7 +60,7 @@ func Test_Resource_PerformActions(t *testing.T) {
 			// Close the server when test finishes
 			defer server.Close()
 
-			c := testClient(server.Client(), server.URL)
+			c := testClient(testRequester(server.Client(), server.URL))
 
 			resp, err := f(c, resName)
 			if err != nil {
@@ -199,7 +199,7 @@ func TestCreateResource(t *testing.T) {
 			// Close the server when test finishes
 			defer server.Close()
 
-			c := testClient(server.Client(), server.URL)
+			c := testClient(testRequester(server.Client(), server.URL))
 
 			resp, err := c.CreateResource(context.Background(), &resource)
 			if err != nil {
@@ -290,7 +290,7 @@ func TestUpdateResource(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	resp, err := c.UpdateResource(context.Background(), resource.Name, &resource)
 	if err != nil {
