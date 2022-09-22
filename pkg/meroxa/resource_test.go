@@ -352,7 +352,7 @@ func TestIntrospectResource(t *testing.T) {
 	}))
 	defer server.Close()
 
-	c := testClient(server.Client(), server.URL)
+	c := testClient(testRequester(server.Client(), server.URL))
 
 	_, err := c.IntrospectResource(context.Background(), output.Name)
 	if err != nil {

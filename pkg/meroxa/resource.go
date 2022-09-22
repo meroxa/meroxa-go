@@ -197,7 +197,7 @@ func (c *client) performResourceAction(ctx context.Context, nameOrID string, act
 // IntrospectResource returns introspection results of a Resource.
 func (c *client) IntrospectResource(ctx context.Context, nameOrUUID string) (*ResourceIntrospection, error) {
 	path := fmt.Sprintf("%s/%s/introspection", ResourcesBasePath, nameOrUUID)
-	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil)
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}
