@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/google/go-cmp/cmp"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -319,6 +320,43 @@ func TestUpdateResource(t *testing.T) {
 
 	if resp.Status.LastUpdatedAt.IsZero() {
 		t.Errorf("expected time to not be null: got=%s", resp.Status.LastUpdatedAt)
+	}
+}
+
+func TestIntrospectResource(t *testing.T) {
+	output := generateResource("test", "postgres://example.com:5432/mydb", nil)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if diff := cmp.Diff(http.MethodGet, req.Method); diff != "" {
+			t.Fatalf("mismatched of request method (-want +got): %s", diff)
+		}
+
+		if diff := cmp.Diff(fmt.Sprintf("%s/%s/introspection", ResourcesBasePath, output.Name), req.URL.Path); diff != "" {
+			t.Fatalf("mismatched of request path (-want +got): %s", diff)
+		}
+
+		introspectionResponse := ResourceIntrospection{
+			ID:              0,
+			AccountID:       110,
+			UUID:            output.UUID,
+			ResourceID:      100,
+			Collections:     []byte(`["users", "events"]`),
+			Schemas:         []byte(`["public"]`),
+			Capabilities:    nil,
+			Samples:         nil,
+			ResourceVersion: "9.6",
+			IntrospectedAt:  time.Now().UTC(),
+		}
+
+		json.NewEncoder(w).Encode(introspectionResponse)
+	}))
+	defer server.Close()
+
+	c := testClient(server.Client(), server.URL)
+
+	_, err := c.IntrospectResource(context.Background(), output.Name)
+	if err != nil {
+		t.Fatalf("expected no error, got %+v", err)
 	}
 }
 
