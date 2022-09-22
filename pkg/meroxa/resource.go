@@ -79,16 +79,16 @@ type Resource struct {
 
 // ResourceIntrospection represents the introspection results of a Resource
 type ResourceIntrospection struct {
-	ID              int64     `json:"id"`
-	AccountID       int       `json:"account_id"`
-	UUID            string    `json:"uuid"`
-	ResourceID      int       `json:"resource_id"`
-	Collections     []byte    `json:"collections,omitempty"`
-	Schemas         []byte    `json:"schemas,omitempty"`
-	Capabilities    []byte    `json:"capabilities,omitempty"`
-	Samples         []byte    `json:"samples,omitempty"`
-	ResourceVersion string    `json:"resource_version"`
-	IntrospectedAt  time.Time `json:"introspected_at"`
+	ID              int64               `json:"id"`
+	AccountID       int                 `json:"account_id"`
+	UUID            string              `json:"uuid"`
+	ResourceID      int                 `json:"resource_id"`
+	Collections     []string            `json:"collections,omitempty"`
+	Schemas         map[string]string   `json:"schemas,omitempty"`
+	Capabilities    map[string]string   `json:"capabilities,omitempty"`
+	Samples         map[string][]string `json:"samples,omitempty"`
+	ResourceVersion string              `json:"resource_version"`
+	IntrospectedAt  time.Time           `json:"introspected_at"`
 }
 
 // UpdateResourceInput represents the Meroxa Resource we're updating in the Meroxa API
