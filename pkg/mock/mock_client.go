@@ -90,16 +90,16 @@ func (mr *MockaccountMockRecorder) ListAccounts(ctx interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAccounts", reflect.TypeOf((*Mockaccount)(nil).ListAccounts), ctx)
 }
 
-// SetClientActiveAccount mocks base method.
-func (m *Mockaccount) SetClientActiveAccount(accountUUID string) {
+// SetClientAccountHeader mocks base method.
+func (m *Mockaccount) SetClientAccountHeader(accountUUID string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetClientActiveAccount", accountUUID)
+	m.ctrl.Call(m, "SetClientAccountHeader", accountUUID)
 }
 
-// SetClientActiveAccount indicates an expected call of SetClientActiveAccount.
-func (mr *MockaccountMockRecorder) SetClientActiveAccount(accountUUID interface{}) *gomock.Call {
+// SetClientAccountHeader indicates an expected call of SetClientAccountHeader.
+func (mr *MockaccountMockRecorder) SetClientAccountHeader(accountUUID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientActiveAccount", reflect.TypeOf((*Mockaccount)(nil).SetClientActiveAccount), accountUUID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientAccountHeader", reflect.TypeOf((*Mockaccount)(nil).SetClientAccountHeader), accountUUID)
 }
 
 // MockClient is a mock of Client interface.
@@ -839,16 +839,16 @@ func (mr *MockClientMockRecorder) RotateTunnelKeyForResource(ctx, nameOrID inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RotateTunnelKeyForResource", reflect.TypeOf((*MockClient)(nil).RotateTunnelKeyForResource), ctx, nameOrID)
 }
 
-// SetClientActiveAccount mocks base method.
-func (m *MockClient) SetClientActiveAccount(accountUUID string) {
+// SetClientAccountHeader mocks base method.
+func (m *MockClient) SetClientAccountHeader(accountUUID string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetClientActiveAccount", accountUUID)
+	m.ctrl.Call(m, "SetClientAccountHeader", accountUUID)
 }
 
-// SetClientActiveAccount indicates an expected call of SetClientActiveAccount.
-func (mr *MockClientMockRecorder) SetClientActiveAccount(accountUUID interface{}) *gomock.Call {
+// SetClientAccountHeader indicates an expected call of SetClientAccountHeader.
+func (mr *MockClientMockRecorder) SetClientAccountHeader(accountUUID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientActiveAccount", reflect.TypeOf((*MockClient)(nil).SetClientActiveAccount), accountUUID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientAccountHeader", reflect.TypeOf((*MockClient)(nil).SetClientAccountHeader), accountUUID)
 }
 
 // UpdateConnector mocks base method.
