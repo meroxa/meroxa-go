@@ -90,6 +90,18 @@ func (mr *MockaccountMockRecorder) ListAccounts(ctx interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAccounts", reflect.TypeOf((*Mockaccount)(nil).ListAccounts), ctx)
 }
 
+// SetClientActiveAccount mocks base method.
+func (m *Mockaccount) SetClientActiveAccount(accountUUID string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetClientActiveAccount", accountUUID)
+}
+
+// SetClientActiveAccount indicates an expected call of SetClientActiveAccount.
+func (mr *MockaccountMockRecorder) SetClientActiveAccount(accountUUID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientActiveAccount", reflect.TypeOf((*Mockaccount)(nil).SetClientActiveAccount), accountUUID)
+}
+
 // MockClient is a mock of Client interface.
 type MockClient struct {
 	ctrl     *gomock.Controller
@@ -825,6 +837,18 @@ func (m *MockClient) RotateTunnelKeyForResource(ctx context.Context, nameOrID st
 func (mr *MockClientMockRecorder) RotateTunnelKeyForResource(ctx, nameOrID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RotateTunnelKeyForResource", reflect.TypeOf((*MockClient)(nil).RotateTunnelKeyForResource), ctx, nameOrID)
+}
+
+// SetClientActiveAccount mocks base method.
+func (m *MockClient) SetClientActiveAccount(accountUUID string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetClientActiveAccount", accountUUID)
+}
+
+// SetClientActiveAccount indicates an expected call of SetClientActiveAccount.
+func (mr *MockClientMockRecorder) SetClientActiveAccount(accountUUID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientActiveAccount", reflect.TypeOf((*MockClient)(nil).SetClientActiveAccount), accountUUID)
 }
 
 // UpdateConnector mocks base method.
