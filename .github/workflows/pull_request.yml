@@ -1,9 +1,7 @@
 name: Build and Tests
 
 # Run this workflow every time a new PR wants to merge to master/main
-on:
-  pull_request:
-    types: [opened, reopened]
+on: [pull_request]
 
 jobs:
   build:
