@@ -187,7 +187,10 @@ func testRequester(c *http.Client, u string) *Requester {
 }
 
 func testClient(r requester) *client {
-	return &client{requester: r}
+	return &client{
+		requester: r,
+		headers:   make(http.Header),
+	}
 }
 
 func generateConnector(name string, config, metadata map[string]interface{}) Connector {
