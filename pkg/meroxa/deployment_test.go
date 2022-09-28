@@ -108,3 +108,34 @@ func TestGetLatestDeployment(t *testing.T) {
 		t.Errorf("expected response not same as deployment")
 	}
 }
+
+func TestGetDeployment(t *testing.T) {
+	appName := "test"
+	deployment := generateDeployment(appName, "abc", "latest")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s/deployments/%s", applicationsBasePath, appName, deployment.UUID), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		if err := json.NewEncoder(w).Encode(deployment); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(testRequester(server.Client(), server.URL))
+
+	resp, err := c.GetDeployment(context.Background(), appName, deployment.UUID)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &deployment) {
+		t.Errorf("expected response not same as deployment")
+	}
+}
