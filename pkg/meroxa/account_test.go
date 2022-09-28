@@ -11,15 +11,6 @@ import (
 	"testing"
 )
 
-func TestSetClientActiveAccount(t *testing.T) {
-	client := testClient(nil)
-	client.SetClientAccountHeader("47523a84-3f5b-11ed-b878-0242ac120002")
-	//nolint:staticcheck
-	if client.headers[meroxaAccountUUIDHeader][0] != "47523a84-3f5b-11ed-b878-0242ac120002" {
-		t.Fatal("Meroxa-Account-UUID is not set correctly")
-	}
-}
-
 func TestListAccounts(t *testing.T) {
 	testCases := []struct {
 		desc             string
