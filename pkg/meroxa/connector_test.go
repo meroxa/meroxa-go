@@ -181,6 +181,7 @@ func TestUpdateConnector(t *testing.T) {
 func testRequester(c *http.Client, u string) *Requester {
 	parsedURL, _ := url.Parse(u)
 	return &Requester{
+		headers:    make(http.Header),
 		baseURL:    parsedURL,
 		httpClient: c,
 	}
@@ -189,7 +190,6 @@ func testRequester(c *http.Client, u string) *Requester {
 func testClient(r requester) *client {
 	return &client{
 		requester: r,
-		headers:   make(http.Header),
 	}
 }
 
