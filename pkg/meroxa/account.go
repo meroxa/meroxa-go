@@ -35,6 +35,6 @@ func (c *client) ListAccounts(ctx context.Context) ([]*Account, error) {
 	return accounts, nil
 }
 
-func (c *client) SetClientActiveAccount(accountUUID string) {
+func (c *client) SetClientAccountHeader(accountUUID string) {
 	c.headers[meroxaAccountUUIDHeader] = []string{accountUUID}
 }
