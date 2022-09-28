@@ -59,7 +59,7 @@ type requester interface {
 
 type account interface {
 	ListAccounts(ctx context.Context) ([]*Account, error)
-	SetClientActiveAccount(accountUUID string)
+	SetClientAccountHeader(accountUUID string)
 }
 
 // Client represents the interface to the Meroxa API
