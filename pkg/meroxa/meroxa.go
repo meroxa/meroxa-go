@@ -123,6 +123,7 @@ type Client interface {
 	UpdateResource(ctx context.Context, nameOrID string, input *UpdateResourceInput) (*Resource, error)
 	RotateTunnelKeyForResource(ctx context.Context, nameOrID string) (*Resource, error)
 	ValidateResource(ctx context.Context, nameOrID string) (*Resource, error)
+	IntrospectResource(ctx context.Context, nameOrID string) (*ResourceIntrospection, error)
 
 	ListResourceTypes(ctx context.Context) ([]string, error)
 
