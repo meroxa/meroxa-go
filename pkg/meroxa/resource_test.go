@@ -349,7 +349,10 @@ func TestIntrospectResource(t *testing.T) {
 			IntrospectedAt:  time.Now().UTC(),
 		}
 
-		json.NewEncoder(w).Encode(introspectionResponse)
+		err := json.NewEncoder(w).Encode(introspectionResponse)
+		if err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
 	}))
 	defer server.Close()
 
