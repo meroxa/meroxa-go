@@ -46,7 +46,8 @@ func TestHandleAPIErrors(t *testing.T) {
 	}{
 		{httpNoErrorResponse, nil, ""},
 		{http503HTMLResponse, errors.New("HTTP/1.0 503 Service Unavailable"), "HTTP/1.0 503 Service Unavailable"},
-		{http422JSONResponse(errorJSONResponse(`{ "code": "already_exists", "message": "resource with name test already exists"}`)),
+		{http422JSONResponse(errorJSONResponse(
+			`{ "code": "already_exists", "message": "resource with name test already exists"}`)),
 			&errResponse{
 				Code:    "already_exists",
 				Message: "resource with name test already exists",
