@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/volatiletech/null/v8"
 )
 
 func TestCreateDeployment(t *testing.T) {
@@ -19,9 +18,9 @@ func TestCreateDeployment(t *testing.T) {
 	gitSha := "abc"
 	input := CreateDeploymentInput{
 		GitSha:      gitSha,
-		Application: EntityIdentifier{Name: null.StringFrom(appName)},
-		SpecVersion: null.StringFrom(specVersion),
-		Spec:        null.StringFrom("{}"),
+		Application: EntityIdentifier{Name: appName},
+		SpecVersion: specVersion,
+		Spec:        "{}",
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -36,10 +35,10 @@ func TestCreateDeployment(t *testing.T) {
 			t.Errorf("expected git_sha %s, got %s", input.GitSha, cr.GitSha)
 		}
 		if cr.Spec != input.Spec {
-			t.Errorf("expected spec %s, got %s", input.Spec.String, cr.Spec.String)
+			t.Errorf("expected spec %s, got %s", input.Spec, cr.Spec)
 		}
 		if cr.SpecVersion != input.SpecVersion {
-			t.Errorf("expected spec_version %s, got %s", input.SpecVersion.String, cr.SpecVersion.String)
+			t.Errorf("expected spec_version %s, got %s", input.SpecVersion, cr.SpecVersion)
 		}
 		if cr.Application != input.Application {
 			t.Errorf("expected application %v, got %v", input.Application, cr.Application)
@@ -73,8 +72,8 @@ func generateDeployment(appName, gitSha, specVersion string) Deployment {
 	return Deployment{
 		UUID:        uuid.NewString(),
 		GitSha:      gitSha,
-		Application: EntityIdentifier{Name: null.StringFrom(appName)},
-		SpecVersion: null.StringFrom(specVersion),
+		Application: EntityIdentifier{Name: appName},
+		SpecVersion: specVersion,
 		Status:      DeploymentStatus{State: DeploymentStateDeploying}}
 }
 

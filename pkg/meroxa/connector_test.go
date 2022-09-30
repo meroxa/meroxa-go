@@ -9,8 +9,6 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
-
-	"github.com/volatiletech/null/v8"
 )
 
 func TestCreateConnector(t *testing.T) {
@@ -215,7 +213,7 @@ func generateConnector(name string, config, metadata map[string]interface{}) Con
 		Name:          name,
 		Configuration: config,
 		Metadata:      metadata,
-		Environment:   &EntityIdentifier{Name: null.StringFrom("my-env")},
+		Environment:   &EntityIdentifier{Name: "my-env"},
 	}
 }
 

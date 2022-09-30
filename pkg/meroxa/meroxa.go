@@ -10,8 +10,6 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/volatiletech/null/v8"
 )
 
 const (
@@ -28,15 +26,15 @@ type EnvironmentIdentifier struct {
 
 // EntityIdentifier represents one or both values for a Meroxa Entity
 type EntityIdentifier struct {
-	UUID null.String `json:"uuid,omitempty"`
-	Name null.String `json:"name,omitempty"`
+	UUID string `json:"uuid,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 func (e EntityIdentifier) GetNameOrUUID() (string, error) {
-	if e.Name.Valid {
-		return e.Name.String, nil
-	} else if e.UUID.Valid {
-		return e.UUID.String, nil
+	if e.Name != "" {
+		return e.Name, nil
+	} else if e.UUID != "" {
+		return e.UUID, nil
 	}
 	return "", fmt.Errorf("identifier has neither name or UUID")
 }
