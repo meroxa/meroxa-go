@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-
-	"github.com/volatiletech/null/v8"
 )
 
 const (
@@ -135,7 +133,7 @@ func TestCreateResource(t *testing.T) {
 			input: func() CreateResourceInput {
 				var resource CreateResourceInput
 				var env = &EntityIdentifier{
-					Name: null.StringFrom("my-environment"),
+					Name: "my-environment",
 				}
 
 				resource.Environment = env
@@ -233,7 +231,7 @@ func TestCreateResource(t *testing.T) {
 			}
 
 			if resource.Environment != nil {
-				if want, got := resource.Environment.Name.String, resp.Environment.Name.String; want != got {
+				if want, got := resource.Environment.Name, resp.Environment.Name; want != got {
 					t.Errorf("unexpected environment name: want=%s got=%s", want, got)
 				}
 			}

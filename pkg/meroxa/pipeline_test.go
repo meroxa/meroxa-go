@@ -8,8 +8,6 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
-
-	"github.com/volatiletech/null/v8"
 )
 
 func TestUpdatePipelineStatus(t *testing.T) {
@@ -192,7 +190,7 @@ func TestCreatePipeline(t *testing.T) {
 
 		rP := generatePipeline(pi.Name, "")
 		rP.Environment = pi.Environment
-		rP.Environment.UUID = null.StringFrom("067fc522-7f3c-4c71-8749-68f3698c2c68")
+		rP.Environment.UUID = "067fc522-7f3c-4c71-8749-68f3698c2c68"
 
 		// Return response to satisfy client and test response
 		if err := json.NewEncoder(w).Encode(rP); err != nil {
@@ -238,8 +236,8 @@ func generatePipelineWithEnvironment(name string) Pipeline {
 	p := generatePipeline(name, "")
 
 	p.Environment = &EntityIdentifier{
-		UUID: null.StringFrom("9c73bbc5-75c2-400d-a270-d8aefe727c15"),
-		Name: null.StringFrom("my-environment"),
+		UUID: "9c73bbc5-75c2-400d-a270-d8aefe727c15",
+		Name: "my-environment",
 	}
 	return p
 }

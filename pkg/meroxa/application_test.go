@@ -10,15 +10,14 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/volatiletech/null/v8"
 )
 
 func TestCreateApplication(t *testing.T) {
 	input := CreateApplicationInput{
 		Name:     "test",
 		Language: "golang",
-		GitSha:   null.StringFrom("abc"),
-		Pipeline: EntityIdentifier{UUID: null.StringFrom("def")},
+		GitSha:   "abc",
+		Pipeline: EntityIdentifier{UUID: "def"},
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -73,7 +72,7 @@ func TestCreateApplicationV2(t *testing.T) {
 	input := CreateApplicationInput{
 		Name:     "test",
 		Language: "golang",
-		GitSha:   null.StringFrom("abc"),
+		GitSha:   "abc",
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -150,31 +149,31 @@ func TestGetApplicationByName(t *testing.T) {
 func TestGetApplicationByUUID(t *testing.T) {
 	app := generateApplication("")
 	app.Functions = make([]EntityIdentifier, 0)
-	app.Functions = append(app.Functions, EntityIdentifier{Name: null.StringFrom("fun1")})
+	app.Functions = append(app.Functions, EntityIdentifier{Name: "fun1"})
 	app.Connectors = make([]EntityIdentifier, 0)
 	app.Connectors = append(
 		app.Connectors,
-		EntityIdentifier{Name: null.StringFrom("conn1")},
-		EntityIdentifier{Name: null.StringFrom("conn2")})
+		EntityIdentifier{Name: "conn1"},
+		EntityIdentifier{Name: "conn2"})
 	app.Resources = make([]ApplicationResource, 0)
 	app.Resources = append(
 		app.Resources,
 		ApplicationResource{
 			EntityIdentifier: EntityIdentifier{
-				Name: null.StringFrom("resource1"),
+				Name: "resource1",
 			},
 			Collection: ResourceCollection{
-				Name:   null.StringFrom("table"),
-				Source: null.StringFrom("true"),
+				Name:   "table",
+				Source: "true",
 			},
 		},
 		ApplicationResource{
 			EntityIdentifier: EntityIdentifier{
-				Name: null.StringFrom("resource1"),
+				Name: "resource1",
 			},
 			Collection: ResourceCollection{
-				Name:        null.StringFrom("table_out"),
-				Destination: null.StringFrom("true"),
+				Name:        "table_out",
+				Destination: "true",
 			},
 		})
 
