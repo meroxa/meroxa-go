@@ -20,7 +20,7 @@ func TestCreateDeployment(t *testing.T) {
 		GitSha:      gitSha,
 		Application: EntityIdentifier{Name: appName},
 		SpecVersion: specVersion,
-		Spec:        "{}",
+		Spec:        map[string]interface{}{},
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -34,7 +34,7 @@ func TestCreateDeployment(t *testing.T) {
 		if cr.GitSha != input.GitSha {
 			t.Errorf("expected git_sha %s, got %s", input.GitSha, cr.GitSha)
 		}
-		if cr.Spec != input.Spec {
+		if reflect.DeepEqual(cr.Spec, input.Spec) {
 			t.Errorf("expected spec %s, got %s", input.Spec, cr.Spec)
 		}
 		if cr.SpecVersion != input.SpecVersion {
