@@ -148,13 +148,13 @@ func TestGetApplicationByName(t *testing.T) {
 
 func TestGetApplicationByUUID(t *testing.T) {
 	app := generateApplication("")
-	app.Functions = make([]EntityIdentifier, 0)
-	app.Functions = append(app.Functions, EntityIdentifier{Name: "fun1"})
-	app.Connectors = make([]EntityIdentifier, 0)
+	app.Functions = make([]EntityDetails, 0)
+	app.Functions = append(app.Functions, EntityDetails{EntityIdentifier: EntityIdentifier{Name: "fun1"}})
+	app.Connectors = make([]EntityDetails, 0)
 	app.Connectors = append(
 		app.Connectors,
-		EntityIdentifier{Name: "conn1"},
-		EntityIdentifier{Name: "conn2"})
+		EntityDetails{EntityIdentifier: EntityIdentifier{Name: "conn1"}},
+		EntityDetails{EntityIdentifier: EntityIdentifier{Name: "conn2"}})
 	app.Resources = make([]ApplicationResource, 0)
 	app.Resources = append(
 		app.Resources,
