@@ -10,5 +10,5 @@ gomod:
 	go mod vendor
 
 .PHONY: test
-test:
+test: mockgen
 	go test ./...
