@@ -1,7 +1,11 @@
-SHELL=/bin/bash -o pipefail
+SHELL           =/bin/bash -o pipefail
+MOCKGEN_VERSION ?= v1.6.0
+
+mockgen-install:
+	go install github.com/golang/mock/mockgen@$(MOCKGEN_VERSION)
 
 .PHONY: mockgen
-mockgen:
+mockgen: mockgen-install
 		mockgen -source pkg/meroxa/meroxa.go -imports meroxa=github.com/meroxa/meroxa-go -package mock > pkg/mock/mock_client.go
 
 .PHONY: gomod
@@ -10,5 +14,5 @@ gomod:
 	go mod vendor
 
 .PHONY: test
-test:
+test: mockgen
 	go test ./...
