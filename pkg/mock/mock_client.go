@@ -379,6 +379,21 @@ func (mr *MockClientMockRecorder) GetApplication(ctx, name interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplication", reflect.TypeOf((*MockClient)(nil).GetApplication), ctx, name)
 }
 
+// GetApplicationLogs mocks base method.
+func (m *MockClient) GetApplicationLogs(ctx context.Context, name string) (*meroxa.ApplicationLogs, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetApplicationLogs", ctx, name)
+	ret0, _ := ret[0].(*meroxa.ApplicationLogs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetApplicationLogs indicates an expected call of GetApplicationLogs.
+func (mr *MockClientMockRecorder) GetApplicationLogs(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplicationLogs", reflect.TypeOf((*MockClient)(nil).GetApplicationLogs), ctx, name)
+}
+
 // GetBuild mocks base method.
 func (m *MockClient) GetBuild(ctx context.Context, uuid string) (*meroxa.Build, error) {
 	m.ctrl.T.Helper()

@@ -59,6 +59,12 @@ type Application struct {
 	DeletedAt   time.Time             `json:"deleted_at,omitempty"`
 }
 
+type ApplicationLogs struct {
+	FunctionLogs   map[string]string `json:"functions"`
+	ConnectorLogs  map[string]string `json:"connectors"`
+	DeploymentLogs map[string]string `json:"latest_deployment"`
+}
+
 // CreateApplicationInput represents the input for a Meroxa Application create operation in the API
 type CreateApplicationInput struct {
 	Name     string           `json:"name"`
@@ -213,4 +219,24 @@ func (c *client) ListApplications(ctx context.Context) ([]*Application, error) {
 	}
 
 	return aa, nil
+}
+
+func (c *client) GetApplicationLogs(ctx context.Context, name string) (*ApplicationLogs, error) {
+	resp, err := c.MakeRequest(ctx, http.MethodGet, fmt.Sprintf("%s/%s/logs", applicationsBasePath, name), nil, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var l *ApplicationLogs
+	err = json.NewDecoder(resp.Body).Decode(&l)
+	if err != nil {
+		return nil, err
+	}
+
+	return l, nil
 }
