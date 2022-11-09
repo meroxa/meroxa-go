@@ -359,3 +359,44 @@ func TestDeleteApplicationEntitiesWithAppFound(t *testing.T) {
 		t.Errorf("got %v, expected %v", resp.StatusCode, http.StatusOK)
 	}
 }
+
+func TestGetApplicationLogs(t *testing.T) {
+	name := "my-app"
+	appLogs := ApplicationLogs{
+		FunctionLogs: map[string]string{
+			"func1": "success",
+		},
+		ConnectorLogs: map[string]string{
+			"conn1": "success",
+		},
+		DeploymentLogs: map[string]string{
+			"ab-cd-ef": "success",
+		},
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s/logs", applicationsBasePath, name), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		if err := json.NewEncoder(w).Encode(appLogs); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(testRequester(server.Client(), server.URL))
+
+	resp, err := c.GetApplicationLogs(context.Background(), name)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &appLogs) {
+		t.Errorf("expected response same as application logs")
+	}
+}
