@@ -59,10 +59,15 @@ type account interface {
 	ListAccounts(ctx context.Context) ([]*Account, error)
 }
 
+type genericHeader interface {
+	AddHeader(key, value string)
+}
+
 // Client represents the interface to the Meroxa API
 type Client interface {
 	requester
 	account
+	genericHeader
 
 	CreateApplication(ctx context.Context, input *CreateApplicationInput) (*Application, error)
 	CreateApplicationV2(ctx context.Context, input *CreateApplicationInput) (*Application, error)
@@ -162,6 +167,18 @@ func New(options ...Option) (Client, error) {
 		requester: r,
 	}
 	return c, nil
+}
+
+// AddHeader allows for setting a generic header to use for requests.
+func (c *client) AddHeader(key, value string) {
+	c.AddHeader(key, value)
+}
+
+func (r *Requester) AddHeader(key, value string) {
+	if r.headers == nil {
+		r.headers = make(http.Header)
+	}
+	r.headers[key] = []string{value}
 }
 
 func (r *Requester) MakeRequest(ctx context.Context, method, path string, body interface{}, params url.Values, headers http.Header) (*http.Response, error) {

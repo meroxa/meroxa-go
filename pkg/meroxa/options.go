@@ -91,13 +91,13 @@ func WithAccountUUID(accountUUID string) Option {
 	}
 }
 
-// WithReferer sets the Referer header to use for requests.
-func WithReferer(referer string) Option {
+// WithHeader allows for setting a generic header to use for requests.
+func WithHeader(key, value string) Option {
 	return func(r *Requester) error {
 		if r.headers == nil {
 			r.headers = make(http.Header)
 		}
-		r.headers["Referer"] = []string{referer}
+		r.headers[key] = []string{value}
 		return nil
 	}
 }
