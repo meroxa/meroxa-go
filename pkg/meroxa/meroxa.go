@@ -53,21 +53,17 @@ type Requester struct {
 
 type requester interface {
 	MakeRequest(ctx context.Context, method string, path string, body interface{}, params url.Values, headers http.Header) (*http.Response, error)
+	AddHeader(key string, value string)
 }
 
 type account interface {
 	ListAccounts(ctx context.Context) ([]*Account, error)
 }
 
-type genericHeader interface {
-	AddHeader(key, value string)
-}
-
 // Client represents the interface to the Meroxa API
 type Client interface {
 	requester
 	account
-	genericHeader
 
 	CreateApplication(ctx context.Context, input *CreateApplicationInput) (*Application, error)
 	CreateApplicationV2(ctx context.Context, input *CreateApplicationInput) (*Application, error)
@@ -171,7 +167,7 @@ func New(options ...Option) (Client, error) {
 
 // AddHeader allows for setting a generic header to use for requests.
 func (c *client) AddHeader(key, value string) {
-	c.AddHeader(key, value)
+	c.requester.AddHeader(key, value)
 }
 
 func (r *Requester) AddHeader(key, value string) {
