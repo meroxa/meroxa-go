@@ -87,3 +87,7 @@ func newMockRequester() *mockRequester {
 func (m mockRequester) MakeRequest(ctx context.Context, method string, path string, body interface{}, params url.Values, headers http.Header) (*http.Response, error) {
 	return m.response, m.err
 }
+
+func (m mockRequester) AddHeader(key, value string) {
+	m.response.Header.Add(key, value)
+}
