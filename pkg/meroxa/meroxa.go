@@ -174,7 +174,7 @@ func (r *Requester) AddHeader(key, value string) {
 	if r.headers == nil {
 		r.headers = make(http.Header)
 	}
-	r.headers[key] = []string{value}
+	r.headers.Add(key, value)
 }
 
 func (r *Requester) MakeRequest(ctx context.Context, method, path string, body interface{}, params url.Values, headers http.Header) (*http.Response, error) {

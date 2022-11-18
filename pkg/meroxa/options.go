@@ -86,7 +86,7 @@ func WithAccountUUID(accountUUID string) Option {
 		if r.headers == nil {
 			r.headers = make(http.Header)
 		}
-		r.headers[meroxaAccountUUIDHeader] = []string{accountUUID}
+		r.headers.Add(meroxaAccountUUIDHeader, accountUUID)
 		return nil
 	}
 }
@@ -97,7 +97,7 @@ func WithHeader(key, value string) Option {
 		if r.headers == nil {
 			r.headers = make(http.Header)
 		}
-		r.headers[key] = []string{value}
+		r.headers.Add(key, value)
 		return nil
 	}
 }

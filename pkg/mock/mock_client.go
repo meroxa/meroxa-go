@@ -37,6 +37,18 @@ func (m *Mockrequester) EXPECT() *MockrequesterMockRecorder {
 	return m.recorder
 }
 
+// AddHeader mocks base method.
+func (m *Mockrequester) AddHeader(key, value string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "AddHeader", key, value)
+}
+
+// AddHeader indicates an expected call of AddHeader.
+func (mr *MockrequesterMockRecorder) AddHeader(key, value interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddHeader", reflect.TypeOf((*Mockrequester)(nil).AddHeader), key, value)
+}
+
 // MakeRequest mocks base method.
 func (m *Mockrequester) MakeRequest(ctx context.Context, method, path string, body interface{}, params url.Values, headers http.Header) (*http.Response, error) {
 	m.ctrl.T.Helper()
@@ -88,41 +100,6 @@ func (m *Mockaccount) ListAccounts(ctx context.Context) ([]*meroxa.Account, erro
 func (mr *MockaccountMockRecorder) ListAccounts(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAccounts", reflect.TypeOf((*Mockaccount)(nil).ListAccounts), ctx)
-}
-
-// MockgenericHeader is a mock of genericHeader interface.
-type MockgenericHeader struct {
-	ctrl     *gomock.Controller
-	recorder *MockgenericHeaderMockRecorder
-}
-
-// MockgenericHeaderMockRecorder is the mock recorder for MockgenericHeader.
-type MockgenericHeaderMockRecorder struct {
-	mock *MockgenericHeader
-}
-
-// NewMockgenericHeader creates a new mock instance.
-func NewMockgenericHeader(ctrl *gomock.Controller) *MockgenericHeader {
-	mock := &MockgenericHeader{ctrl: ctrl}
-	mock.recorder = &MockgenericHeaderMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockgenericHeader) EXPECT() *MockgenericHeaderMockRecorder {
-	return m.recorder
-}
-
-// AddHeader mocks base method.
-func (m *MockgenericHeader) AddHeader(key, value string) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "AddHeader", key, value)
-}
-
-// AddHeader indicates an expected call of AddHeader.
-func (mr *MockgenericHeaderMockRecorder) AddHeader(key, value interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddHeader", reflect.TypeOf((*MockgenericHeader)(nil).AddHeader), key, value)
 }
 
 // MockClient is a mock of Client interface.
