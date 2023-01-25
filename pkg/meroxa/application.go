@@ -53,7 +53,7 @@ type Application struct {
 	Connectors  []EntityDetails       `json:"connectors,omitempty"`
 	Functions   []EntityDetails       `json:"functions,omitempty"`
 	Resources   []ApplicationResource `json:"resources,omitempty"`
-	Deployments []EntityIdentifier    `json:"deployments,omitempty"`
+	Deployments []Deployment          `json:"deployments,omitempty"`
 	CreatedAt   time.Time             `json:"created_at"`
 	UpdatedAt   time.Time             `json:"updated_at"`
 	DeletedAt   time.Time             `json:"deleted_at,omitempty"`

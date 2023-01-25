@@ -33,11 +33,13 @@ type Deployment struct {
 	Spec        map[string]interface{} `json:"spec,omitempty"`
 	SpecVersion string                 `json:"spec_version,omitempty"`
 	CreatedBy   string                 `json:"created_by"`
+	Environment EntityIdentifier       `json:"environment"`
 }
 
 type CreateDeploymentInput struct {
 	GitSha      string                 `json:"git_sha"`
 	Application EntityIdentifier       `json:"application"`
+	Environment EntityIdentifier       `json:"environment"`
 	Spec        map[string]interface{} `json:"spec,omitempty"`
 	SpecVersion string                 `json:"spec_version,omitempty"`
 }

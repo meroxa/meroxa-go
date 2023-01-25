@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
-
-	"github.com/google/uuid"
 )
 
 func TestCreateApplication(t *testing.T) {
@@ -58,6 +57,18 @@ func TestCreateApplication(t *testing.T) {
 	if resp.Name != input.Name {
 		t.Errorf("expected name %s, got %s", input.Name, resp.Name)
 	}
+}
+
+func generateApplicationWithDeployments(name string) Application {
+	app := generateApplication(name)
+	envName := "self-hosted"
+
+	deployments := []Deployment{
+		generateDeploymentWithEnvironment(app.Name, uuid.NewString(), "0.2.0", envName),
+		generateDeploymentWithEnvironment(app.Name, uuid.NewString(), "0.2.0", envName),
+	}
+	app.Deployments = deployments
+	return app
 }
 
 func generateApplication(name string) Application {
@@ -204,9 +215,9 @@ func TestGetApplicationByUUID(t *testing.T) {
 	}
 }
 
-func TestListApplications(t *testing.T) {
-	a1 := generateApplication("app1")
-	a2 := generateApplication("app2")
+func TestListApplicationsWithDeployments(t *testing.T) {
+	a1 := generateApplicationWithDeployments("app1")
+	a2 := generateApplicationWithDeployments("app2")
 	list := []*Application{&a1, &a2}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -233,6 +244,17 @@ func TestListApplications(t *testing.T) {
 
 	if !reflect.DeepEqual(resp, list) {
 		t.Errorf("expected response same as list")
+	}
+
+	// for each application
+	for _, a := range resp {
+		// check its deployments
+		for _, d := range a.Deployments {
+			_, err := d.Environment.GetNameOrUUID()
+			if err != nil {
+				t.Errorf("application %v should contain deployment with its environment", a)
+			}
+		}
 	}
 }
 
