@@ -13,120 +13,109 @@ import (
 )
 
 func TestCreateDeployment(t *testing.T) {
-	appName := "test"
-	specVersion := "latest"
-	gitSha := "abc"
-	input := CreateDeploymentInput{
-		GitSha:      gitSha,
-		Application: EntityIdentifier{Name: appName},
-		SpecVersion: specVersion,
-		Spec:        map[string]interface{}{},
+	tests := []struct {
+		desc            string
+		input           func(string, string, string, string) CreateDeploymentInput
+		deployment      func(string, string, string, string) Deployment
+		withEnvironment bool
+	}{
+		{
+			desc: "Deployment without environment",
+			input: func(appName, gitSha, specVersion, _ string) CreateDeploymentInput {
+				return CreateDeploymentInput{
+					Application: EntityIdentifier{Name: appName},
+					GitSha:      gitSha,
+					SpecVersion: specVersion,
+					Spec:        map[string]interface{}{},
+				}
+			},
+			deployment: func(appName, gitSha, specVersion, _ string) Deployment {
+				return generateDeployment(appName, gitSha, specVersion)
+			},
+			withEnvironment: false,
+		},
+		{
+			desc: "Deployment with environment",
+			input: func(appName, gitSha, specVersion, environmentName string) CreateDeploymentInput {
+				return CreateDeploymentInput{
+					Application: EntityIdentifier{Name: appName},
+					GitSha:      gitSha,
+					SpecVersion: specVersion,
+					Spec:        map[string]interface{}{},
+					Environment: EntityIdentifier{Name: environmentName},
+				}
+			},
+			deployment: func(appName, gitSha, specVersion, environmentName string) Deployment {
+				return generateDeploymentWithEnvironment(appName, gitSha, specVersion, environmentName)
+			},
+			withEnvironment: true,
+		},
 	}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// Test request
-		var cr CreateDeploymentInput
-		err := json.NewDecoder(req.Body).Decode(&cr)
-		if err != nil {
-			t.Errorf("expected no error, got %+v", err)
-		}
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			var input CreateDeploymentInput
 
-		if cr.GitSha != input.GitSha {
-			t.Errorf("expected git_sha %s, got %s", input.GitSha, cr.GitSha)
-		}
-		if reflect.DeepEqual(cr.Spec, input.Spec) {
-			t.Errorf("expected spec %s, got %s", input.Spec, cr.Spec)
-		}
-		if cr.SpecVersion != input.SpecVersion {
-			t.Errorf("expected spec_version %s, got %s", input.SpecVersion, cr.SpecVersion)
-		}
-		if cr.Application != input.Application {
-			t.Errorf("expected application %v, got %v", input.Application, cr.Application)
-		}
+			if tc.withEnvironment {
+				input = tc.input("app-name", "fc89d80e-2dea-4dab-9a34-3095aa2a8958", "latest", "self-hosted")
+			} else {
+				input = tc.input("app-name", "fc89d80e-2dea-4dab-9a34-3095aa2a8958", "latest", "")
+			}
 
-		defer req.Body.Close()
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				// Test request
+				var cr CreateDeploymentInput
+				err := json.NewDecoder(req.Body).Decode(&cr)
+				if err != nil {
+					t.Errorf("expected no error, got %+v", err)
+				}
 
-		// Return response to satisfy client and test response
-		c := generateDeployment(appName, gitSha, specVersion)
-		if err := json.NewEncoder(w).Encode(c); err != nil {
-			t.Errorf("expected no error, got %+v", err)
-		}
-	}))
-	// Close the server when test finishes
-	defer server.Close()
+				if cr.GitSha != input.GitSha {
+					t.Errorf("expected git_sha %s, got %s", input.GitSha, cr.GitSha)
+				}
+				if reflect.DeepEqual(cr.Spec, input.Spec) {
+					t.Errorf("expected spec %s, got %s", input.Spec, cr.Spec)
+				}
+				if cr.SpecVersion != input.SpecVersion {
+					t.Errorf("expected spec_version %s, got %s", input.SpecVersion, cr.SpecVersion)
+				}
+				if cr.Application != input.Application {
+					t.Errorf("expected application %v, got %v", input.Application, cr.Application)
+				}
 
-	c := testClient(testRequester(server.Client(), server.URL))
+				if cr.Environment != input.Environment {
+					t.Errorf("expected environment %v, got %v", input.Environment, cr.Environment)
+				}
 
-	resp, err := c.CreateDeployment(context.Background(), &input)
+				defer req.Body.Close()
 
-	if err != nil {
-		t.Errorf("expected no error, got %+v", err)
-	}
+				// Return response to satisfy client and test response
+				var d Deployment
+				if tc.withEnvironment {
+					d = tc.deployment(input.Application.Name, input.GitSha, input.SpecVersion, input.Environment.Name)
+				} else {
+					d = tc.deployment(input.Application.Name, input.GitSha, input.SpecVersion, "")
+				}
 
-	if resp.GitSha != input.GitSha {
-		t.Errorf("expected git_sha %s, got %s", input.GitSha, resp.GitSha)
-	}
-}
+				if err := json.NewEncoder(w).Encode(d); err != nil {
+					t.Errorf("expected no error, got %+v", err)
+				}
+			}))
+			// Close the server when test finishes
+			defer server.Close()
 
-func TestCreateDeploymentWithEnvironment(t *testing.T) {
-	appName := "test"
-	specVersion := "latest"
-	gitSha := "abc"
-	environmentName := "self-hosted-env"
-	input := CreateDeploymentInput{
-		GitSha:      gitSha,
-		Application: EntityIdentifier{Name: appName},
-		SpecVersion: specVersion,
-		Spec:        map[string]interface{}{},
-		Environment: EntityIdentifier{Name: environmentName},
-	}
+			c := testClient(testRequester(server.Client(), server.URL))
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// Test request
-		var cr CreateDeploymentInput
-		err := json.NewDecoder(req.Body).Decode(&cr)
-		if err != nil {
-			t.Errorf("expected no error, got %+v", err)
-		}
+			resp, err := c.CreateDeployment(context.Background(), &input)
 
-		if cr.GitSha != input.GitSha {
-			t.Errorf("expected git_sha %s, got %s", input.GitSha, cr.GitSha)
-		}
-		if reflect.DeepEqual(cr.Spec, input.Spec) {
-			t.Errorf("expected spec %s, got %s", input.Spec, cr.Spec)
-		}
-		if cr.SpecVersion != input.SpecVersion {
-			t.Errorf("expected spec_version %s, got %s", input.SpecVersion, cr.SpecVersion)
-		}
-		if cr.Application != input.Application {
-			t.Errorf("expected application %v, got %v", input.Application, cr.Application)
-		}
+			if err != nil {
+				t.Errorf("expected no error, got %+v", err)
+			}
 
-		if cr.Environment != input.Environment {
-			t.Errorf("expected environment %v, got %v", input.Environment, cr.Environment)
-		}
-
-		defer req.Body.Close()
-
-		// Return response to satisfy client and test response
-		c := generateDeploymentWithEnvironment(appName, gitSha, specVersion, environmentName)
-		if err := json.NewEncoder(w).Encode(c); err != nil {
-			t.Errorf("expected no error, got %+v", err)
-		}
-	}))
-	// Close the server when test finishes
-	defer server.Close()
-
-	c := testClient(testRequester(server.Client(), server.URL))
-
-	resp, err := c.CreateDeployment(context.Background(), &input)
-
-	if err != nil {
-		t.Errorf("expected no error, got %+v", err)
-	}
-
-	if resp.GitSha != input.GitSha {
-		t.Errorf("expected git_sha %s, got %s", input.GitSha, resp.GitSha)
+			if resp.GitSha != input.GitSha {
+				t.Errorf("expected git_sha %s, got %s", input.GitSha, resp.GitSha)
+			}
+		})
 	}
 }
 
