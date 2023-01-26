@@ -68,6 +68,12 @@ func generateApplication(name string) Application {
 	return Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateRunning}}
 }
 
+func generateApplicationWithEnvironment(name string) Application {
+	a := Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateRunning}}
+	a.Environment = generateApplicationEnvironment("private", "env-1234", "aws")
+	return a
+}
+
 func TestCreateApplicationV2(t *testing.T) {
 	input := CreateApplicationInput{
 		Name:     "test",
@@ -147,7 +153,7 @@ func TestGetApplicationByName(t *testing.T) {
 }
 
 func TestGetApplicationByUUID(t *testing.T) {
-	app := generateApplication("")
+	app := generateApplicationWithEnvironment("")
 	app.Functions = make([]EntityDetails, 0)
 	app.Functions = append(app.Functions, EntityDetails{EntityIdentifier: EntityIdentifier{Name: "fun1"}})
 	app.Connectors = make([]EntityDetails, 0)
@@ -176,6 +182,8 @@ func TestGetApplicationByUUID(t *testing.T) {
 				Destination: "true",
 			},
 		})
+
+	app.Environment = generateApplicationEnvironment("private", "aws", "env-1234")
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
@@ -207,7 +215,9 @@ func TestGetApplicationByUUID(t *testing.T) {
 func TestListApplications(t *testing.T) {
 	a1 := generateApplication("app1")
 	a2 := generateApplication("app2")
-	list := []*Application{&a1, &a2}
+	a3 := generateApplicationWithEnvironment("app3")
+
+	list := []*Application{&a1, &a2, &a3}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := applicationsBasePath, req.URL.Path; want != got {

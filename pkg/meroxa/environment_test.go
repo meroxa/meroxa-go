@@ -326,3 +326,11 @@ func generateEnvironment(t EnvironmentType, p EnvironmentProvider, n string, sta
 		UUID:     "1a92d590-d59c-460b-94de-870f04ab35bf",
 	}
 }
+
+func generateApplicationEnvironment(t EnvironmentType, p EnvironmentProvider, n string) ApplicationEnvironment {
+	return ApplicationEnvironment{
+		EntityIdentifier: EntityIdentifier{Name: n},
+		Type:             t,
+		Provider:         p,
+	}
+}
