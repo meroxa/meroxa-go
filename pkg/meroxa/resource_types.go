@@ -102,7 +102,7 @@ type ResourceType struct {
 	FormConfig   map[string]interface{}   `json:"form_config"`
 	OptedIn      bool                     `json:"opted_in"`
 	HasAccess    bool                     `json:"has_access"`
-	CLIOnly      bool                     `json:"cli_only"`
+	CliOnly      bool                     `json:"cli_only"`
 }
 
 // ListResourceTypes returns the list of supported resources
