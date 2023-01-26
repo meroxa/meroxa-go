@@ -63,9 +63,9 @@ func generateApplicationWithDeployments(name string) Application {
 	app := generateApplication(name)
 	envName := "self-hosted"
 
-	deployments := []Deployment{
-		generateDeploymentWithEnvironment(app.Name, uuid.NewString(), "0.2.0", envName),
-		generateDeploymentWithEnvironment(app.Name, uuid.NewString(), "0.2.0", envName),
+	deployments := []ApplicationDeployment{
+		generateAppDeploymentWithEnv(envName),
+		generateAppDeploymentWithEnv(envName),
 	}
 	app.Deployments = deployments
 	return app

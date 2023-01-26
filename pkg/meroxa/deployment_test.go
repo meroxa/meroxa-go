@@ -45,8 +45,8 @@ func TestCreateDeployment(t *testing.T) {
 					Environment: EntityIdentifier{Name: environmentName},
 				}
 			},
-			deployment: func(appName, gitSha, specVersion, environmentName string) Deployment {
-				return generateDeploymentWithEnvironment(appName, gitSha, specVersion, environmentName)
+			deployment: func(appName, gitSha, specVersion, envName string) Deployment {
+				return generateDeploymentWithEnv(appName, gitSha, specVersion, envName)
 			},
 			withEnvironment: true,
 		},
@@ -119,11 +119,15 @@ func TestCreateDeployment(t *testing.T) {
 	}
 }
 
-func generateDeploymentWithEnvironment(appName, gitSha, specVersion, environmentName string) Deployment {
-	deployment := generateDeployment(appName, gitSha, specVersion)
-	deployment.Environment = EntityIdentifier{Name: environmentName}
-
-	return deployment
+func generateAppDeploymentWithEnv(environmentName string) ApplicationDeployment {
+	return ApplicationDeployment{
+		EntityIdentifier: EntityIdentifier{
+			UUID: uuid.NewString(),
+		},
+		Environment: EntityIdentifier{
+			Name: environmentName,
+		},
+	}
 }
 
 func generateDeployment(appName, gitSha, specVersion string) Deployment {
@@ -136,10 +140,17 @@ func generateDeployment(appName, gitSha, specVersion string) Deployment {
 	}
 }
 
+func generateDeploymentWithEnv(appName, gitSha, specVersion, envName string) Deployment {
+	deployment := generateDeployment(appName, gitSha, specVersion)
+	deployment.Environment = EntityIdentifier{Name: envName}
+	return deployment
+}
+
 func TestGetLatestDeployment(t *testing.T) {
 	appName := "test"
-	environmentName := "self-hosted"
-	deployment := generateDeploymentWithEnvironment(appName, "abc", "latest", environmentName)
+	gitSha := "9d856c23-82ad-4f01-8901-b1fe09c800e6"
+	envName := "self-hosted"
+	deployment := generateDeploymentWithEnv(appName, gitSha, "latest", envName)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s/deployments/latest", applicationsBasePath, appName), req.URL.Path; want != got {
@@ -170,8 +181,9 @@ func TestGetLatestDeployment(t *testing.T) {
 
 func TestGetDeployment(t *testing.T) {
 	appName := "test"
-	environmentName := "self-hosted"
-	deployment := generateDeploymentWithEnvironment(appName, "abc", "latest", environmentName)
+	gitSha := "6adb1fc3-9cdb-4f56-a60b-98e0f96a63dd"
+	envName := "self-hosted"
+	deployment := generateDeploymentWithEnv(appName, gitSha, "latest", envName)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s/deployments/%s", applicationsBasePath, appName, deployment.UUID), req.URL.Path; want != got {
