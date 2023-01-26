@@ -23,6 +23,13 @@ type DeploymentStatus struct {
 	Details string          `json:"details,omitempty"`
 }
 
+type DeploymentEnvironment struct {
+	EntityIdentifier
+	Provider EnvironmentProvider `json:"provider"`
+	Region   EnvironmentRegion   `json:"region"`
+	Type     EnvironmentType     `json:"type"`
+}
+
 type Deployment struct {
 	UUID        string                 `json:"uuid"`
 	GitSha      string                 `json:"git_sha"`
@@ -33,7 +40,7 @@ type Deployment struct {
 	Spec        map[string]interface{} `json:"spec,omitempty"`
 	SpecVersion string                 `json:"spec_version,omitempty"`
 	CreatedBy   string                 `json:"created_by"`
-	Environment EntityIdentifier       `json:"environment"`
+	Environment DeploymentEnvironment  `json:"environment"`
 }
 
 type CreateDeploymentInput struct {

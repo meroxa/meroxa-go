@@ -63,11 +63,10 @@ func generateApplicationWithDeployments(name string) Application {
 	app := generateApplication(name)
 	envName := "self-hosted"
 
-	deployments := []ApplicationDeployment{
+	app.Deployments = []ApplicationDeployment{
 		generateAppDeploymentWithEnv(envName),
 		generateAppDeploymentWithEnv(envName),
 	}
-	app.Deployments = deployments
 	return app
 }
 

@@ -121,11 +121,11 @@ func TestCreateDeployment(t *testing.T) {
 
 func generateAppDeploymentWithEnv(environmentName string) ApplicationDeployment {
 	return ApplicationDeployment{
-		EntityIdentifier: EntityIdentifier{
-			UUID: uuid.NewString(),
-		},
-		Environment: EntityIdentifier{
-			Name: environmentName,
+		EntityIdentifier{UUID: uuid.NewString()},
+		DeploymentEnvironment{
+			EntityIdentifier: EntityIdentifier{
+				Name: environmentName,
+			},
 		},
 	}
 }
@@ -142,7 +142,7 @@ func generateDeployment(appName, gitSha, specVersion string) Deployment {
 
 func generateDeploymentWithEnv(appName, gitSha, specVersion, envName string) Deployment {
 	deployment := generateDeployment(appName, gitSha, specVersion)
-	deployment.Environment = EntityIdentifier{Name: envName}
+	deployment.Environment = generateDeploymentEnvironment("private", "aws", "environment-1234")
 	return deployment
 }
 

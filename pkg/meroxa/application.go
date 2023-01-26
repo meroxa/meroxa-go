@@ -37,7 +37,7 @@ type ApplicationResource struct {
 
 type ApplicationDeployment struct {
 	EntityIdentifier
-	Environment EntityIdentifier `json:"environment"`
+	Environment DeploymentEnvironment `json:"environment"`
 }
 
 type EntityDetails struct {

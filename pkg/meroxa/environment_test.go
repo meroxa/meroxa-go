@@ -316,6 +316,15 @@ func TestRepairEnvironment(t *testing.T) {
 	}
 }
 
+func generateDeploymentEnvironment(t EnvironmentType, p EnvironmentProvider, n string) DeploymentEnvironment {
+	return DeploymentEnvironment{
+		EntityIdentifier: EntityIdentifier{Name: n},
+		Type:             t,
+		Provider:         p,
+		Region:           "us-east-1",
+	}
+}
+
 func generateEnvironment(t EnvironmentType, p EnvironmentProvider, n string, status EnvironmentViewStatus) Environment {
 	return Environment{
 		Type:     t,
