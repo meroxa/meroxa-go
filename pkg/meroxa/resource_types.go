@@ -105,9 +105,32 @@ type ResourceType struct {
 	CliOnly      bool                     `json:"cli_only"`
 }
 
-// ListResourceTypes returns the list of supported resources
-func (c *client) ListResourceTypes(ctx context.Context) ([]ResourceType, error) {
+// ListResourceTypes returns the list of supported resource types.
+func (c *client) ListResourceTypes(ctx context.Context) ([]string, error) {
 	path := "/v1/resource-types"
+
+	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = handleAPIErrors(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var supportedTypes []string
+	err = json.NewDecoder(resp.Body).Decode(&supportedTypes)
+	if err != nil {
+		return nil, err
+	}
+
+	return supportedTypes, nil
+}
+
+// ListResourceTypesV2 returns the list of supported resource types as objects.
+func (c *client) ListResourceTypesV2(ctx context.Context) ([]ResourceType, error) {
+	path := "/v2/resource-types"
 
 	resp, err := c.MakeRequest(ctx, http.MethodGet, path, nil, nil, nil)
 	if err != nil {
