@@ -3,11 +3,12 @@ package meroxa
 import (
 	"context"
 	"encoding/json"
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/uuid"
 )
 
 func TestListResourceTypesV2(t *testing.T) {
