@@ -68,50 +68,83 @@ func generateApplication(name string) Application {
 	return Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateRunning}}
 }
 
+func generateApplicationWithEnvironment(name string) Application {
+	a := Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateRunning}}
+	a.Environment = generateApplicationEnvironment("private", "env-1234", "aws")
+	return a
+}
+
 func TestCreateApplicationV2(t *testing.T) {
-	input := CreateApplicationInput{
-		Name:     "test",
-		Language: "golang",
-		GitSha:   "abc",
+
+	tests := []struct {
+		desc  string
+		input func() CreateApplicationInput
+	}{
+		{
+			desc: "An application without an environment",
+			input: func() CreateApplicationInput {
+				return CreateApplicationInput{
+					Name:     "test",
+					Language: "golang",
+					GitSha:   "abc",
+				}
+			},
+		},
+		{
+			desc: "An application with an environment",
+			input: func() CreateApplicationInput {
+				return CreateApplicationInput{
+					Name:        "test",
+					Language:    "golang",
+					GitSha:      "abc",
+					Environment: EntityIdentifier{Name: "my-env"},
+				}
+			},
+		},
 	}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// Test request
-		type connectionRequest struct {
-			Name string `json:"name"`
-		}
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			input := tc.input()
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				// Test request
+				type connectionRequest struct {
+					Name string `json:"name"`
+				}
 
-		var cr connectionRequest
-		err := json.NewDecoder(req.Body).Decode(&cr)
-		if err != nil {
-			t.Errorf("expected no error, got %+v", err)
-		}
+				var cr connectionRequest
+				err := json.NewDecoder(req.Body).Decode(&cr)
+				if err != nil {
+					t.Errorf("expected no error, got %+v", err)
+				}
 
-		if cr.Name != input.Name {
-			t.Errorf("expected name %s, got %s", input.Name, cr.Name)
-		}
+				if cr.Name != input.Name {
+					t.Errorf("expected name %s, got %s", input.Name, cr.Name)
+				}
 
-		defer req.Body.Close()
+				defer req.Body.Close()
 
-		// Return response to satisfy client and test response
-		c := generateApplication(input.Name)
-		if err := json.NewEncoder(w).Encode(c); err != nil {
-			t.Errorf("expected no error, got %+v", err)
-		}
-	}))
-	// Close the server when test finishes
-	defer server.Close()
+				// Return response to satisfy client and test response
+				c := generateApplication(input.Name)
+				if err := json.NewEncoder(w).Encode(c); err != nil {
+					t.Errorf("expected no error, got %+v", err)
+				}
+			}))
+			// Close the server when test finishes
+			defer server.Close()
 
-	c := testClient(testRequester(server.Client(), server.URL))
+			c := testClient(testRequester(server.Client(), server.URL))
 
-	resp, err := c.CreateApplicationV2(context.Background(), &input)
+			resp, err := c.CreateApplicationV2(context.Background(), &input)
 
-	if err != nil {
-		t.Errorf("expected no error, got %+v", err)
-	}
+			if err != nil {
+				t.Errorf("expected no error, got %+v", err)
+			}
 
-	if resp.Name != input.Name {
-		t.Errorf("expected name %s, got %s", input.Name, resp.Name)
+			if resp.Name != input.Name {
+				t.Errorf("expected name %s, got %s", input.Name, resp.Name)
+			}
+		})
 	}
 }
 
@@ -147,7 +180,7 @@ func TestGetApplicationByName(t *testing.T) {
 }
 
 func TestGetApplicationByUUID(t *testing.T) {
-	app := generateApplication("")
+	app := generateApplicationWithEnvironment("")
 	app.Functions = make([]EntityDetails, 0)
 	app.Functions = append(app.Functions, EntityDetails{EntityIdentifier: EntityIdentifier{Name: "fun1"}})
 	app.Connectors = make([]EntityDetails, 0)
@@ -176,6 +209,8 @@ func TestGetApplicationByUUID(t *testing.T) {
 				Destination: "true",
 			},
 		})
+
+	app.Environment = generateApplicationEnvironment("private", "aws", "env-1234")
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
@@ -207,7 +242,9 @@ func TestGetApplicationByUUID(t *testing.T) {
 func TestListApplications(t *testing.T) {
 	a1 := generateApplication("app1")
 	a2 := generateApplication("app2")
-	list := []*Application{&a1, &a2}
+	a3 := generateApplicationWithEnvironment("app3")
+
+	list := []*Application{&a1, &a2, &a3}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := applicationsBasePath, req.URL.Path; want != got {
