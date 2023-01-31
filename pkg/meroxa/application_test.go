@@ -97,7 +97,7 @@ func TestCreateApplicationV2(t *testing.T) {
 					Name:        "test",
 					Language:    "golang",
 					GitSha:      "abc",
-					Environment: EntityIdentifier{Name: "my-env"},
+					Environment: &EntityIdentifier{Name: "my-env"},
 				}
 			},
 		},
