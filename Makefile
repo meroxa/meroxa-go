@@ -16,3 +16,17 @@ gomod:
 .PHONY: test
 test: mockgen
 	go test ./...
+
+.PHONY: lint
+lint: ./bin/golangci-lint
+	./bin/golangci-lint run
+
+.PHONY: ci-lint
+ci-lint: ./bin/golangci-lint
+	./bin/golangci-lint run --out-format=github-actions -v
+
+./bin/golangci-lint:
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b ./bin v1.49.0
+
+.PHONY: vet
+vet: lint
