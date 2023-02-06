@@ -70,7 +70,8 @@ func generateApplication(name string) Application {
 
 func generateApplicationWithEnvironment(name string) Application {
 	a := Application{Name: name, UUID: uuid.NewString(), Language: "golang", GitSha: "abc", Status: ApplicationStatus{State: ApplicationStateRunning}}
-	a.Environment = generateApplicationEnvironment("env-1234", "123")
+	env := generateApplicationEnvironment("env-1234", "123")
+	a.Environment = &env
 	return a
 }
 
@@ -210,7 +211,8 @@ func TestGetApplicationByUUID(t *testing.T) {
 			},
 		})
 
-	app.Environment = generateApplicationEnvironment("env-1234", "123")
+	env := generateApplicationEnvironment("env-1234", "123")
+	app.Environment = &env
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
