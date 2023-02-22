@@ -18,7 +18,7 @@ func TestListResourceTypesV2(t *testing.T) {
 	list := []ResourceType{r1, r2}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := V2ResourcesTypeBasePath, req.URL.Path; want != got {
+		if want, got := ResourcesTypeBasePathV2, req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
