@@ -3,10 +3,11 @@ package meroxa
 import (
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestCreateSourceV1(t *testing.T) {
@@ -44,12 +45,13 @@ func TestCreateSourceV2(t *testing.T) {
 
 	getUrl := "https://s3-get.url"
 	putUrl := "https://s3-put.url"
+	env := &EntityIdentifier{UUID: uuid.NewString()}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		s := generateSource(getUrl, putUrl)
+		s := generateSourceV2(getUrl, putUrl, env)
 		if err := json.NewEncoder(w).Encode(s); err != nil {
 			t.Errorf("expected no error, got %+v", err)
 		}
@@ -68,6 +70,9 @@ func TestCreateSourceV2(t *testing.T) {
 	if resp.PutUrl != putUrl {
 		t.Errorf("expected getUrl %s, got %s", putUrl, resp.PutUrl)
 	}
+	if resp.Environment == nil {
+		t.Errorf("expected environment %s, got %s", env.UUID, resp.Environment.UUID)
+	}
 }
 
 func generateSource(getUrl, putUrl string) Source {
@@ -78,4 +83,17 @@ func generateSource(getUrl, putUrl string) Source {
 		putUrl = "https://meroxa-put-url.com"
 	}
 	return Source{GetUrl: getUrl, PutUrl: putUrl}
+}
+
+func generateSourceV2(getUrl, putUrl string, env *EntityIdentifier) Source {
+	if getUrl == "" {
+		getUrl = "https://meroxa-get-url.com"
+	}
+	if putUrl == "" {
+		putUrl = "https://meroxa-put-url.com"
+	}
+	if env == nil {
+		env.UUID = "12345"
+	}
+	return Source{GetUrl: getUrl, PutUrl: putUrl, Environment: env}
 }
