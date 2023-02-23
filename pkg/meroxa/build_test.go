@@ -57,7 +57,7 @@ func TestCreateBuild(t *testing.T) {
 	}
 }
 
-func TestCreateBuildV2(t *testing.T) {
+func TestCreateBuildWithEnv(t *testing.T) {
 	input := CreateBuildInput{
 		SourceBlob: SourceBlob{
 			Url: "https://meroxa-test.url",
@@ -89,7 +89,7 @@ func TestCreateBuildV2(t *testing.T) {
 		defer req.Body.Close()
 
 		// Return response to satisfy client and test response
-		b := generateBuildV2("", input.SourceBlob.Url, input.Environment.UUID)
+		b := generateBuildWithEnv("", input.SourceBlob.Url, input.Environment.UUID)
 		if err := json.NewEncoder(w).Encode(b); err != nil {
 			t.Errorf("expected no error, got %+v", err)
 		}
@@ -155,7 +155,7 @@ func generateBuild(uuid, url string) Build {
 	return Build{Uuid: uuid, SourceBlob: SourceBlob{Url: url}}
 }
 
-func generateBuildV2(uuid, url, env string) Build {
+func generateBuildWithEnv(uuid, url, env string) Build {
 	if uuid == "" {
 		uuid = "31152ef2-16e0-4c8e-8bd1-9e2181c4974a"
 	}
