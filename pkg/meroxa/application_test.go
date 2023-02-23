@@ -154,7 +154,7 @@ func TestGetApplicationByName(t *testing.T) {
 	app := generateApplication(name)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, name), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s", applicationsBasePathV1, name), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -215,7 +215,7 @@ func TestGetApplicationByUUID(t *testing.T) {
 	app.Environment = &env
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s", applicationsBasePathV1, app.UUID), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -249,7 +249,7 @@ func TestListApplications(t *testing.T) {
 	list := []*Application{&a1, &a2, &a3}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := applicationsBasePath, req.URL.Path; want != got {
+		if want, got := applicationsBasePathV1, req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -279,7 +279,7 @@ func TestDeleteApplication(t *testing.T) {
 	app := generateApplication("another-app")
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.UUID), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s", applicationsBasePathV1, app.UUID), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -312,7 +312,7 @@ func TestDeleteApplicationEntitiesWithAppNotFound(t *testing.T) {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc(fmt.Sprintf("%s/%s", applicationsBasePath, appName), func(res http.ResponseWriter, req *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("%s/%s", applicationsBasePathV1, appName), func(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusNotFound)
 		defer req.Body.Close()
 	})
@@ -376,7 +376,7 @@ func TestDeleteApplicationEntitiesWithAppFound(t *testing.T) {
 	app := generateApplication("another-app")
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s", applicationsBasePath, app.Name), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s", applicationsBasePathV1, app.Name), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -414,7 +414,7 @@ func TestGetApplicationLogs(t *testing.T) {
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s/logs", applicationsBasePath, name), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s/logs", applicationsBasePathV1, name), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 

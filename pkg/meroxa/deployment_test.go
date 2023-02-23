@@ -82,7 +82,7 @@ func TestGetLatestDeployment(t *testing.T) {
 	deployment := generateDeployment(appName, "abc", "latest")
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s/deployments/latest", applicationsBasePath, appName), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s/deployments/latest", applicationsBasePathV1, appName), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -113,7 +113,7 @@ func TestGetDeployment(t *testing.T) {
 	deployment := generateDeployment(appName, "abc", "latest")
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s/deployments/%s", applicationsBasePath, appName, deployment.UUID), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s/deployments/%s", applicationsBasePathV1, appName, deployment.UUID), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
