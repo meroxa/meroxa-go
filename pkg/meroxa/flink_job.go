@@ -13,17 +13,19 @@ const flinkJobsBasePath = "/v1/flink-jobs"
 type FlinkJobState string
 
 const (
-	FlinkJobStateCancelled    FlinkJobState = "cancelled"
-	FlinkJobStateCancelling   FlinkJobState = "cancelling"
-	FlinkJobStateCreated      FlinkJobState = "created"
-	FlinkJobStateFailed       FlinkJobState = "failed"
-	FlinkJobStateFailing      FlinkJobState = "failing"
-	FlinkJobStateFinished     FlinkJobState = "finished"
-	FlinkJobStateInitializing FlinkJobState = "initializing"
-	FlinkJobStateReconciling  FlinkJobState = "reconciling"
-	FlinkJobStateRestarting   FlinkJobState = "restarting"
-	FlinkJobStateRunning      FlinkJobState = "running"
-	FlinkJobStateSuspended    FlinkJobState = "suspended"
+	FlinkJobStateCancelled     FlinkJobState = "cancelled"
+	FlinkJobStateCancelling    FlinkJobState = "cancelling"
+	FlinkJobStateCreated       FlinkJobState = "created"
+	FlinkJobStateDOA           FlinkJobState = "doa"
+	FlinkJobStateFailed        FlinkJobState = "failed"
+	FlinkJobStateFailing       FlinkJobState = "failing"
+	FlinkJobStateFinished      FlinkJobState = "finished"
+	FlinkJobStateInitializing  FlinkJobState = "initializing"
+	FlinkJobStateReconciling   FlinkJobState = "reconciling"
+	FlinkJobStateRestarting    FlinkJobState = "restarting"
+	FlinkJobStateRunning       FlinkJobState = "running"
+	FlinkJobStateSuspended     FlinkJobState = "suspended"
+	FlinkJobStateUninitialized FlinkJobState = "uninitialized"
 )
 
 type FlinkJobStatus struct {
