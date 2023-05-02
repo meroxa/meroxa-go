@@ -83,6 +83,10 @@ type Client interface {
 	GetLatestDeployment(ctx context.Context, appIdentifier string) (*Deployment, error)
 	CreateDeployment(ctx context.Context, input *CreateDeploymentInput) (*Deployment, error)
 
+	GetFlinkJob(ctx context.Context, nameOrUUID string) (*FlinkJob, error)
+	ListFlinkJobs(ctx context.Context) ([]*FlinkJob, error)
+	CreateFlinkJob(ctx context.Context, input *CreateFlinkJobInput) (*FlinkJob, error)
+
 	CreateFunction(ctx context.Context, input *CreateFunctionInput) (*Function, error)
 	GetFunction(ctx context.Context, nameOrUUID string) (*Function, error)
 	GetFunctionLogs(ctx context.Context, nameOrUUID string) (*http.Response, error)
