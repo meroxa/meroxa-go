@@ -375,6 +375,20 @@ func (mr *MockClientMockRecorder) DeleteEnvironment(ctx, nameOrUUID interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteEnvironment", reflect.TypeOf((*MockClient)(nil).DeleteEnvironment), ctx, nameOrUUID)
 }
 
+// DeleteFlinkJob mocks base method.
+func (m *MockClient) DeleteFlinkJob(ctx context.Context, nameOrUUID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFlinkJob", ctx, nameOrUUID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFlinkJob indicates an expected call of DeleteFlinkJob.
+func (mr *MockClientMockRecorder) DeleteFlinkJob(ctx, nameOrUUID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFlinkJob", reflect.TypeOf((*MockClient)(nil).DeleteFlinkJob), ctx, nameOrUUID)
+}
+
 // DeleteFunction mocks base method.
 func (m *MockClient) DeleteFunction(ctx context.Context, nameOrUUID string) (*meroxa.Function, error) {
 	m.ctrl.T.Helper()

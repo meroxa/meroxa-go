@@ -121,3 +121,30 @@ func TestGetFlinkJob(t *testing.T) {
 		t.Errorf("expected response not same as flink job")
 	}
 }
+
+func TestDeleteFlinkJob(t *testing.T) {
+	name := "test"
+	flinkJob := generateFlinkJob(name)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s", flinkJobsBasePath, name), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		if err := json.NewEncoder(w).Encode(flinkJob); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(testRequester(server.Client(), server.URL))
+
+	err := c.DeleteFlinkJob(context.Background(), name)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+}

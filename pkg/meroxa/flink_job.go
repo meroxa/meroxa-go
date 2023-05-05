@@ -101,3 +101,12 @@ func (c *client) CreateFlinkJob(ctx context.Context, input *CreateFlinkJobInput)
 
 	return fj, nil
 }
+
+func (c *client) DeleteFlinkJob(ctx context.Context, nameOrUUID string) error {
+	resp, err := c.MakeRequest(ctx, http.MethodDelete, fmt.Sprintf("%s/%s", flinkJobsBasePath, nameOrUUID), nil, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	return handleAPIErrors(resp)
+}
