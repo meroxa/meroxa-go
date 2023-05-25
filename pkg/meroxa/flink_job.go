@@ -11,36 +11,55 @@ import (
 const flinkJobsBasePath = "/v1/flink-jobs"
 
 type FlinkJobState string
+type FlinkJobLifecycleState string
+type FlinkJobReconciliationState string
+type FlinkJobManagerDeploymentState string
 
 const (
-	FlinkJobStateCancelled     FlinkJobState = "cancelled"
-	FlinkJobStateCancelling    FlinkJobState = "cancelling"
-	FlinkJobStateCreated       FlinkJobState = "created"
-	FlinkJobStateDOA           FlinkJobState = "doa"
-	FlinkJobStateFailed        FlinkJobState = "failed"
-	FlinkJobStateFailing       FlinkJobState = "failing"
-	FlinkJobStateFinished      FlinkJobState = "finished"
-	FlinkJobStateInitializing  FlinkJobState = "initializing"
-	FlinkJobStateReconciling   FlinkJobState = "reconciling"
-	FlinkJobStateRestarting    FlinkJobState = "restarting"
-	FlinkJobStateRunning       FlinkJobState = "running"
-	FlinkJobStateSuspended     FlinkJobState = "suspended"
-	FlinkJobStateUninitialized FlinkJobState = "uninitialized"
+	FlinkJobLifecycleStateCreated       FlinkJobState = "created"
+	FlinkJobLifecycleStateDeploying     FlinkJobState = "deploying"
+	FlinkJobLifecycleStateDoa           FlinkJobState = "doa"
+	FlinkJobLifecycleStateFailed        FlinkJobState = "failed"
+	FlinkJobLifecycleStateRolledBack    FlinkJobState = "rolled_back"
+	FlinkJobLifecycleStateRollingBack   FlinkJobState = "rolling_back"
+	FlinkJobLifecycleStateStable        FlinkJobState = "stable"
+	FlinkJobLifecycleStateSuspended     FlinkJobState = "suspended"
+	FlinkJobLifecycleStateUninitialized FlinkJobState = "uninitialized"
+	FlinkJobLifecycleStateUpgrading     FlinkJobState = "upgrading"
+
+	FlinkJobStateRunning   FlinkJobState = "running"
+	FlinkJobStateSuspended FlinkJobState = "suspended"
+
+	FlinkJobReconciliationStateDeployed    FlinkJobState = "deployed"
+	FlinkJobReconciliationStateRolledBack  FlinkJobState = "rolled_back"
+	FlinkJobReconciliationStateRollingBack FlinkJobState = "rolling_back"
+	FlinkJobReconciliationStateUpgrading   FlinkJobState = "upgrading"
+
+	FlinkJobStateDeployedNotReady FlinkJobState = "deployed_not_ready"
+	FlinkJobStateDeploying        FlinkJobState = "deploying"
+	FlinkJobStateError            FlinkJobState = "error"
+	FlinkJobStateFailing          FlinkJobState = "failing"
+	FlinkJobStateMissing          FlinkJobState = "missing"
+	FlinkJobStateReady            FlinkJobState = "ready"
 )
 
 type FlinkJobStatus struct {
-	State   FlinkJobState `json:"state"`
-	Details string        `json:"details,omitempty"`
+	LifecycleState         FlinkJobLifecycleState         `json:"lifecycle_state"`
+	State                  FlinkJobState                  `json:"state"`
+	ReconciliationState    FlinkJobReconciliationState    `json:"reconciliation_state"`
+	ManagerDeploymentState FlinkJobManagerDeploymentState `json:"manager_deployment_state"`
+	Details                string                         `json:"details,omitempty"`
 }
 
 type FlinkJob struct {
-	UUID         string           `json:"uuid"`
-	Name         string           `json:"name"`
-	OutputStream string           `json:"output_stream,omitempty"`
-	Environment  EntityIdentifier `json:"environment,omitempty"`
-	Status       FlinkJobStatus   `json:"status"`
-	CreatedAt    time.Time        `json:"created_at"`
-	UpdatedAt    time.Time        `json:"updated_at"`
+	UUID          string           `json:"uuid"`
+	Name          string           `json:"name"`
+	InputStreams  []string         `json:"input_streams,omitempty"`
+	OutputStreams []string         `json:"output_streams,omitempty"`
+	Environment   EntityIdentifier `json:"environment,omitempty"`
+	Status        FlinkJobStatus   `json:"status"`
+	CreatedAt     time.Time        `json:"created_at"`
+	UpdatedAt     time.Time        `json:"updated_at"`
 }
 
 type CreateFlinkJobInput struct {
