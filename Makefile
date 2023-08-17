@@ -30,3 +30,7 @@ ci-lint: ./bin/golangci-lint
 
 .PHONY: vet
 vet: lint
+
+.PHONY: generate
+generate: mockgen-install
+	go generate ./...

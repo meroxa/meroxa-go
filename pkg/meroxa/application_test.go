@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -437,5 +438,58 @@ func TestGetApplicationLogs(t *testing.T) {
 
 	if !reflect.DeepEqual(resp, &appLogs) {
 		t.Errorf("expected response same as application logs")
+	}
+}
+
+func TestGetApplicationLogsV2(t *testing.T) {
+	name := "my-app"
+	appLogs := Logs{
+		Data: []LogData{
+			{
+				Log:    "everything is great",
+				Source: "fun-name",
+			},
+			{
+				Log:    "everything is awesome",
+				Source: "fun-name",
+			},
+			{
+				Log:    "everything is cool",
+				Source: "fun-name",
+			},
+		},
+		Metadata: Metadata{
+			End:    time.Now().UTC(),
+			Start:  time.Now().UTC().Add(-12 * time.Hour),
+			Limit:  10,
+			Source: "fun-name",
+			Query:  "everything",
+		},
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s/logs", applicationsBasePathV2, name), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		if err := json.NewEncoder(w).Encode(appLogs); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(testRequester(server.Client(), server.URL))
+
+	resp, err := c.GetApplicationLogsV2(context.Background(), name)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &appLogs) {
+		t.Errorf("expected response same as application logs.\nwant: %v\ngot: %v", &appLogs, resp)
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestCreateBuild(t *testing.T) {
@@ -118,7 +119,7 @@ func TestGetBuild(t *testing.T) {
 	build := generateBuild(uuid, "")
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s", buildsBasePath, uuid), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s", buildsBasePathV1, uuid), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -167,4 +168,55 @@ func generateBuildWithEnv(uuid, url, env string) Build {
 		env = "...."
 	}
 	return Build{Uuid: uuid, SourceBlob: SourceBlob{Url: url}, Environment: &EntityIdentifier{UUID: env}}
+}
+
+func TestGetBuildLogsV2(t *testing.T) {
+	uuid := "my-function-build"
+	buildLogs := Logs{
+		Data: []LogData{
+			{
+				Log:    "I'm",
+				Source: uuid,
+			},
+			{
+				Log:    "a",
+				Source: uuid,
+			},
+			{
+				Log:    "function build",
+				Source: uuid,
+			},
+		},
+		Metadata: Metadata{
+			End:   time.Now().UTC(),
+			Start: time.Now().UTC().Add(-12 * time.Hour),
+			Limit: 10,
+		},
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s/logs", buildsBasePathV2, uuid), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		if err := json.NewEncoder(w).Encode(buildLogs); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(testRequester(server.Client(), server.URL))
+
+	resp, err := c.GetBuildLogsV2(context.Background(), uuid)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &buildLogs) {
+		t.Errorf("expected response same as function build logs.\nwant: %v\ngot: %v", &buildLogs, resp)
+	}
 }
