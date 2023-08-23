@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestCreateFlinkJob(t *testing.T) {
@@ -65,7 +66,7 @@ func TestListFlinkJobs(t *testing.T) {
 	flinkJobs := []*FlinkJob{generateFlinkJob("test1"), generateFlinkJob("test2")}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := flinkJobsBasePath, req.URL.Path; want != got {
+		if want, got := flinkJobsBasePathV1, req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -96,7 +97,7 @@ func TestGetFlinkJob(t *testing.T) {
 	flinkJob := generateFlinkJob(name)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s", flinkJobsBasePath, name), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s", flinkJobsBasePathV1, name), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -127,7 +128,7 @@ func TestDeleteFlinkJob(t *testing.T) {
 	flinkJob := generateFlinkJob(name)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if want, got := fmt.Sprintf("%s/%s", flinkJobsBasePath, name), req.URL.Path; want != got {
+		if want, got := fmt.Sprintf("%s/%s", flinkJobsBasePathV1, name), req.URL.Path; want != got {
 			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
 		}
 
@@ -146,5 +147,58 @@ func TestDeleteFlinkJob(t *testing.T) {
 	err := c.DeleteFlinkJob(context.Background(), name)
 	if err != nil {
 		t.Errorf("expected no error, got %+v", err)
+	}
+}
+
+func TestGetFlinkLogsV2(t *testing.T) {
+	name := "my-flink-job"
+	flinkJobLogs := Logs{
+		Data: []LogData{
+			{
+				Log:    "everything is great",
+				Source: "fun-name",
+			},
+			{
+				Log:    "everything is awesome",
+				Source: "fun-name",
+			},
+			{
+				Log:    "everything is cool",
+				Source: "fun-name",
+			},
+		},
+		Metadata: Metadata{
+			End:    time.Now().UTC(),
+			Start:  time.Now().UTC().Add(-12 * time.Hour),
+			Limit:  10,
+			Source: "fun-name",
+			Query:  "everything",
+		},
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if want, got := fmt.Sprintf("%s/%s/logs", flinkJobsBasePathV2, name), req.URL.Path; want != got {
+			t.Fatalf("mismatched of request path: want=%s got=%s", want, got)
+		}
+
+		defer req.Body.Close()
+
+		// Return response to satisfy client and test response
+		if err := json.NewEncoder(w).Encode(flinkJobLogs); err != nil {
+			t.Errorf("expected no error, got %+v", err)
+		}
+	}))
+	// Close the server when test finishes
+	defer server.Close()
+
+	c := testClient(testRequester(server.Client(), server.URL))
+
+	resp, err := c.GetFlinkLogsV2(context.Background(), name)
+	if err != nil {
+		t.Errorf("expected no error, got %+v", err)
+	}
+
+	if !reflect.DeepEqual(resp, &flinkJobLogs) {
+		t.Errorf("expected response same as flink job logs.\nwant: %v\ngot: %v", &flinkJobLogs, resp)
 	}
 }
